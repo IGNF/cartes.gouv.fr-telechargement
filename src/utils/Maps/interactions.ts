@@ -1,47 +1,6 @@
-import { Style, Fill, Stroke } from "ol/style";
-
-/**
- * Définit les styles pour les entités WFS en fonction de l'état ou de l'interaction.
- */
-const styleDalle = {
-  /**
-   * Style appliqué par defaut.
-   */
-  default: {
-    fill: new Fill({
-      color: "#dcdcfc", // Vert clair pour indiquer une sélection
-    }),
-    stroke: new Stroke({
-      color: "#3a3a68", // Gris pour les contours
-      width: 1,
-    }),
-  },
-  /**
-   * Style appliqué lorsqu'une dalle est sélectionnée.
-   */
-  selected: {
-    fill: new Fill({
-      color: "#20bf0a", // Vert clair pour indiquer une sélection
-    }),
-    stroke: new Stroke({
-      color: "rgba(112, 119, 122)", // Gris pour les contours
-      width: 2,
-    }),
-  },
-
-  /**
-   * Style appliqué lors d'un survol de dalle dans le menu.
-   */
-  pointer_move_dalle_menu: {
-    fill: new Fill({
-      color: "#e8f54a", // Jaune clair pour un survol
-    }),
-    stroke: new Stroke({
-      color: "black", // Noir pour les contours
-      width: 2,
-    }),
-  },
-};
+import { Map } from "ol";
+import { FeatureLike } from "ol/Feature";
+import { getStyleForDalle } from "./style";
 
 /**
  * Génère un style OpenLayers basé sur le type d'interaction ou d'état.
@@ -50,10 +9,31 @@ const styleDalle = {
  *               Exemple : "select" ou "pointer_move_dalle_menu".
  * @returns Un objet `Style` configuré pour OpenLayers.
  */
-export const getStyleForDalle = (type: keyof typeof styleDalle): Style => {
-  const config = styleDalle[type];
-  return new Style({
-    fill: config.fill,
-    stroke: config.stroke,
+export const addHovers = (map: Map) => {
+  // Détecter le survol et changer le style
+  let highlightedFeature: FeatureLike | null = null;
+  map.on("pointermove", function (event) {
+    // Vérifier si l'événement de survol touche une features
+    const feature = map.forEachFeatureAtPixel(event.pixel, function (feature) {
+      return feature;
+    });
+
+    if (feature) {
+      // Si une features est survolée, appliquer le style de survol
+      if (highlightedFeature !== feature) {
+        // Rétablir le style précédent pour l'ancienne features survolée
+        if (highlightedFeature) {
+          highlightedFeature.setStyle(getStyleForDalle('default'));
+        }
+        highlightedFeature = feature;
+        feature.setStyle(getStyleForDalle('hoverStyle')); // Appliquer le style de survol
+      }
+    } else {
+      // Si aucune features n'est survolée, réinitialiser le style
+      if (highlightedFeature) {
+        highlightedFeature.setStyle(getStyleForDalle('default'));
+        highlightedFeature = null;
+      }
+    }
   });
 };

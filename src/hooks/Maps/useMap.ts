@@ -9,6 +9,7 @@ import { createWFSLayers } from "../../utils/Maps/Layers";
 import proj4 from "proj4";
 import { register } from "ol/proj/proj4";
 import { get } from "ol/proj";
+import { addHovers } from "../../utils/Maps/interactions";
 
 export const useMap = (containerRef: React.RefObject<HTMLDivElement>, downloadUrl?: any) => {
   const [map, setMap] = useState<Map | null>(null);
@@ -37,6 +38,7 @@ export const useMap = (containerRef: React.RefObject<HTMLDivElement>, downloadUr
       });
 
       addControls(mapInstance);
+      addHovers(mapInstance)
       setMap(mapInstance);
 
     };

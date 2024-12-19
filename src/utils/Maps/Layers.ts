@@ -3,7 +3,7 @@ import VectorLayer from "ol/layer/Vector";
 import GeoJSON from "ol/format/GeoJSON";
 import { Fill, Stroke, Style } from "ol/style";
 import { format } from "ol/coordinate";
-import { getStyleForDalle } from "./interactions";
+import { getStyleForDalle } from "./style";
 
 /**
  * Crée un style générique pour une couche vectorielle.
