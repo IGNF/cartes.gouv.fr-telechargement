@@ -36,9 +36,17 @@ export const createVectorLayer = (source: VectorSource, style: Style) =>
  * Crée et retourne toutes les couches nécessaires pour la carte.
  */
 export const createWFSLayers = (wfsUrl: string, typeName: string) => {
-  const styleDalle = { select: { fill: new Fill({ color: "#20bf0a", }), stroke: new Stroke({ color: "rgba(112, 119, 122)", width: 2, }), }, pointer_move_dalle_menu: { fill: new Fill({ color: "#e8f54a", }), stroke: new Stroke({ color: "black", width: 2, }), }, }
+  const styleDalle = {
+    select: {
+      fill: new Fill({ color: "#20bf0a" }),
+      stroke: new Stroke({ color: "rgba(112, 119, 122)", width: 2 }),
+    },
+    pointer_move_dalle_menu: {
+      fill: new Fill({ color: "#e8f54a" }),
+      stroke: new Stroke({ color: "black", width: 2 }),
+    },
+  };
 
-  
   const vectorSource = new VectorSource({
     format: new GeoJSON(),
     url: function (extent) {
@@ -56,8 +64,11 @@ export const createWFSLayers = (wfsUrl: string, typeName: string) => {
     style: (feature) => {
       const isSelected = feature.get("selected"); // Exemple de propriété
       return isSelected
-        ? getStyleForDalle("pointer_move_dalle_menu")
-        : getStyleForDalle("select");
+        ? getStyleForDalle("selected")
+        : getStyleForDalle("default");
     },
+    // TODO: faire en sorte que le zoom soit pris du filtre
+    minZoom: 7, // La couche sera visible à partir du niveau de zoom 7
+    maxZoom: 11, // La couche sera visible jusqu'au niveau de zoom 11
   });
 };

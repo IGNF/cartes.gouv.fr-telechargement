@@ -5,9 +5,21 @@ import { Style, Fill, Stroke } from "ol/style";
  */
 const styleDalle = {
   /**
+   * Style appliqué par defaut.
+   */
+  default: {
+    fill: new Fill({
+      color: "#dcdcfc", // Vert clair pour indiquer une sélection
+    }),
+    stroke: new Stroke({
+      color: "#3a3a68", // Gris pour les contours
+      width: 1,
+    }),
+  },
+  /**
    * Style appliqué lorsqu'une dalle est sélectionnée.
    */
-  select: {
+  selected: {
     fill: new Fill({
       color: "#20bf0a", // Vert clair pour indiquer une sélection
     }),
