@@ -12,3 +12,6 @@ config.ini
 config_*.ini
 config-*.ini
 test.ini
+
+# Dossiers node_modules
+node_modules/

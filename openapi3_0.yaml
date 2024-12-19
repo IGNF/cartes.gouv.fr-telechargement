@@ -1,0 +1,363 @@
+openapi: 3.0.0
+info:
+  title: Service Tableau d'Assemblage
+  description: API pour accéder aux données du tableau d'assemblage, y compris les couches chantier, filtres et produits téléchargeables.
+  version: 1.0.0
+servers:
+  - url: https://data.geopf.fr/private/wfs/
+    description: Serveur principal pour accéder aux données WFS
+paths:
+  /chantier:
+    get:
+      summary: Récupérer les chantiers disponibles pour un produit
+      description: Retourne les chantier disponibles selon le produit et l'emprise.
+      parameters:
+        - name: service
+          in: query
+          required: true
+          schema:
+            type: string
+            example: WFS
+        - name: version
+          in: query
+          required: true
+          schema:
+            type: string
+            example: "2.0.0"
+        - name: apiKey
+          in: query
+          required: true
+          schema:
+            type: string
+            example: interface_catalogue
+        - name: request
+          in: query
+          required: true
+          schema:
+            type: string
+            example: GetFeature
+        - name: typeNames
+          in: query
+          required: true
+          schema:
+            type: string
+            example: "IGNF_LIDAR-HD"
+        - name: outputFormat
+          in: query
+          required: true
+          schema:
+            type: string
+            example: "application/json"
+        - name: srsName
+          in: query
+          required: true
+          schema:
+            type: string
+            example: "EPSG:4326"
+      responses:
+        '200':
+          description: Retourne les chantiers disponibles et les informations associées
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  type:
+                    type: string
+                    example: "FeatureCollection"
+                  features:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        type:
+                          type: string
+                          example: "Feature"
+                        geometry:
+                          type: object
+                          properties:
+                            type:
+                              type: string
+                              example: "Polygon"
+                            coordinates:
+                              type: array
+                              items:
+                                type: array
+                                items:
+                                  type: number
+                                  example: 2.3522, 2.3822, 2.3622, 2.3722, 
+                        properties:
+                          type: object
+                          properties:
+                            id:
+                              type: integer
+                              description: Identifiant unique
+                              example: f18687d9-6c92-4671-b558-d87dd6db12ec
+                            name:
+                              type: string
+                              description: Nom du chantier
+                              example: "QX"
+                            timestamp:
+                              type: string
+                              format: date
+                              description: Date de création du chantier
+                              example: "2024-11-21"
+                            legend:
+                              type: string
+                              description: Legende qui sera affiché au survol d'un chantier
+                              example: "QX"
+                            metadonnees_lot:
+                              type: string
+                              description: Url de téléchargement de ma donnée
+                              example: "https://mon-chemin/metadonneesLot"
+                            zoomStart:
+                              type: integer
+                              description: Niveau d'apparition de la couche
+                              example: 8
+                            zoomStop:
+                              type: integer
+                              description: Niveau de disparition de la couche
+                              example: 10
+                            affichage_chantier:
+                              type: boolean
+                              description: Indique si la couche chantier doit être affiché
+                              example: true
+                            
+  
+  /produit:
+    get:
+      summary: Récupérer les infos sur les données disponibles du produit à télécharger
+      description: Retourne les informations sur le produit avec les liens pour télécharger les données.
+      parameters:
+        - name: service
+          in: query
+          required: true
+          schema:
+            type: string
+            example: WFS
+        - name: version
+          in: query
+          required: true
+          schema:
+            type: string
+            example: "2.0.0"
+        - name: apiKey
+          in: query
+          required: true
+          schema:
+            type: string
+            example: interface_catalogue
+        - name: request
+          in: query
+          required: true
+          schema:
+            type: string
+            example: GetFeature
+        - name: typeNames
+          in: query
+          required: true
+          schema:
+            type: string
+            example: "IGNF_LIDAR-HD"
+        - name: outputFormat
+          in: query
+          required: true
+          schema:
+            type: string
+            example: "application/json"
+        - name: srsName
+          in: query
+          required: true
+          schema:
+            type: string
+            example: "EPSG:4326"
+      responses:
+        '200':
+          description: Retourne les produits à télécharger
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  type:
+                    type: string
+                    example: "FeatureCollection"
+                  features:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        type:
+                          type: string
+                          example: "Feature"
+                        geometry:
+                          type: object
+                          properties:
+                            type:
+                              type: string
+                              example: "Polygon"
+                            coordinates:
+                              type: array
+                              items:
+                                type: array
+                                items:
+                                  type: number
+                        properties:
+                          type: object
+                          properties:
+                            id:
+                              type: UUID
+                              description: Identifiant unique
+                              example: f18687d9-6c92-4671-b558-d87dd6db12ec
+                            name:
+                              type: string
+                              description: Nom de la donnée
+                              example: "LHD_FXX_0515_6721"
+                            url:
+                              type: string
+                              description: URL de téléchargement de la donnée
+                              example: "https://mon-lien/telechargement"
+                            nomTelechargement:
+                              type: string
+                              description: Nom à donnée à la dalle téléchargé
+                              example: "Dalle 16 du lidarHD"
+                            id_chantier:
+                              type: string
+                              description: Id du chantier auquel apartient la donnée
+                              example: "1"
+                            timestamp:
+                              type: string
+                              format: date
+                              description: Date de création de la donnée
+                              example: "2024-11-21"
+                            legende:
+                              type: string
+                              description: Légende à afficher au survole de la donnée dans l'interface
+                              example: "LHD_FXX_0515_6721"
+                            zoomStart:
+                              type: integer
+                              description: Niveau d'apparition de la couchedans l'interface de téléchargement
+                              example: 10
+                            zoomStop:
+                              type: integer
+                              description: Niveau de disparition de la couche dans l'interface de téléchargement
+                              example: 15
+  /filtre:
+    get:
+      summary: Récupérer les filtres existants
+      description: Cette route permet de récupérer les filtres existants pour les données et chantiers d'un produit, incluant des options de recherche, de sélection et d'affichage.
+      parameters:
+        - name: service
+          in: query
+          required: true
+          schema:
+            type: string
+            example: WFS
+        - name: version
+          in: query
+          required: true
+          schema:
+            type: string
+            example: "2.0.0"
+        - name: apiKey
+          in: query
+          required: true
+          schema:
+            type: string
+            example: interface_catalogue
+        - name: request
+          in: query
+          required: true
+          schema:
+            type: string
+            example: GetFeature
+        - name: typeNames
+          in: query
+          required: true
+          schema:
+            type: string
+            example: "IGNF_LIDAR-HD"
+        - name: outputFormat
+          in: query
+          required: true
+          schema:
+            type: string
+            example: "application/json"
+        - name: srsName
+          in: query
+          required: true
+          schema:
+            type: string
+            example: "EPSG:4326"
+      responses:
+        '200':
+          description: Réponse avec les filtres existants
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  type:
+                    type: string
+                    example: FeatureCollection
+                  features:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        type:
+                          type: string
+                          example: Feature
+                        geometry:
+                          type: string
+                          example: null
+                        properties:
+                          type: object
+                          properties:
+                            id:
+                              type: UUID
+                              description: Identifiant unique
+                              example: f18687d9-6c92-4671-b558-d87dd6db12ec
+                            name:
+                              type: string
+                              description: Nom du produit associé aux filtres
+                              example: MNS
+                            timestampStart:
+                              type: string
+                              format: date-time
+                              description: Date de la plus vielle donnée disponible
+                              example: "2024-01-01"
+                            chantier:
+                              type: array
+                              description: Liste des chantiers disponibles pour le produit
+                              items:
+                                type: object
+                                properties:
+                                  idChantier:
+                                    type: integer
+                                    example: 1
+                                  nom:
+                                    type: string
+                                    example: "QX"
+                            recherche:
+                              type: boolean
+                              description: Indique si le fonctionnalité recherche par ville département ou région doit etre activé
+                              example: true
+                            mode_selection:
+                              type: array
+                              description: Indique les méthodes possible de séléction sur la carte pour le produit
+                              items:
+                                type: string
+                                enum:
+                                  - clic
+                                  - rectangle
+                                  - polygone
+                                  - geojson
+                                  - shp
+                                  - recherche
+                            cartes:
+                              type: array
+                              description: indique les fond de cartes à utiliser
+                              items:
+                                type: string
+                                example: ["PlanIGNV2", "Ortho"]
