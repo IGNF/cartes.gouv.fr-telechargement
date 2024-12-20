@@ -35,17 +35,7 @@ export const createVectorLayer = (source: VectorSource, style: Style) =>
 /**
  * Crée et retourne toutes les couches nécessaires pour la carte.
  */
-export const createWFSLayers = (wfsUrl: string, typeName: string) => {
-  const styleDalle = {
-    select: {
-      fill: new Fill({ color: "#20bf0a" }),
-      stroke: new Stroke({ color: "rgba(112, 119, 122)", width: 2 }),
-    },
-    pointer_move_dalle_menu: {
-      fill: new Fill({ color: "#e8f54a" }),
-      stroke: new Stroke({ color: "black", width: 2 }),
-    },
-  };
+export const createWFSLayersDalle = (wfsUrl: string, typeName: string,minZoom?:number,maxZoom?:number) => {
 
   const vectorSource = new VectorSource({
     format: new GeoJSON(),
@@ -68,7 +58,36 @@ export const createWFSLayers = (wfsUrl: string, typeName: string) => {
         : getStyleForDalle("default");
     },
     // TODO: faire en sorte que le zoom soit pris du filtre
-    minZoom: 7, // La couche sera visible à partir du niveau de zoom 7
-    maxZoom: 11, // La couche sera visible jusqu'au niveau de zoom 11
+    minZoom: minZoom, // La couche sera visible à partir du niveau de zoom 7
+    maxZoom: maxZoom, // La couche sera visible jusqu'au niveau de zoom 11
+  });
+};
+
+export const createWFSLayersBloc = (wfsUrl: string, typeName: string,minZoom?:number,maxZoom?:number) => {
+
+
+  const vectorSourceBloc = new VectorSource({
+    format: new GeoJSON(),
+    url: function (extent) {
+      return (
+        `${wfsUrl}?` +
+        `service=WFS&version=2.0.0&apikey=interface_catalogue&request=GetFeature&typeNames=${typeName}` +
+        `&outputFormat=application/json&bbox=${extent.join(",")},EPSG:3857`
+      );
+    },
+    strategy: (extent) => [extent], // Charger les entités visibles dans la vue actuelle
+  });
+
+  return new VectorLayer({
+    source: vectorSourceBloc,
+    style: (feature) => {
+      const isSelected = feature.get("selected"); // Exemple de propriété
+      return isSelected
+        ? getStyleForDalle("selected")
+        : getStyleForDalle("default");
+    },
+    // TODO: faire en sorte que le zoom soit pris du filtre
+    minZoom: minZoom, // La couche sera visible à partir du niveau de zoom 7
+    maxZoom: maxZoom, // La couche sera visible jusqu'au niveau de zoom 11
   });
 };

@@ -5,15 +5,21 @@ import TileLayer from "ol/layer/Tile";
 import OSM from "ol/source/OSM";
 import { addControls } from "../../utils/Maps/controls";
 import Gp from "geoportal-access-lib";
-import { createWFSLayers } from "../../utils/Maps/Layers";
+import {
+  createWFSLayersBloc,
+  createWFSLayersDalle,
+} from "../../utils/Maps/Layers";
 import proj4 from "proj4";
 import { register } from "ol/proj/proj4";
 import { get } from "ol/proj";
 import { addHovers } from "../../utils/Maps/interactions";
 
-export const useMap = (containerRef: React.RefObject<HTMLDivElement>, downloadUrl?: any) => {
+export const useMap = (
+  containerRef: React.RefObject<HTMLDivElement>,
+  downloadUrl?: any
+) => {
   const [map, setMap] = useState<Map | null>(null);
-  const wfsUrl = 'https://data.geopf.fr/private/wfs/'
+  const wfsUrl = "https://data.geopf.fr/private/wfs/";
 
   proj4.defs(
     "EPSG:2154",
@@ -27,20 +33,23 @@ export const useMap = (containerRef: React.RefObject<HTMLDivElement>, downloadUr
     const createMap = () => {
       const mapInstance = new Map({
         target: containerRef.current,
-        layers: [new TileLayer({ source: new OSM() }),
-          createWFSLayers(wfsUrl, downloadUrl)
+        layers: [
+          new TileLayer({ source: new OSM() }),
+          createWFSLayersBloc(wfsUrl, downloadUrl + ":mns-bloc", 0,8 ),
+          createWFSLayersDalle(wfsUrl, downloadUrl + ":mns-dalle", 8, 16),
         ],
         view: new View({
           center: [288074.8449901076, 6247982.515792289],
           zoom: 8,
+          maxZoom: 16
         }),
-        projection: get("EPSG:2154")
+        projection: get("EPSG:2154"),
       });
 
-      addControls(mapInstance);
-      addHovers(mapInstance)
-      setMap(mapInstance);
 
+      addControls(mapInstance);
+      addHovers(mapInstance);
+      setMap(mapInstance);
     };
 
     const getConfig = async () => {
@@ -54,7 +63,11 @@ export const useMap = (containerRef: React.RefObject<HTMLDivElement>, downloadUr
     };
 
     getConfig();
+
+
   }, [containerRef]);
+
+
 
   return map;
 };

@@ -10,6 +10,8 @@ import { getStyleForDalle } from "./style";
  * @returns Un objet `Style` configuré pour OpenLayers.
  */
 export const addHovers = (map: Map) => {
+
+  
   // Détecter le survol et changer le style
   let highlightedFeature: FeatureLike | null = null;
   map.on("pointermove", function (event) {
