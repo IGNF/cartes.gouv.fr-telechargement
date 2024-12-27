@@ -23,10 +23,10 @@ function MapComponent() {
     <div className="fr-container--fluid fr-grid-row">
       <div
         ref={mapContainerRef}
-        className="map-container fr-col-10"
-        style={{ height: "70vh", width: "100%" }}
+        className="map-container fr-col-8"
+        style={{ height: "90vh", width: "100%" }}
       />
-      <div className="fr-col-2" >
+      <div className="fr-col-4" >
       <Menu selectedDalles={selectedDalles} title={downloadUrl}></Menu>
       </div>
     </div>

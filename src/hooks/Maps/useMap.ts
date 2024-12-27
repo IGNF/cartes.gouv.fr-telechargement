@@ -35,12 +35,12 @@ export const useMap = (
 
     const dalleLayer = createWFSLayersDalle(
       wfsUrl,
-      downloadUrl + ":mns-dalle",//TODO à changer
+      downloadUrl + "-dalle",//TODO à changer
       8,
       16
     );
 
-    const blocLayer = createWFSLayersBloc(wfsUrl, downloadUrl + ":mns-bloc", 0, 8)
+    const blocLayer = createWFSLayersBloc(wfsUrl, downloadUrl + "-bloc", 0, 8)
 
     const createMap = () => {
       const mapInstance = new Map({
@@ -52,7 +52,7 @@ export const useMap = (
         ],
         view: new View({
           center: [288074.8449901076, 6247982.515792289],
-          zoom: 8,
+          zoom: 6,
           maxZoom: 16,
         }),
         projection: get("EPSG:2154"),
