@@ -2,8 +2,7 @@ import VectorSource from "ol/source/Vector";
 import VectorLayer from "ol/layer/Vector";
 import GeoJSON from "ol/format/GeoJSON";
 import { Fill, Stroke, Style } from "ol/style";
-import { format } from "ol/coordinate";
-import { getStyleForDalle } from "./style";
+import { getStyleForDalles,getStyleForBlocs, getStyleForDalle } from "./style";
 
 /**
  * Crée un style générique pour une couche vectorielle.
@@ -52,10 +51,12 @@ export const createWFSLayersDalle = (wfsUrl: string, typeName: string,minZoom?:n
   return new VectorLayer({
     source: vectorSource,
     style: (feature) => {
-      const isSelected = feature.get("selected"); // Exemple de propriété
+      
+      const isSelected = feature.get('selected')
+      
       return isSelected
-        ? getStyleForDalle("selected")
-        : getStyleForDalle("default");
+        ? getStyleForDalle("selected") // Style pour les entités sélectionnées
+        : getStyleForDalle("default"); // Style par défaut pour les autres
     },
     // TODO: faire en sorte que le zoom soit pris du filtre
     minZoom: minZoom, // La couche sera visible à partir du niveau de zoom 7
@@ -82,9 +83,7 @@ export const createWFSLayersBloc = (wfsUrl: string, typeName: string,minZoom?:nu
     source: vectorSourceBloc,
     style: (feature) => {
       const isSelected = feature.get("selected"); // Exemple de propriété
-      return isSelected
-        ? getStyleForDalle("selected")
-        : getStyleForDalle("default");
+      return getStyleForBlocs(feature);
     },
     // TODO: faire en sorte que le zoom soit pris du filtre
     minZoom: minZoom, // La couche sera visible à partir du niveau de zoom 7

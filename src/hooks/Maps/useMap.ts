@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import Map from "ol/Map";
 import View from "ol/View";
 import TileLayer from "ol/layer/Tile";
@@ -12,11 +12,14 @@ import {
 import proj4 from "proj4";
 import { register } from "ol/proj/proj4";
 import { get } from "ol/proj";
-import { addHovers } from "../../utils/Maps/interactions";
+import { addHoveredInteraction, addSelectedInteraction, addZoomInteraction } from "../../utils/Maps/interactions";
+
 
 export const useMap = (
   containerRef: React.RefObject<HTMLDivElement>,
-  downloadUrl?: any
+  downloadUrl: any,
+  setSelectedDalles: (dalles: any[]) => void,
+  selectedDalles: any[]
 ) => {
   const [map, setMap] = useState<Map | null>(null);
   const wfsUrl = "https://data.geopf.fr/private/wfs/";
@@ -26,29 +29,43 @@ export const useMap = (
     "+proj=lcc +lat_1=49.000000000 +lat_2=44.000000000 +lat_0=46.500000000 +lon_0=3.000000000 +x_0=700000.000 +y_0=6600000.000 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs"
   );
   register(proj4);
-
+  
   useEffect(() => {
     if (!containerRef.current) return;
+
+    const dalleLayer = createWFSLayersDalle(
+      wfsUrl,
+      downloadUrl + ":mns-dalle",//TODO à changer
+      8,
+      16
+    );
+
+    const blocLayer = createWFSLayersBloc(wfsUrl, downloadUrl + ":mns-bloc", 0, 8)
 
     const createMap = () => {
       const mapInstance = new Map({
         target: containerRef.current,
         layers: [
           new TileLayer({ source: new OSM() }),
-          createWFSLayersBloc(wfsUrl, downloadUrl + ":mns-bloc", 0,8 ),
-          createWFSLayersDalle(wfsUrl, downloadUrl + ":mns-dalle", 8, 16),
+          blocLayer,
+          dalleLayer,
         ],
         view: new View({
           center: [288074.8449901076, 6247982.515792289],
           zoom: 8,
-          maxZoom: 16
+          maxZoom: 16,
         }),
         projection: get("EPSG:2154"),
       });
 
-
       addControls(mapInstance);
-      addHovers(mapInstance);
+      addZoomInteraction(mapInstance,blocLayer,10)
+      addSelectedInteraction(
+        mapInstance,
+        dalleLayer,
+        setSelectedDalles,
+      );
+      addHoveredInteraction(mapInstance)
       setMap(mapInstance);
     };
 
@@ -63,10 +80,7 @@ export const useMap = (
     };
 
     getConfig();
-
-
-  }, [containerRef]);
-
+  }, [containerRef, downloadUrl, setSelectedDalles,]);
 
 
   return map;
