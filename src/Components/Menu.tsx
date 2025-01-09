@@ -2,6 +2,7 @@ import { Accordion } from "@codegouvfr/react-dsfr/Accordion";
 import { Download } from "@codegouvfr/react-dsfr/Download";
 import { Button } from "@codegouvfr/react-dsfr/Button";
 import { getRouteApi } from "@tanstack/react-router";
+import { Card } from "@codegouvfr/react-dsfr/Card";
 const route = getRouteApi("/download/$downloadUrl");
 
 const Menu = ({
