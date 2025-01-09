@@ -10,9 +10,18 @@ export const Route = createFileRoute("/download/$downloadUrl")({
 function RouteComponent() {
   const { downloadUrl } = Route.useParams();
 
+  const [selectedDalles, setSelectedDalles] = useState<any[]>([]);
+   // Fonction pour supprimer une dalle par son nom ou ID
+   const handleDeleteDalle = (dalleName: string) => {
+    setSelectedDalles((prevDalles) => prevDalles.filter((dalle) => dalle.name !== dalleName));
+  };
+
   return (
-    <div>
-      <MapComponent />
+    <div className="fr-container--fluid fr-grid-row">
+      <MapComponent selectedDalles={selectedDalles} setSelectedDalles={setSelectedDalles} />
+      <div className="fr-col-4" >
+      <Menu selectedDalles={selectedDalles} onDeleteDalle={handleDeleteDalle}></Menu>
+      </div>
     </div>
   );
 }

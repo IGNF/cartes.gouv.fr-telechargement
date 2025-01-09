@@ -6,31 +6,28 @@ import "@gouvfr/dsfr/dist/dsfr.css";
 import "@gouvfr/dsfr/dist/utility/icons/icons.css";
 import "geopf-extensions-openlayers/css/Dsfr.css";
 import { getRouteApi } from "@tanstack/react-router";
-import Menu from "./Menu";
 const route = getRouteApi("/download/$downloadUrl");
 
-function MapComponent() {
+const MapComponent = ({
+  selectedDalles,
+  setSelectedDalles,
+}: {
+  selectedDalles: any[];
+  setSelectedDalles: (dalles: any[]) => void;
+}) => {
   const { downloadUrl } = route.useParams();
 
   const mapContainerRef = useRef<HTMLDivElement>(null);
 
-  // État pour les dalles sélectionnées
-  const [selectedDalles, setSelectedDalles] = useState<any[]>([]);
-
   useMap(mapContainerRef, downloadUrl, setSelectedDalles, selectedDalles);
 
   return (
-    <div className="fr-container--fluid fr-grid-row">
-      <div
-        ref={mapContainerRef}
-        className="map-container fr-col-8"
-        style={{ height: "90vh", width: "100%" }}
-      />
-      <div className="fr-col-4" >
-      <Menu selectedDalles={selectedDalles} title={downloadUrl}></Menu>
-      </div>
-    </div>
+    <div
+      ref={mapContainerRef}
+      className="map-container fr-col-8"
+      style={{ height: "90vh", width: "100%" }}
+    />
   );
-}
+};
 
 export default MapComponent;

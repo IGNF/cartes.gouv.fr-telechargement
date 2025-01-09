@@ -1,15 +1,17 @@
 import { Accordion } from "@codegouvfr/react-dsfr/Accordion";
 import { Download } from "@codegouvfr/react-dsfr/Download";
 import { Button } from "@codegouvfr/react-dsfr/Button";
-import { MouseEventHandler } from "react";
+import { getRouteApi } from "@tanstack/react-router";
+const route = getRouteApi("/download/$downloadUrl");
 
-function Menu({
+const Menu = ({
   selectedDalles,
-  title,
+  onDeleteDalle,
 }: {
   selectedDalles: any[];
-  title: string;
-}) {
+  onDeleteDalle: (dalleName: string) => void;
+}) => {
+  const { downloadUrl } = route.useParams();
   const onDownload = () => {
     // variable qui aura le contenu
     let contenu = "";
@@ -24,7 +26,7 @@ function Menu({
     // Créer un lien pour le téléchargement du fichier
     const a = document.createElement("a");
     a.href = blobUrl;
-    a.download = title;
+    a.download = downloadUrl;
     a.style.display = "none";
     document.body.appendChild(a);
     // Déclencher le téléchargement
@@ -40,7 +42,14 @@ function Menu({
       {selectedDalles.length > 0 ? (
         <>
           <Accordion className="fr-m-1w" label="Dalles séléctionné">
-            <ul>
+            <ul
+              style={{
+                maxHeight: "200px", // Hauteur maximale
+                overflowY: "auto", // Défilement vertical activé
+                overflowX: "hidden", // Désactive le défilement horizontal
+                paddingRight: "10px", // Optionnel : espace pour la barre de défilement
+              }}
+            >
               {selectedDalles.map((dalle, index) => (
                 <li key={index}>
                   <strong>Nom :</strong>
@@ -49,7 +58,12 @@ function Menu({
                     details=""
                     label={dalle.name}
                     linkProps={{ href: dalle.url }}
-                  ></Download>
+                  />
+                  <Button
+                    iconId="fr-icon-delete-line"
+                    onClick={() => onDeleteDalle(dalle.name)}
+                    priority="tertiary no outline"
+                  />
                   {/* Ajoutez d'autres propriétés ici si nécessaire */}
                 </li>
               ))}
@@ -68,6 +82,6 @@ function Menu({
       )}
     </div>
   );
-}
+};
 
 export default Menu;
