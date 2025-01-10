@@ -9,19 +9,19 @@
     "build": "vite build",
     "serve": "vite preview",
     "start": "vite",
-    "predev": "react-dsfr update-icons",
-    "prebuild": "react-dsfr update-icons"
+    "predev": "react-dsfr update-icons"
   },
   "devDependencies": {
     "@tanstack/router-plugin": "^1.87.7",
     "@types/jest": "^29.5.14",
+    "@types/proj4": "^2.5.6",
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",
     "@vitejs/plugin-react": "^4.3.2",
     "vite": "^6.0.3"
   },
   "dependencies": {
-    "@codegouvfr/react-dsfr": "^1.16.4",
+    "@codegouvfr/react-dsfr": "^1.16.7",
     "@openapitools/openapi-generator-cli": "^2.15.3",
     "@tanstack/react-router": "^1.87.7",
     "@tanstack/router-devtools": "^1.87.7",
