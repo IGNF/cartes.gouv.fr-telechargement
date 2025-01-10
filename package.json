@@ -9,7 +9,8 @@
     "build": "vite build",
     "serve": "vite preview",
     "start": "vite",
-    "predev": "react-dsfr update-icons"
+    "predev": "react-dsfr update-icons",
+    "prebuild": "react-dsfr update-icons"
   },
   "devDependencies": {
     "@tanstack/router-plugin": "^1.87.7",
