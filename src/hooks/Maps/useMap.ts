@@ -1,17 +1,18 @@
 // React Core
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useEffect,  useState } from "react";
 
 // OpenLayers Core
 import Map from "ol/Map";
 import View from "ol/View";
-import TileLayer from "ol/layer/Tile";
-import OSM from "ol/source/OSM";
 import proj4 from "proj4";
 import { register } from "ol/proj/proj4";
 import { get } from "ol/proj";
 
 // Geoportal Extensions
 import Gp from "geoportal-access-lib";
+import { 
+  LayerWMTS
+} from "geopf-extensions-openlayers";
 
 // Custom Utils
 import { addControls } from "../../utils/Maps/controls";
@@ -59,7 +60,9 @@ export const useMap = (
       const mapInstance = new Map({
         target: containerRef.current,
         layers: [
-          new TileLayer({ source: new OSM() }),
+          new LayerWMTS({
+            layer: "GEOGRAPHICALGRIDSYSTEMS.PLANIGNV2",
+          }),
           blocLayer,
           dalleLayer,
         ],
