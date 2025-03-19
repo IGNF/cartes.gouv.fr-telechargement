@@ -30,7 +30,7 @@ export const createWFSLayersDalle = (
     source: vectorSource,
     style: function (feature) {
 
-      return isDalleSelected(feature.get('name'))
+      return isDalleSelected(feature.getId())
         ? getStyleForDalle("selected") // Style pour les entités sélectionnées
         : getStyleForDalle("default"); // Style par défaut pour les autres
     },

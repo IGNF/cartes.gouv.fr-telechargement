@@ -59,7 +59,6 @@ export const useMap = (
       console.log("remove");
       removeDalle(dalle.id);
     }
-    dalleLayer.getSource()?.refresh()
   };
 
   // Define and register the projection
@@ -130,7 +129,6 @@ export const useMap = (
   useEffect(() => {
     console.log("Mise à jour du style des features...");
 
-    // dalleLayer.getSource()?.refresh();
 
     dalleLayer.getSource()?.on("change", function (evt) {
       var source = evt.target;
@@ -141,8 +139,6 @@ export const useMap = (
       }
     });
 
-    console.log(selectedDalles);
-    map?.getLayers();
   }, [dalleLayer]);
 
   return map;

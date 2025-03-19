@@ -21,18 +21,24 @@ export const useDalleStore = create<DalleStore>((set, get) => ({
   addDalle: (dalle) =>
     set((state) => ({ selectedDalles: [...state.selectedDalles, dalle] })),
   addDalleLayer: (dalleLayer) => set((state) => ({ dalleLayer: dalleLayer })),
-  removeDalle: (id) =>{
+  removeDalle: (id) => {
     set((state) => ({
       selectedDalles: state.selectedDalles.filter((d) => d.id !== id),
-    }))
-    console.log('hello',id);
-    console.log('featuresRemoved',get().dalleLayer);
-    
-    
-    get().dalleLayer.getFeatureById(id)?.setStyle(getStyleForDalle("default"))
+    }));
+    console.log("hello", id);
+    console.log("featuresRemoved", get().dalleLayer);
+
+    get().dalleLayer.getFeatureById(id)?.setStyle(getStyleForDalle("default"));
   },
-  clearDalles: () => set({ selectedDalles: [] }),
-  isDalleSelected: (name) => {
-    return get().selectedDalles.some((dalle) => dalle.name === name);
+  clearDalles: () => {
+    get().selectedDalles.forEach((dalle) =>
+      get()
+        .dalleLayer.getFeatureById(dalle.id)
+        ?.setStyle(getStyleForDalle("default"))
+    );
+    set({ selectedDalles: [] });
+  },
+  isDalleSelected: (id) => {
+    return get().selectedDalles.some((dalle) => dalle.id === id);
   },
 }));
