@@ -2,17 +2,22 @@ import { Accordion } from "@codegouvfr/react-dsfr/Accordion";
 import { Download } from "@codegouvfr/react-dsfr/Download";
 import { Button } from "@codegouvfr/react-dsfr/Button";
 import { getRouteApi } from "@tanstack/react-router";
-import { Card } from "@codegouvfr/react-dsfr/Card";
+import { useDalleStore } from "../hooks/Store/useDalleStore";
 const route = getRouteApi("/download/$downloadUrl");
 
 const Menu = ({
-  selectedDalles,
-  onDeleteDalle,
 }: {
-  selectedDalles: any[];
-  onDeleteDalle: (dalleName: string) => void;
 }) => {
+  // On récupère le nom du produit
   const { downloadUrl } = route.useParams();
+
+  //On récupère du store les dalles selectionné 
+  const selectedDalles = useDalleStore((state)=> state.selectedDalles);
+  // on récupère la fonction peremettant de supprimer une dalle du store
+  const removeDalle = useDalleStore((state)=> state.removeDalle);
+
+
+  // Fonction permettant de télécharger le fichier avec les liens pour vers les dalles seléctionné
   const onDownload = () => {
     // variable qui aura le contenu
     let contenu = "";
@@ -39,9 +44,10 @@ const Menu = ({
 
   return (
     <div className="fr-m-1w">
-      <h3>Dalles sélectionnées</h3>
       {selectedDalles.length > 0 ? (
         <>
+          <h3>Dalles sélectionnées</h3>
+          Sélectionnez les dalles qui vous intéressent puis téléchargez la liste des liens pour les récupérer. 
           <Accordion className="fr-m-1w" label="Dalles séléctionné">
             <ul
               style={{
@@ -62,7 +68,7 @@ const Menu = ({
                   />
                   <Button
                     iconId="fr-icon-delete-line"
-                    onClick={() => onDeleteDalle(dalle.name)}
+                    onClick={() => removeDalle(dalle.id)}
                     priority="tertiary no outline"
                   />
                   {/* Ajoutez d'autres propriétés ici si nécessaire */}
@@ -79,7 +85,13 @@ const Menu = ({
           </Button>
         </>
       ) : (
-        <p>Aucune dalle sélectionnée</p>
+        <div className="fr-text--lead">
+          Cette interface vous permet de visualiser les données disponibles dans
+          votre zone d'intérêt et de récupérer une liste de liens pour les
+          télécharger. <br />
+          Cliquez sur la zone d'intérêt souhaitée pour consulter
+          les données disponibles.
+        </div>
       )}
     </div>
   );

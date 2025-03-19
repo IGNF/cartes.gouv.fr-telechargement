@@ -1,41 +1,19 @@
 import VectorSource from "ol/source/Vector";
 import VectorLayer from "ol/layer/Vector";
 import GeoJSON from "ol/format/GeoJSON";
-import { Fill, Stroke, Style } from "ol/style";
-import { getStyleForDalles,getStyleForBlocs, getStyleForDalle } from "./style";
-
-/**
- * Crée un style générique pour une couche vectorielle.
- * @param fillColor Couleur de remplissage
- * @param strokeColor Couleur de contour
- * @param strokeWidth Épaisseur du contour
- */
-export const createStyle = (
-  fillColor: string,
-  strokeColor: string = "black",
-  strokeWidth: number = 0.5
-) =>
-  new Style({
-    fill: new Fill({ color: fillColor }),
-    stroke: new Stroke({ color: strokeColor, width: strokeWidth }),
-  });
-
-/**
- * Crée une couche vectorielle avec une source donnée.
- * @param source Source vectorielle
- * @param style Style à appliquer
- */
-export const createVectorLayer = (source: VectorSource, style: Style) =>
-  new VectorLayer({
-    source,
-    style,
-  });
+import { getStyleForBlocs, getStyleForDalle } from "./style";
 
 /**
  * Crée et retourne toutes les couches nécessaires pour la carte.
  */
-export const createWFSLayersDalle = (wfsUrl: string, typeName: string,minZoom?:number,maxZoom?:number) => {
-
+export const createWFSLayersDalle = (
+  wfsUrl: string,
+  typeName: string,
+  selectedDalles: any,
+  isDalleSelected:any,
+  minZoom?: number,
+  maxZoom?: number
+) => {
   const vectorSource = new VectorSource({
     format: new GeoJSON(),
     url: function (extent) {
@@ -50,11 +28,9 @@ export const createWFSLayersDalle = (wfsUrl: string, typeName: string,minZoom?:n
 
   return new VectorLayer({
     source: vectorSource,
-    style: (feature) => {
-      
-      const isSelected = feature.get('selected')
-      
-      return isSelected
+    style: function (feature) {
+
+      return isDalleSelected(feature.get('name'))
         ? getStyleForDalle("selected") // Style pour les entités sélectionnées
         : getStyleForDalle("default"); // Style par défaut pour les autres
     },
@@ -64,9 +40,12 @@ export const createWFSLayersDalle = (wfsUrl: string, typeName: string,minZoom?:n
   });
 };
 
-export const createWFSLayersBloc = (wfsUrl: string, typeName: string,minZoom?:number,maxZoom?:number) => {
-
-
+export const createWFSLayersBloc = (
+  wfsUrl: string,
+  typeName: string,
+  minZoom?: number,
+  maxZoom?: number
+) => {
   const vectorSourceBloc = new VectorSource({
     format: new GeoJSON(),
     url: function (extent) {

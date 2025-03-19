@@ -2,8 +2,8 @@ import { Map } from "ol";
 import {
   GeoportalZoom,
   SearchEngine,
-  LayerSwitcher
 } from "geopf-extensions-openlayers";
+
 
 /**
  * Ajoute les contrôles OpenLayers à une carte.

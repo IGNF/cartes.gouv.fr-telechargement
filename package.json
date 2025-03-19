@@ -26,8 +26,9 @@
     "@openapitools/openapi-generator-cli": "^2.15.3",
     "@tanstack/react-router": "^1.87.7",
     "@tanstack/router-devtools": "^1.87.7",
-    "geopf-extensions-openlayers": "^1.0.0-beta.1",
+    "geopf-extensions-openlayers": "^1.0.0-beta.3",
     "react": "^18.3.1",
-    "react-dom": "^18.3.1"
+    "react-dom": "^18.3.1",
+    "zustand": "^5.0.3"
   }
 }

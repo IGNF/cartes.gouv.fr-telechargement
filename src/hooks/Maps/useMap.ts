@@ -1,5 +1,5 @@
 // React Core
-import { useEffect,  useState } from "react";
+import { useEffect, useState } from "react";
 
 // OpenLayers Core
 import Map from "ol/Map";
@@ -10,9 +10,7 @@ import { get } from "ol/proj";
 
 // Geoportal Extensions
 import Gp from "geoportal-access-lib";
-import { 
-  LayerWMTS
-} from "geopf-extensions-openlayers";
+import { LayerWMTS } from "geopf-extensions-openlayers";
 
 // Custom Utils
 import { addControls } from "../../utils/Maps/controls";
@@ -20,12 +18,16 @@ import {
   createWFSLayersBloc,
   createWFSLayersDalle,
 } from "../../utils/Maps/Layers";
-import { addHoveredInteraction, addSelectedInteraction, addZoomInteraction } from "../../utils/Maps/interactions";
+import {
+  addSelectedInteraction,
+  addZoomInteraction,
+  useForceUpdateLayer,
+} from "../../utils/Maps/interactions";
 import { getStyleForDalle } from "../../utils/Maps/style";
 
 /**
  * Custom hook to initialize and manage an OpenLayers map.
- * 
+ *
  * @param {React.RefObject<HTMLDivElement>} containerRef - The reference to the map container element.
  * @param {string} downloadUrl - The URL for downloading map data.
  * @param {Function} setSelectedDalles - Function to update the selected dalles.
@@ -34,14 +36,31 @@ import { getStyleForDalle } from "../../utils/Maps/style";
  */
 export const useMap = (
   containerRef: React.RefObject<HTMLDivElement>,
-  downloadUrl: any,
-  setSelectedDalles: (dalles: any[]) => void,
-  selectedDalles: any[]
+  downloadUrl: string,
+  selectedDalles: any,
+  addDalle: any,
+  isDalleSelected: any,
+  removeDalle: any,
+  addDalleLayer: any
 ) => {
   const [map, setMap] = useState<Map | null>(null);
-  const [dalleLayer, setDalleLayer] = useState<any>(null);
-  const [blocLayer, setBlocLayer] = useState<any>(null);
   const wfsUrl = "https://data.geopf.fr/private/wfs/";
+
+  const handleFeatureClick = (
+    dalleName: string,
+    dalleUrl: string,
+    dalleId: string
+  ) => {
+    const dalle = { name: dalleName, url: dalleUrl, id: dalleId };
+
+    if (!isDalleSelected(dalle.name)) {
+      addDalle(dalle);
+    } else {
+      console.log("remove");
+      removeDalle(dalle.id);
+    }
+    dalleLayer.getSource()?.refresh()
+  };
 
   // Define and register the projection
   proj4.defs(
@@ -49,7 +68,18 @@ export const useMap = (
     "+proj=lcc +lat_1=49.000000000 +lat_2=44.000000000 +lat_0=46.500000000 +lon_0=3.000000000 +x_0=700000.000 +y_0=6600000.000 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs"
   );
   register(proj4);
-  
+
+  const dalleLayer = createWFSLayersDalle(
+    wfsUrl,
+    downloadUrl + "-dalle",
+    selectedDalles,
+    isDalleSelected,
+    8,
+    16
+  );
+
+  const blocLayer = createWFSLayersBloc(wfsUrl, downloadUrl + "-bloc", 0, 8);
+
   useEffect(() => {
     if (!containerRef.current) return;
 
@@ -75,9 +105,9 @@ export const useMap = (
       });
 
       addControls(mapInstance);
-      addZoomInteraction(mapInstance, blocLayer, 10);
-      addSelectedInteraction(mapInstance, dalleLayer, setSelectedDalles);
-      addHoveredInteraction(mapInstance);
+      addZoomInteraction(mapInstance, blocLayer, 12);
+      addSelectedInteraction(mapInstance, dalleLayer, handleFeatureClick);
+      // addHoveredInteraction(mapInstance, dalleLayer);
       setMap(mapInstance);
     };
 
@@ -94,35 +124,26 @@ export const useMap = (
       await config.call();
     };
 
-    const dalleLayer = createWFSLayersDalle(
-      wfsUrl,
-      downloadUrl + "-dalle",
-      8,
-      16
-    );
-
-    const blocLayer = createWFSLayersBloc(wfsUrl, downloadUrl + "-bloc", 0, 8);
-
-    setDalleLayer(dalleLayer);
-    setBlocLayer(blocLayer);
-
     getConfig();
-  }, [containerRef, downloadUrl, setSelectedDalles]);
+  }, [containerRef, downloadUrl]);
 
-  // Effect to update the styles of selected dalles when selectedDalles changes
   useEffect(() => {
-    console.log("useEffect triggered");
-    console.log("dalleLayer:", dalleLayer);
-    console.log("selectedDalles:", selectedDalles);
-    if (!dalleLayer) return;
+    console.log("Mise à jour du style des features...");
 
-    const features = dalleLayer.getSource().getFeatures();
-    features.forEach((feature: any) => {
-      const isSelected = selectedDalles.some((dalle) => dalle.name === feature.get('name'));
-      feature.setStyle(getStyleForDalle(isSelected ? 'selected' : 'default'));
-      feature.set('selected', isSelected);
+    // dalleLayer.getSource()?.refresh();
+
+    dalleLayer.getSource()?.on("change", function (evt) {
+      var source = evt.target;
+      console.log(evt.target);
+
+      if (source.getState() === "ready") {
+        addDalleLayer(source);
+      }
     });
-  }, [selectedDalles, dalleLayer]);
+
+    console.log(selectedDalles);
+    map?.getLayers();
+  }, [dalleLayer]);
 
   return map;
 };
