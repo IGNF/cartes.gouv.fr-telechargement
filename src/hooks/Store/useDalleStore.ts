@@ -1,44 +1,37 @@
 import { create } from "zustand";
-import { getStyleForDalle } from "../../utils/Maps/style";
 
 type Dalle = { name: string; url: string; id: string };
 
 type DalleLayer = any;
 
 type DalleStore = {
-  selectedDalles: Dalle[];
-  dalleLayer: DalleLayer;
-  addDalle: (dalle: Dalle) => void;
-  addDalleLayer: (dalleLayer: DalleLayer) => void;
-  removeDalle: (id: string) => void;
-  clearDalles: () => void;
-  isDalleSelected: (dalle: Dalle) => boolean;
+  selectedProduits: Dalle[];
+  produitLayer: DalleLayer;
+  addProduit: (dalle: Dalle) => void;
+  addProduitLayer: (dalleLayer: DalleLayer) => void;
+  removeProduit: (id: string) => void;
+  removeAllProduits: () => void;
+  isProduitSelected: (dalle: Dalle) => boolean;
 };
 
 export const useDalleStore = create<DalleStore>((set, get) => ({
-  selectedDalles: [],
-  dalleLayer: null,
-  addDalle: (dalle) =>
-    set((state) => ({ selectedDalles: [...state.selectedDalles, dalle] })),
-  addDalleLayer: (dalleLayer) => set((state) => ({ dalleLayer: dalleLayer })),
-  removeDalle: (id) => {
+  selectedProduits: [],
+  produitLayer: null,
+  addProduit: (produit) =>
+    set((state) => ({ selectedProduits: [...state.selectedProduits, produit] })),
+  addProduitLayer: (produitLayer) => set((state) => ({ produitLayer: produitLayer })),
+  removeProduit: (id) => {
+    get().produitLayer?.changed();
     set((state) => ({
-      selectedDalles: state.selectedDalles.filter((d) => d.id !== id),
+      selectedProduits: state.selectedProduits.filter((produit) => produit.id !== id),
     }));
-    console.log("hello", id);
-    console.log("featuresRemoved", get().dalleLayer);
 
-    get().dalleLayer.getFeatureById(id)?.setStyle(getStyleForDalle("default"));
+    // get().dalleLayer.getFeatureById(id)?.setStyle(getStyleForDalle("default"));
   },
-  clearDalles: () => {
-    get().selectedDalles.forEach((dalle) =>
-      get()
-        .dalleLayer.getFeatureById(dalle.id)
-        ?.setStyle(getStyleForDalle("default"))
-    );
-    set({ selectedDalles: [] });
+  removeAllProduits: () => {
+    get().produitLayer?.changed();
+    set({ selectedProduits: [] });
   },
-  isDalleSelected: (id) => {
-    return get().selectedDalles.some((dalle) => dalle.id === id);
-  },
+  isProduitSelected: (id) =>
+    get().selectedProduits.some((produit) => produit.id === id),
 }));

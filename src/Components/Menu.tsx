@@ -3,14 +3,16 @@ import { Download } from "@codegouvfr/react-dsfr/Download";
 import { Button } from "@codegouvfr/react-dsfr/Button";
 import { getRouteApi } from "@tanstack/react-router";
 import { useDalleStore } from "../hooks/Store/useDalleStore";
+import { useMapStore } from "../hooks/Store/useMapStore";
 
 const route = getRouteApi("/download/$downloadUrl");
 
 const Menu = () => {
   const { downloadUrl } = route.useParams();
-  const selectedDalles = useDalleStore((state) => state.selectedDalles);
-  const removeDalle = useDalleStore((state) => state.removeDalle);
-  const clearDalles = useDalleStore((state) => state.clearDalles);
+  const selectedDalles = useDalleStore((state) => state.selectedProduits);
+  const removeDalle = useDalleStore((state) => state.removeProduit);
+  const clearDalles = useDalleStore((state) => state.removeAllProduits);
+  const map = useMapStore((state)=> state.map)
 
   const onDownload = () => {
     const contenu = selectedDalles.map((dalle) => dalle.url).join("\n");

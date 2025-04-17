@@ -34,7 +34,6 @@ export const useInteractions = (
         .join("-")}`;
       feature.setProperties({ id });
       drawnPolygonsLayer.getSource().addFeature(feature);
-      console.log(`Dessin terminé : ${type}`, feature);
     };
 
     drawPolygon.on("drawend", (event) => onDrawEnd(event, "polygon"));

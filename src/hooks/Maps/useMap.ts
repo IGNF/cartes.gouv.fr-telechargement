@@ -15,15 +15,15 @@ import { LayerWMTS } from "geopf-extensions-openlayers";
 // Custom Utils
 import { addControls } from "../../utils/Maps/controls";
 import {
-  createWFSLayersBloc,
-  createWFSLayersDalle,
+  tmsLayer
 } from "../../utils/Maps/Layers";
 import {
-  addSelectedInteraction,
+  addHoveredInteraction,
+  addTileClickInteractionTMS,
   addZoomInteraction,
-  useForceUpdateLayer,
 } from "../../utils/Maps/interactions";
 import { getStyleForDalle } from "../../utils/Maps/style";
+import VectorTileLayer from "ol/layer/VectorTile";
 
 /**
  * Custom hook to initialize and manage an OpenLayers map.
@@ -31,53 +31,44 @@ import { getStyleForDalle } from "../../utils/Maps/style";
  * @param {React.RefObject<HTMLDivElement>} containerRef - The reference to the map container element.
  * @param {string} downloadUrl - The URL for downloading map data.
  * @param {Function} setSelectedDalles - Function to update the selected dalles.
- * @param {any[]} selectedDalles - Array of selected dalles.
+ * @param {any[]} selectedProduits - Array of selected dalles.
  * @returns {Map | null} The initialized map instance.
  */
 export const useMap = (
   containerRef: React.RefObject<HTMLDivElement>,
   downloadUrl: string,
-  selectedDalles: any,
-  addDalle: any,
-  isDalleSelected: any,
-  removeDalle: any,
-  addDalleLayer: any
+  selectedProduits: any,
+  addProduit: any,
+  isProduitSelected: any,
+  removeProduit: any,
+  addProduitLayer: any
 ) => {
   const [map, setMap] = useState<Map | null>(null);
-  const wfsUrl = "https://data.geopf.fr/private/wfs/";
 
-  const handleFeatureClick = (
-    dalleName: string,
-    dalleUrl: string,
-    dalleId: string
-  ) => {
-    const dalle = { name: dalleName, url: dalleUrl, id: dalleId };
-
-    if (!isDalleSelected(dalle.name)) {
-      addDalle(dalle);
-    } else {
-      console.log("remove");
-      removeDalle(dalle.id);
-    }
-  };
+ 
 
   // Define and register the projection
   proj4.defs(
-    "EPSG:2154",
+    "EPSG:3857",
     "+proj=lcc +lat_1=49.000000000 +lat_2=44.000000000 +lat_0=46.500000000 +lon_0=3.000000000 +x_0=700000.000 +y_0=6600000.000 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs"
   );
   register(proj4);
 
-  const dalleLayer = createWFSLayersDalle(
-    wfsUrl,
-    downloadUrl + "-dalle",
-    selectedDalles,
-    isDalleSelected,
-    8,
-    16
-  );
+  
+  const chantierLayer = tmsLayer("https://data-qua.priv.geopf.fr/tms/1.0.0/ignf_lidarhd_tamnhbloc/{z}/{x}/{y}.pbf", 8);
 
-  const blocLayer = createWFSLayersBloc(wfsUrl, downloadUrl + "-bloc", 0, 8);
+  const produitLayer = tmsLayer("https://data-qua.priv.geopf.fr/tms/1.0.0/ignf_lidarhd_ta_dalle_mnh_moinsdedalles_sansurl_tms/{z}/{x}/{y}.pbf", 16);
+
+
+  const selectionProduitLayer = new VectorTileLayer({
+    renderMode: "vector",
+    source: produitLayer.getSource(),
+    style: function (feature) {
+      if (isProduitSelected(feature.getProperties()["name"])) {
+        return getStyleForDalle("selected");
+      }
+    },
+  });
 
   useEffect(() => {
     if (!containerRef.current) return;
@@ -92,8 +83,9 @@ export const useMap = (
           new LayerWMTS({
             layer: "GEOGRAPHICALGRIDSYSTEMS.PLANIGNV2",
           }),
-          blocLayer,
-          dalleLayer,
+          chantierLayer,
+          produitLayer,
+          selectionProduitLayer,
         ],
         view: new View({
           center: [288074.8449901076, 6247982.515792289],
@@ -103,10 +95,19 @@ export const useMap = (
         projection: get("EPSG:2154"),
       });
 
+      addProduitLayer(selectionProduitLayer);
       addControls(mapInstance);
-      addZoomInteraction(mapInstance, blocLayer, 12);
-      addSelectedInteraction(mapInstance, dalleLayer, handleFeatureClick);
-      // addHoveredInteraction(mapInstance, dalleLayer);
+      addZoomInteraction(mapInstance, chantierLayer, 12);
+      addTileClickInteractionTMS(
+        mapInstance,
+        selectionProduitLayer,
+        isProduitSelected,
+        addProduit,
+        removeProduit
+      );
+      addHoveredInteraction(mapInstance, selectionProduitLayer, isProduitSelected);
+
+      addHoveredInteraction(mapInstance, selectionProduitLayer, isProduitSelected);
       setMap(mapInstance);
     };
 
@@ -124,22 +125,8 @@ export const useMap = (
     };
 
     getConfig();
-  }, [containerRef, downloadUrl]);
-
-  useEffect(() => {
-    console.log("Mise à jour du style des features...");
-
-
-    dalleLayer.getSource()?.on("change", function (evt) {
-      var source = evt.target;
-      console.log(evt.target);
-
-      if (source.getState() === "ready") {
-        addDalleLayer(source);
-      }
-    });
-
-  }, [dalleLayer]);
+  }, []);
 
   return map;
 };
+

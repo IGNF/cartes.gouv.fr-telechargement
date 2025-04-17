@@ -12,16 +12,16 @@ const route = getRouteApi("/download/$downloadUrl");
 const MapComponent = () => {
   const { downloadUrl } = route.useParams();
 
-  const selectedDalle = useDalleStore((state)=> state.selectedDalles)
-  const addDalle = useDalleStore((state)=> state.addDalle);
-  const isDalleSelected = useDalleStore((state) => state.isDalleSelected)
-  const removeDalle = useDalleStore((state)=>state.removeDalle)
-  const addDalleLayer = useDalleStore((state)=>state.addDalleLayer)
+  const selectedDalle = useDalleStore((state)=> state.selectedProduits)
+  const addDalle = useDalleStore((state)=> state.addProduit);
+  const isDalleSelected = useDalleStore((state) => state.isProduitSelected)
+  const removeDalle = useDalleStore((state)=>state.removeProduit)
+  const addProduitLayer = useDalleStore((state)=>state.addProduitLayer)
 
 
   const mapContainerRef = useRef<HTMLDivElement>(null);
 
-  useMap(mapContainerRef, downloadUrl,selectedDalle, addDalle, isDalleSelected, removeDalle,addDalleLayer);
+  useMap(mapContainerRef, downloadUrl,selectedDalle, addDalle, isDalleSelected, removeDalle,addProduitLayer);
 
   return (
     <div
