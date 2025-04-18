@@ -27,7 +27,7 @@ const MapComponent = () => {
     <div
       ref={mapContainerRef}
       className="map-container fr-col-8"
-      style={{ height: "90vh", width: "100%" }}
+      style={{ height: "80vh", width: "100%" }}
     />
   );
 };
