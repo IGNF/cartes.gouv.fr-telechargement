@@ -37,7 +37,7 @@ function RootComponent() {
       />
       <Outlet />
       <Footer
-        accessibility="fully compliant"
+        accessibility="partially compliant"
         contentDescription="
     Le site officiel pour le téléchargement à la dalle des données raster IGN.
     "
