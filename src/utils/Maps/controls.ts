@@ -2,8 +2,8 @@ import { Map } from "ol";
 import {
   GeoportalZoom,
   SearchEngine,
+  Territories,
 } from "geopf-extensions-openlayers";
-
 
 /**
  * Ajoute les contrôles OpenLayers à une carte.
@@ -12,5 +12,16 @@ import {
 export const addControls = (map: Map) => {
   map.addControl(new GeoportalZoom({ position: "bottom-left" }));
   map.addControl(new SearchEngine({ position: "top-right" }));
-
+  map.addControl(
+    new Territories({
+      collapsed: true,
+      draggable: true,
+      position: "top-right",
+      panel: true,
+      auto: true,
+      thumbnail: false,
+      reduce: false,
+      tiles: 3,
+    })
+  );
 };

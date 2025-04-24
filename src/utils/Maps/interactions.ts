@@ -169,11 +169,7 @@ const handleFeatureClick = (
  * @param feature - Feature de type dalle
  * @param zoomLevel - Niveau de zoom cible (facultatif)
  */
-const centerOnFeatureSmooth = (
-  map: Map,
-  feature: any,
-  zoomLevel?: number
-) => {
+const centerOnFeatureSmooth = (map: Map, feature: any, zoomLevel?: number) => {
   const geometry = feature.getGeometry();
 
   const center = getCenter(geometry.getExtent());
