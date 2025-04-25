@@ -64,7 +64,7 @@ export const useMap = (
     renderMode: "vector",
     source: produitLayer.getSource(),
     style: function (feature) {
-      if (isProduitSelected(feature.getProperties()["name"])) {
+      if (isProduitSelected(feature.getProperties().name)) {
         return getStyleForDalle("selected");
       }
     },
@@ -103,7 +103,8 @@ export const useMap = (
         selectionProduitLayer,
         isProduitSelected,
         addProduit,
-        removeProduit
+        removeProduit,
+        downloadUrl
       );
       addHoveredInteraction(mapInstance, selectionProduitLayer, isProduitSelected);
 

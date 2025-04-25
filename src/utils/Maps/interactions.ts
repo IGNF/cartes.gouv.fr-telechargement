@@ -5,6 +5,25 @@ import { Select } from "ol/interaction";
 import { click, platformModifierKeyOnly } from "ol/events/condition";
 import { easeOut } from "ol/easing";
 import { getCenter } from "ol/extent";
+import { transformExtent } from "ol/proj";
+import proj4 from "proj4";
+import { register } from "ol/proj/proj4";
+import {
+  generateDownloadLinkMNX,
+  generateDownloadLinkPPK,
+} from "../flux/generateDownloadLink";
+
+proj4.defs(
+  "EPSG:2154",
+  "+proj=lcc +lat_1=49 +lat_2=44 +lat_0=46.5 +lon_0=3 +x_0=700000 +y_0=6600000 +ellps=GRS80 +units=m +no_defs"
+);
+
+proj4.defs(
+  "EPSG:2952",
+  "+proj=utm +zone=22 +ellps=GRS80 +datum=RGFG95 +units=m +no_defs"
+);
+
+register(proj4);
 
 /**
  * Génère un style OpenLayers basé sur le type d'interaction ou d'état.
@@ -118,7 +137,8 @@ export const addTileClickInteractionTMS = (
   selectionLayer: any,
   isProduitSelected: any,
   addProduit: any,
-  removeProduit: any
+  removeProduit: any,
+  downloadUrl: string
 ) => {
   map.on("singleclick", function (event) {
     const pixel = event.pixel;
@@ -126,14 +146,47 @@ export const addTileClickInteractionTMS = (
     map.forEachFeatureAtPixel(pixel, function (feature, layer) {
       if (index === 0) {
         if (layer.getMaxZoom() === 16) {
-          handleFeatureClick(
-            feature.getProperties().name,
-            feature.getProperties().name_chantier,
-            feature.getProperties().name,
-            isProduitSelected,
-            addProduit,
-            removeProduit
-          );
+          console.log(feature.getProperties());
+          if (feature.getProperties().name.endsWith("laz")) {
+            const link = generateDownloadLinkPPK({
+              chantier: feature.getProperties().bloc,
+              produit_name: feature.getProperties().name,
+            });
+
+            handleFeatureClick(
+              feature.getProperties().name,
+              link,
+              feature.getProperties().name,
+              isProduitSelected,
+              addProduit,
+              removeProduit
+            );
+          } else {
+            const source = layer.getSource();
+
+            console.log(feature.getProperties().srs);
+
+            const bbox = transformExtent(
+              feature.getGeometry()?.getExtent(),
+              source?.getProjection()?.getCode(),
+              `EPSG:${feature.getProperties().srs}`
+            );
+            console.log(source?.getProjection());
+
+            const link = generateDownloadLinkMNX({
+              produit: downloadUrl,
+              bbox: bbox,
+              produit_name: feature.getProperties().name,
+            });
+            handleFeatureClick(
+              feature.getProperties().name,
+              link,
+              feature.getProperties().name,
+              isProduitSelected,
+              addProduit,
+              removeProduit
+            );
+          }
 
           centerOnFeatureSmooth(map, feature);
           index += 1;
