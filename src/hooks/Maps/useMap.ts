@@ -55,7 +55,7 @@ export const useMap = (
   register(proj4);
 
   
-  const chantierLayer = tmsLayer("https://data-qua.priv.geopf.fr/tms/1.0.0/ignf_lidarhd_tamnhbloc/{z}/{x}/{y}.pbf", 10);
+  const chantierLayer = tmsLayer("https://data.geopf.fr/sandbox/tms/1.0.0/sandbox_lidarhd_mnt_blocs/{z}/{x}/{y}.pbf", 10);
 
   const produitLayer = tmsLayer("https://data.geopf.fr/sandbox/tms/1.0.0/sandbox_lidar-hd_mnt_ta/{z}/{x}/{y}.pbf", 16);
 

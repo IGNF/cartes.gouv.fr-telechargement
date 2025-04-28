@@ -177,6 +177,7 @@ export const addTileClickInteractionTMS = (
               produit: downloadUrl,
               bbox: bbox,
               produit_name: feature.getProperties().name,
+              EPSG:`${feature.getProperties().srs}`
             });
             handleFeatureClick(
               feature.getProperties().name,
