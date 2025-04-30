@@ -4,7 +4,7 @@ import { getStyleForDalle } from "./style";
 import { Select } from "ol/interaction";
 import { click, platformModifierKeyOnly } from "ol/events/condition";
 import { easeOut } from "ol/easing";
-import { getCenter } from "ol/extent";
+import { buffer, getCenter } from "ol/extent";
 import { transformExtent } from "ol/proj";
 import proj4 from "proj4";
 import { register } from "ol/proj/proj4";
@@ -89,13 +89,14 @@ export const addZoomInteraction = (map: Map, layer: any, zoomToGo: number) => {
     if (feature) {
       const geometry = feature.getGeometry(); // on vérifie qu'on a une géométrie pour zoomer dessus
       if (!geometry) return;
-      const extent = geometry.getExtent();
+      const extent = getCenter(geometry.getExtent());
       const view = map.getView();
-      view.fit(extent, {
-        duration: 1000,
-        easing: easeOut,
-        maxZoom: zoomToGo,
-      });
+      view.animate({zoom:zoomToGo,duration:1000,anchor:extent})
+      // view.fit(extent, {
+      //   duration: 1000,
+      //   easing: easeOut,
+      //   maxZoom: zoomToGo,
+      // });
     }
   });
 };

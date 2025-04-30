@@ -97,7 +97,7 @@ export const useMap = (
 
       addProduitLayer(selectionProduitLayer);
       addControls(mapInstance);
-      addZoomInteraction(mapInstance, chantierLayer, 12);
+      addZoomInteraction(mapInstance, chantierLayer, 11);
       addTileClickInteractionTMS(
         mapInstance,
         selectionProduitLayer,
