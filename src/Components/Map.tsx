@@ -7,7 +7,7 @@ import "@gouvfr/dsfr/dist/dsfr.css";
 import "@gouvfr/dsfr/dist/utility/icons/icons.css";
 import "geopf-extensions-openlayers/css/Dsfr.css";
 import { getRouteApi } from "@tanstack/react-router";
-const route = getRouteApi("/download/$downloadUrl");
+const route = getRouteApi("/$downloadUrl");
 
 const MapComponent = () => {
   const { downloadUrl } = route.useParams();

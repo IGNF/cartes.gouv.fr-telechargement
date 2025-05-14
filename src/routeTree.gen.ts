@@ -11,27 +11,13 @@
 // Import Routes
 
 import { Route as rootRoute } from './routes/__root'
-import { Route as AboutImport } from './routes/about'
-import { Route as IndexImport } from './routes/index'
-import { Route as DownloadDownloadUrlImport } from './routes/download.$downloadUrl'
+import { Route as DownloadUrlImport } from './routes/$downloadUrl'
 
 // Create/Update Routes
 
-const AboutRoute = AboutImport.update({
-  id: '/about',
-  path: '/about',
-  getParentRoute: () => rootRoute,
-} as any)
-
-const IndexRoute = IndexImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => rootRoute,
-} as any)
-
-const DownloadDownloadUrlRoute = DownloadDownloadUrlImport.update({
-  id: '/download/$downloadUrl',
-  path: '/download/$downloadUrl',
+const DownloadUrlRoute = DownloadUrlImport.update({
+  id: '/$downloadUrl',
+  path: '/$downloadUrl',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -39,25 +25,11 @@ const DownloadDownloadUrlRoute = DownloadDownloadUrlImport.update({
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexImport
-      parentRoute: typeof rootRoute
-    }
-    '/about': {
-      id: '/about'
-      path: '/about'
-      fullPath: '/about'
-      preLoaderRoute: typeof AboutImport
-      parentRoute: typeof rootRoute
-    }
-    '/download/$downloadUrl': {
-      id: '/download/$downloadUrl'
-      path: '/download/$downloadUrl'
-      fullPath: '/download/$downloadUrl'
-      preLoaderRoute: typeof DownloadDownloadUrlImport
+    '/$downloadUrl': {
+      id: '/$downloadUrl'
+      path: '/$downloadUrl'
+      fullPath: '/$downloadUrl'
+      preLoaderRoute: typeof DownloadUrlImport
       parentRoute: typeof rootRoute
     }
   }
@@ -66,43 +38,33 @@ declare module '@tanstack/react-router' {
 // Create and export the route tree
 
 export interface FileRoutesByFullPath {
-  '/': typeof IndexRoute
-  '/about': typeof AboutRoute
-  '/download/$downloadUrl': typeof DownloadDownloadUrlRoute
+  '/$downloadUrl': typeof DownloadUrlRoute
 }
 
 export interface FileRoutesByTo {
-  '/': typeof IndexRoute
-  '/about': typeof AboutRoute
-  '/download/$downloadUrl': typeof DownloadDownloadUrlRoute
+  '/$downloadUrl': typeof DownloadUrlRoute
 }
 
 export interface FileRoutesById {
   __root__: typeof rootRoute
-  '/': typeof IndexRoute
-  '/about': typeof AboutRoute
-  '/download/$downloadUrl': typeof DownloadDownloadUrlRoute
+  '/$downloadUrl': typeof DownloadUrlRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/about' | '/download/$downloadUrl'
+  fullPaths: '/$downloadUrl'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/about' | '/download/$downloadUrl'
-  id: '__root__' | '/' | '/about' | '/download/$downloadUrl'
+  to: '/$downloadUrl'
+  id: '__root__' | '/$downloadUrl'
   fileRoutesById: FileRoutesById
 }
 
 export interface RootRouteChildren {
-  IndexRoute: typeof IndexRoute
-  AboutRoute: typeof AboutRoute
-  DownloadDownloadUrlRoute: typeof DownloadDownloadUrlRoute
+  DownloadUrlRoute: typeof DownloadUrlRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
-  IndexRoute: IndexRoute,
-  AboutRoute: AboutRoute,
-  DownloadDownloadUrlRoute: DownloadDownloadUrlRoute,
+  DownloadUrlRoute: DownloadUrlRoute,
 }
 
 export const routeTree = rootRoute
@@ -115,19 +77,11 @@ export const routeTree = rootRoute
     "__root__": {
       "filePath": "__root.tsx",
       "children": [
-        "/",
-        "/about",
-        "/download/$downloadUrl"
+        "/$downloadUrl"
       ]
     },
-    "/": {
-      "filePath": "index.tsx"
-    },
-    "/about": {
-      "filePath": "about.tsx"
-    },
-    "/download/$downloadUrl": {
-      "filePath": "download.$downloadUrl.tsx"
+    "/$downloadUrl": {
+      "filePath": "$downloadUrl.tsx"
     }
   }
 }

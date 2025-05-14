@@ -5,7 +5,7 @@ import { getRouteApi } from "@tanstack/react-router";
 import { useDalleStore } from "../hooks/Store/useDalleStore";
 import { useMapStore } from "../hooks/Store/useMapStore";
 
-const route = getRouteApi("/download/$downloadUrl");
+const route = getRouteApi("/$downloadUrl");
 
 const Menu = () => {
   const { downloadUrl } = route.useParams();
