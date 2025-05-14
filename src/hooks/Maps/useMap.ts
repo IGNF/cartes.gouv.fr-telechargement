@@ -55,9 +55,9 @@ export const useMap = (
   register(proj4);
 
   
-  const chantierLayer = tmsLayer("https://data.geopf.fr/sandbox/tms/1.0.0/sandbox_lidarhd_mnt_blocs/{z}/{x}/{y}.pbf", 10);
+  const chantierLayer = tmsLayer(`https://data.geopf.fr/tms/1.0.0/${downloadUrl}-chantier/{z}/{x}/{y}.pbf`, 10);
 
-  const produitLayer = tmsLayer("https://data.geopf.fr/sandbox/tms/1.0.0/sandbox_lidar-hd_mnt_ta/{z}/{x}/{y}.pbf", 16);
+  const produitLayer = tmsLayer(`https://data.geopf.fr/tms/1.0.0/${downloadUrl}-produit/{z}/{x}/{y}.pbf`, 16);
 
 
   const selectionProduitLayer = new VectorTileLayer({
