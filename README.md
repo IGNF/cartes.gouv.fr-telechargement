@@ -1,49 +1,123 @@
-# Modèle de ReadMe
-
-Ci-dessous une proposition de readme pour tout projet
-
+# Interface Diffusion - Carte Téléchargement
 
 ## Description/Résumé du projet
 
-Dans cette section, on décrit la vision générale du projet ainsi que ses objectifs à destination des futurs utilisateurs et des développeurs.
+Ce projet est une interface web permettant de visualiser et de télécharger des produites géographiques à l'aide de cartes interactives. Il utilise **React**, **Vite**, et **OpenLayers** pour offrir une expérience utilisateur fluide et performante. L'objectif principal est de fournir une interface intuitive pour sélectionner et télécharger des données géographiques.
 
-Pour ce dépôt : 
+### Fonctionnalités principales :
 
-Ce dépôt permet de répertorier les différents éléments essentiels dans un dépôt SIDC :
-* ce ReadMe
-* des modèles de tickets type pour des ajouts de fonctionnalité, réparation de bug, ajout de documentation, maintenance/montée de version...
-* des milestones témoins (ex: backlog, sprint1...)
-* des exemples de github Actions CI/CD (lancement de test, build d'images...)
-* des exemples de label pour les futurs tickets
+- Visualisation des données géographiques via une carte interactive.
+- Sélection multiple de données géographiques.
+- Téléchargement des données sélectionnées.
 
+---
 
 ## Installation
 
-La procédure d'installation du projet doit être décrite dans cette section ou dans un fichier complémentaire dont le lien est présent ici.
+### Prérequis :
+- **Node.js** (version 20 ou supérieure)
+- **npm** (version 8 ou supérieure)
+- **Docker** (pour le déploiement)
 
+### Étapes d'installation :
+1. Clonez le dépôt :
+   ```bash
+   git clone https://github.com/votre-utilisateur/votre-repo.git
+   cd votre-repo
+   ```
+2. Installez les dépendances
+   ```bash
+   npm install
+   ```
+3. Lancez l'application 
+   ```bash
+   npm start
+   ```
+4. Accédez à l'application dans votre navigateur à l'adresse:
+   ```
+   http://localhost:5173/
+   ```
+
+### Déploiement avec Docker
+Etapes pour construire et exécuter l'image Docker :
+
+1. Construisez l'image Docker :
+
+   ```bash
+   docker build -t interface-carte-telechargement
+   ```
 
 ## Documentation développeurs
 
-Lien vers la documentation pour les développeurs, à la fois pour maintenir le projet, le déployer et ajouter de nouvelles fonctionnalités. Schémas UML...
+Stack technique :
+
+- Frontend : React, Vite, TanStack Router
+- Cartographie : OpenLayers, Geoportal Extensions
+- Déploiement : Docker, Nginx
+
+Scripts disponibles :
+
+- npm run start : Lance l'application en mode développement.
+- npm run build : Construit l'application pour la production.
+- npm run serve : Prévisualise l'application construite.
+- npm run typecheck : Vérifie les types TypeScript.
 
 
 ## L'arborescence du projet
 
-Exemple d'arborescence de projet :
 
-* `.github/` : dossier contenant les modèles d'issues et github actions ;
-* `.vscode/` : dossier contenant une configuration vscode pour le projet;
-* `doc/` : dossier contenant des fichiers .md de documentation (ex: install.md) ;
-* `tests/`: scripts et explications pour lancer les tests ;
-* `README.md` : ce fichier
+.
+├── src/                # Code source de l'application
+│   ├── Components/     # Composants React
+│   ├── hooks/          # Hooks personnalisés
+│   ├── utils/          # Fonctions utilitaires
+│   └── styles/         # Fichiers de style
+├── public/             # Fichiers statiques
+├── .docker/            # Configuration Docker et Nginx
+├── tests/              # Tests unitaires et d'intégration
+├── [package.json](./package.json)        # Dépendances et scripts npm
+├── Dockerfile          # Fichier Docker pour le déploiement
+└── [README.md](./README.md)           # Documentation du projet
+
+## API/flux utilisés
+
+- **GetCapabilities flux tms** :  https://data.geopf.fr/tms/1.0.0/{layer}/
+
+
+## Contribution
+
+Comment contribuer ?
+
+1. Forkez le depôt
+2. Créez une branche pour votre fonctionnalité ou correction :
+   ```bash
+   git checkout -b feature/ma-fonctionnalite
+   ```
+3. Faites vos modfication et ajoutez un commit :
+   ```bash
+   git commit -m "add(localisation)Ajout de ma fonctionnalité"
+   ```
+4. Poussez vos modification :
+   ```bash
+   git push origin feature/ma-fonctionnalite
+   ```
+
+5. Ouvrez une PullRequest.
+
+Vous pouvez également faire des issues pour discuter en amont de votre besoin.
+
+
 
 ## Contacts du projets
 
-Ici on met la liste des personnes qui travaillent sur ce projet et le maintiennent à jour.
 
 
 |Nom|Prénom|mail|fonction|
 |---|---|---|---|
-|   |   |   |   |
-|   |   |   |   |
-|   |   |   |   |
+|Thauvin|Xavier|   |Chef de projet|
+|Mohad|Mélodia|   |Conceptrice developpeuse|
+
+## Licence
+
+Ce projet est sous license **GNU Alfredo General Public License**. Consultez le fichier [License](./LICENSE) pour plus d'informations.
+
