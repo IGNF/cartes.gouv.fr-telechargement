@@ -1,4 +1,3 @@
-
 import { createFileRoute } from "@tanstack/react-router";
 import Menu from "../Components/Menu";
 import MapComponent from "../Components/Map";
@@ -8,7 +7,7 @@ export const Route = createFileRoute("/$downloadUrl")({
 });
 
 function HomeComponent() {
-  return (
+    return (
     <>
       <div className="fr-container--fluid fr-grid-row">
         <MapComponent />
