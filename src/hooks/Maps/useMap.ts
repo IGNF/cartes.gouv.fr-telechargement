@@ -19,7 +19,7 @@ import {
 } from "../../utils/Maps/Layers";
 import {
   addHoveredInteraction,
-  addTileClickInteractionTMS,
+  addSelectedProduitInteraction,
   addZoomInteraction,
 } from "../../utils/Maps/interactions";
 import { getStyleForDalle } from "../../utils/Maps/style";
@@ -98,7 +98,7 @@ export const useMap = (
       addProduitLayer(selectionProduitLayer);
       addControls(mapInstance);
       addZoomInteraction(mapInstance, chantierLayer, 11);
-      addTileClickInteractionTMS(
+      addSelectedProduitInteraction(
         mapInstance,
         selectionProduitLayer,
         isProduitSelected,

@@ -101,39 +101,9 @@ export const addZoomInteraction = (map: Map, layer: any, zoomToGo: number) => {
   });
 };
 
-/**
- * Ajoute une interaction de sélection à une carte OpenLayers.
- * @param map - L'instance OpenLayers de la carte.
- * @param layer - La couche vectorielle sur laquelle appliquer la sélection.
- * @param setSelectedDalles - Fonction pour mettre à jour les dalles sélectionnées.
- */
-export const addSelectedInteraction = (
-  map: Map,
-  layer: any,
-  handleFeatureClick: any
-) => {
-  const selectInteraction = new Select({
-    condition: function (event) {
-      return click(event) && !platformModifierKeyOnly(event);
-    },
-    layers: [layer], // Applique la sélection uniquement à cette couche
-  });
 
-  // Gestion de l'événement de sélection
-  selectInteraction.on("select", (event) => {
-    handleFeatureClick(
-      event.selected[0].getProperties().name,
-      event.selected[0].getProperties().url,
-      event.selected[0].getId()
-    );
-  });
 
-  map.addInteraction(selectInteraction);
-
-  return selectInteraction; // Retourne l'interaction pour un éventuel nettoyage
-};
-
-export const addTileClickInteractionTMS = (
+export const addSelectedProduitInteraction = (
   map: Map,
   selectionLayer: any,
   isProduitSelected: any,
@@ -148,47 +118,14 @@ export const addTileClickInteractionTMS = (
       if (index === 0) {
         if (layer.getMaxZoom() === 16) {
           console.log(feature.getProperties());
-          if (feature.getProperties().name.endsWith("laz")) {
-            const link = generateDownloadLinkPPK({
-              chantier: feature.getProperties().bloc,
-              produit_name: feature.getProperties().name,
-            });
-
             handleFeatureClick(
               feature.getProperties().name,
-              link,
-              feature.getProperties().name,
+              feature.getProperties().url,
+              feature.getProperties().id,
               isProduitSelected,
               addProduit,
               removeProduit
             );
-          } else {
-            const source = layer.getSource();
-
-            console.log(feature.getProperties().srs);
-
-            const bbox = transformExtent(
-              feature.getGeometry()?.getExtent(),
-              source?.getProjection()?.getCode(),
-              `EPSG:${feature.getProperties().srs}`
-            );
-            console.log(source?.getProjection());
-
-            const link = generateDownloadLinkMNX({
-              produit: downloadUrl,
-              bbox: bbox,
-              produit_name: feature.getProperties().name,
-              EPSG:`${feature.getProperties().srs}`
-            });
-            handleFeatureClick(
-              feature.getProperties().name,
-              link,
-              feature.getProperties().name,
-              isProduitSelected,
-              addProduit,
-              removeProduit
-            );
-          }
 
           centerOnFeatureSmooth(map, feature);
           index += 1;
@@ -196,7 +133,6 @@ export const addTileClickInteractionTMS = (
         }
       }
 
-      console.log("index", index);
     });
   });
 };
