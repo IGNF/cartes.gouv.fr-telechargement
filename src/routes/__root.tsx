@@ -1,9 +1,9 @@
-import * as React from "react";
-import { Link, Outlet, createRootRoute } from "@tanstack/react-router";
-import { TanStackRouterDevtools } from "@tanstack/router-devtools";
+
+import { Outlet, createRootRoute } from "@tanstack/react-router";
 import { Badge } from "@codegouvfr/react-dsfr/Badge";
 import { Header } from "@codegouvfr/react-dsfr/Header";
 import { Footer } from "@codegouvfr/react-dsfr/Footer";
+
 
 export const Route = createRootRoute({
   component: RootComponent,
@@ -22,8 +22,7 @@ function RootComponent() {
         }
         homeLinkProps={{
           href: "/",
-          title:
-            "Téléchargement à la carte",
+          title: "Téléchargement à la carte",
         }}
         id="fr-header-simple-header-with-service-title-and-tagline"
         serviceTitle={

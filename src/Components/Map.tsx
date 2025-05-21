@@ -13,7 +13,7 @@ const MapComponent = () => {
   const { downloadUrl } = route.useParams();
 
   const selectedDalle = useDalleStore((state)=> state.selectedProduits)
-  const addDalle = useDalleStore((state)=> state.addProduit);
+  const addProduit = useDalleStore((state)=> state.addProduit);
   const isDalleSelected = useDalleStore((state) => state.isProduitSelected)
   const removeDalle = useDalleStore((state)=>state.removeProduit)
   const addProduitLayer = useDalleStore((state)=>state.addProduitLayer)
@@ -21,7 +21,7 @@ const MapComponent = () => {
 
   const mapContainerRef = useRef<HTMLDivElement>(null);
 
-  useMap(mapContainerRef, downloadUrl,selectedDalle, addDalle, isDalleSelected, removeDalle,addProduitLayer);
+  useMap(mapContainerRef, downloadUrl,selectedDalle, addProduit, isDalleSelected, removeDalle,addProduitLayer);
 
   return (
     <div
