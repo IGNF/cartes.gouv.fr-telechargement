@@ -32,6 +32,6 @@ export const useDalleStore = create<DalleStore>((set, get) => ({
     get().produitLayer?.changed();
     set({ selectedProduits: [] });
   },
-  isProduitSelected: (id) =>
-    get().selectedProduits.some((produit) => produit.id === id),
+  isProduitSelected: (name) =>
+    get().selectedProduits.some((produit) => produit.name === name),
 }));
