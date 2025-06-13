@@ -147,7 +147,7 @@ const handleFeatureClick = (
 ) => {
   const dalle = { name: dalleName, url: dalleUrl, id: dalleId };
 
-  if (!isProduitSelected(dalle.name)) {
+  if (!isProduitSelected(dalle.id)) {
     addProduit(dalle);
   } else {
     removeProduit(dalle.id);
