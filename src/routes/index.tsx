@@ -7,23 +7,25 @@ export const Route = createFileRoute("/")({
 function RouteComponent() {
   return (
     <div className="fr-container fr-mt-3w">
-      <h1 className="fr-h1">Bienvenue sur l'Interface de Téléchargement</h1>
-      <p className="fr-text--lg">
-        Cette application vous permet de visualiser et de télécharger des
-        données géographiques via une carte interactive.
-      </p>
-      <ul className="fr-list">
-        <li>Explorez les données disponibles sur la carte.</li>
-        <li>Sélectionnez les dalles géographiques qui vous intéressent.</li>
-        <li>Téléchargez les données sélectionnées en quelques clics.</li>
-      </ul>
-      <p className="fr-text--sm">
-        Pour commencer, veuillez fournir un paramètre valide dans l'URL, tel que{" "}
-        <code>
-        https://cartes.gouv.fr/telechargement/{"{"}votre-paramètre{"}"}
-        </code>
-        .
-      </p>
+      <div className="fr-grid-row fr-grid-row--center">
+        <div className="fr-col-12 fr-col-md-8">
+          <h1 className="fr-h1 fr-text--center">Bienvenue sur l'interface cartographique de téléchargement</h1>
+          <p className="fr-text--lg fr-text--center">
+            Cette interface est disponible pour certaines données du catalogue de cartes.gouv.fr.
+          </p>
+          <div className="fr-text--center fr-mt-3w">
+            <a href="https://cartes.gouv.fr/catalogue" className="fr-btn">
+              Accéder au catalogue
+            </a>
+          </div>
+          <p className="fr-text--lg fr-text--center fr-mt-3w">Cette interface vous permet :</p>
+          <ul className="fr-list fr-list--center">
+            <li>de visualiser le tableau d'assemblage des données disponibles sur le territoire</li>
+            <li>de sélectionner les emprises qui vous intéressent</li>
+            <li>de télécharger les données sur les emprises sélectionnées</li>
+          </ul>
+        </div>
+      </div>
     </div>
   );
 }
