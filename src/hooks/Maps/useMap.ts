@@ -64,7 +64,7 @@ export const useMap = (
     renderMode: "vector",
     source: produitLayer.getSource(),
     style: function (feature) {
-      if (isProduitSelected(feature.getProperties().name)) {console.log(`Feature selected: ${feature.getProperties().name}`);
+      if (isProduitSelected(feature.getProperties().id)) {console.log(`Feature selected: ${feature.getProperties().id}`);
       
         return getStyleForDalle("selected");
       }
