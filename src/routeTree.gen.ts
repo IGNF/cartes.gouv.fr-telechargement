@@ -11,20 +11,20 @@
 // Import Routes
 
 import { Route as rootRoute } from './routes/__root'
-import { Route as DownloadUrlImport } from './routes/$downloadUrl'
-import { Route as IndexImport } from './routes/index'
+import { Route as TelechargementIndexImport } from './routes/telechargement/index'
+import { Route as TelechargementDownloadUrlImport } from './routes/telechargement/$downloadUrl'
 
 // Create/Update Routes
 
-const DownloadUrlRoute = DownloadUrlImport.update({
-  id: '/$downloadUrl',
-  path: '/$downloadUrl',
+const TelechargementIndexRoute = TelechargementIndexImport.update({
+  id: '/telechargement/',
+  path: '/telechargement/',
   getParentRoute: () => rootRoute,
 } as any)
 
-const IndexRoute = IndexImport.update({
-  id: '/',
-  path: '/',
+const TelechargementDownloadUrlRoute = TelechargementDownloadUrlImport.update({
+  id: '/telechargement/$downloadUrl',
+  path: '/telechargement/$downloadUrl',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -32,18 +32,18 @@ const IndexRoute = IndexImport.update({
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexImport
+    '/telechargement/$downloadUrl': {
+      id: '/telechargement/$downloadUrl'
+      path: '/telechargement/$downloadUrl'
+      fullPath: '/telechargement/$downloadUrl'
+      preLoaderRoute: typeof TelechargementDownloadUrlImport
       parentRoute: typeof rootRoute
     }
-    '/$downloadUrl': {
-      id: '/$downloadUrl'
-      path: '/$downloadUrl'
-      fullPath: '/$downloadUrl'
-      preLoaderRoute: typeof DownloadUrlImport
+    '/telechargement/': {
+      id: '/telechargement/'
+      path: '/telechargement'
+      fullPath: '/telechargement'
+      preLoaderRoute: typeof TelechargementIndexImport
       parentRoute: typeof rootRoute
     }
   }
@@ -52,38 +52,38 @@ declare module '@tanstack/react-router' {
 // Create and export the route tree
 
 export interface FileRoutesByFullPath {
-  '/': typeof IndexRoute
-  '/$downloadUrl': typeof DownloadUrlRoute
+  '/telechargement/$downloadUrl': typeof TelechargementDownloadUrlRoute
+  '/telechargement': typeof TelechargementIndexRoute
 }
 
 export interface FileRoutesByTo {
-  '/': typeof IndexRoute
-  '/$downloadUrl': typeof DownloadUrlRoute
+  '/telechargement/$downloadUrl': typeof TelechargementDownloadUrlRoute
+  '/telechargement': typeof TelechargementIndexRoute
 }
 
 export interface FileRoutesById {
   __root__: typeof rootRoute
-  '/': typeof IndexRoute
-  '/$downloadUrl': typeof DownloadUrlRoute
+  '/telechargement/$downloadUrl': typeof TelechargementDownloadUrlRoute
+  '/telechargement/': typeof TelechargementIndexRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/$downloadUrl'
+  fullPaths: '/telechargement/$downloadUrl' | '/telechargement'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/$downloadUrl'
-  id: '__root__' | '/' | '/$downloadUrl'
+  to: '/telechargement/$downloadUrl' | '/telechargement'
+  id: '__root__' | '/telechargement/$downloadUrl' | '/telechargement/'
   fileRoutesById: FileRoutesById
 }
 
 export interface RootRouteChildren {
-  IndexRoute: typeof IndexRoute
-  DownloadUrlRoute: typeof DownloadUrlRoute
+  TelechargementDownloadUrlRoute: typeof TelechargementDownloadUrlRoute
+  TelechargementIndexRoute: typeof TelechargementIndexRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
-  IndexRoute: IndexRoute,
-  DownloadUrlRoute: DownloadUrlRoute,
+  TelechargementDownloadUrlRoute: TelechargementDownloadUrlRoute,
+  TelechargementIndexRoute: TelechargementIndexRoute,
 }
 
 export const routeTree = rootRoute
@@ -96,15 +96,15 @@ export const routeTree = rootRoute
     "__root__": {
       "filePath": "__root.tsx",
       "children": [
-        "/",
-        "/$downloadUrl"
+        "/telechargement/$downloadUrl",
+        "/telechargement/"
       ]
     },
-    "/": {
-      "filePath": "index.tsx"
+    "/telechargement/$downloadUrl": {
+      "filePath": "telechargement/$downloadUrl.tsx"
     },
-    "/$downloadUrl": {
-      "filePath": "$downloadUrl.tsx"
+    "/telechargement/": {
+      "filePath": "telechargement/index.tsx"
     }
   }
 }

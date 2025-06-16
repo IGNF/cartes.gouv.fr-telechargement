@@ -4,7 +4,7 @@ import { Button } from "@codegouvfr/react-dsfr/Button";
 import { getRouteApi } from "@tanstack/react-router";
 import { useDalleStore } from "../hooks/Store/useDalleStore";
 
-const route = getRouteApi("/$downloadUrl");
+const route = getRouteApi("/telechargement/$downloadUrl");
 
 const Menu = () => {
   const { downloadUrl } = route.useParams();
