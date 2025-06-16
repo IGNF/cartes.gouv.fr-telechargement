@@ -21,6 +21,7 @@ declare module "@codegouvfr/react-dsfr/spa" {
 const router = createRouter({
   routeTree,
   defaultPreload: "intent",
+  basepath: "/telechargement", // Set the base path for the router
 });
 
 // Register things for typesafety
