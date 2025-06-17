@@ -23,7 +23,7 @@ Pour les produits disposant d’un tableau d’assemblage (flux TMS), ajoutez le
 
 ### Remplacement des variables
 
-- `{nom-produit}` : Remplacez par l’identifiant du produit  (exemple : `IGNF_MNH-LIDAR-HD`, `ORTHOHR`, etc.).
+- `{nom-produit}` : Remplacez par l’identifiant du produit  (exemple : `IGNF_MNH-LIDAR-HD`, `IGNF_BD-ORTHO`, etc.).
 - `<cit:description>` : Peut être personnalisé pour indiquer qu’il s’agit d’un téléchargement à la carte ou par dalle.
 
 ### Condition d’ajout
