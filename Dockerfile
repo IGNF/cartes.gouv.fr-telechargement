@@ -16,6 +16,9 @@ COPY . .
 # Construction de l'application avec Vite
 RUN npm run build
 
+# Vérification du contenu du répertoire de construction
+RUN ls -l /app/dist
+
 FROM nginxinc/nginx-unprivileged:stable-alpine AS production
 
 # Copie de la configuration Nginx
@@ -29,6 +32,12 @@ WORKDIR /usr/share/nginx/html
 
 # Exposer le port 8080
 EXPOSE 8080
+
+# Modifier les permissions
+RUN chmod -R 755 /usr/share/nginx/html
+
+# Vérification du contenu du répertoire de production
+RUN ls -l /usr/share/nginx/html
 
 # Démarrer Nginx
 CMD ["nginx", "-g", "daemon off;"]
