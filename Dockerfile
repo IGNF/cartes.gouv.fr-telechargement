@@ -33,8 +33,6 @@ WORKDIR /usr/share/nginx/html
 # Exposer le port 8080
 EXPOSE 8080
 
-# Modifier les permissions
-RUN chmod -R 755 /usr/share/nginx/html
 
 # Vérification du contenu du répertoire de production
 RUN ls -l /usr/share/nginx/html
