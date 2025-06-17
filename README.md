@@ -63,6 +63,10 @@ Scripts disponibles :
 - npm run typecheck : Vérifie les types TypeScript.
 
 
+## Affichage de l'interface dans le catalogue Geonetwork-ui
+
+Pour les instructions sur l'intégration dans les métadonnées des produits, consultez le fichier [METADATA_INTEGRATION.md](./METADATA_INTEGRATION.md).
+
 ## L'arborescence du projet
 
 
