@@ -14,6 +14,7 @@ const AppHeader: FC<AppHeaderProps> = ({ navItems: propNavItems = [] }) => {
     iconId: "fr-icon-arrow-right-line",
     linkProps: {
       href: "https://www.geoportail.gouv.fr/carte",
+      target: "_self",
       className: "fr-btn--icon-right",
       target: "_blank",
       rel: "noreferrer",
@@ -28,63 +29,97 @@ const AppHeader: FC<AppHeaderProps> = ({ navItems: propNavItems = [] }) => {
     iconId: "fr-icon-account-fill",
     linkProps: {
       href: "https://cartes.gouv.fr/tableau-de-bord",
+      target: "_self",
     },
     text: "mon compte",
   });
 
   // Définition des navItems
-  const navItems: MainNavigationProps.Item[] = propNavItems.length > 0 ? propNavItems : [
-    {
-      menuLinks: [
-        {
-          linkProps: { href: "https://cartes.gouv.fr/documentation" },
-          text: "Documentation",
-        },
-        {
-          linkProps: { href: "https://cartes.gouv.fr/offre" },
-          text: "Offre",
-        },
-        {
-          linkProps: { href: "https://cartes.gouv.fr/nous-rejoindre" },
-          text: "Nous rejoindre",
-        },
-      ],
-      text: "Commencer avec cartes.gouv.fr",
-    },
-    {
-      text: "Catalogue",
-      linkProps: { href: "https://cartes.gouv.fr/catalogue/search" },
-    },
-    {
-      text: "Cartes",
-      linkProps: { href: "https://cartes.gouv.fr/cartes" },
-    },
-    {
-      text: "Actualités",
-      linkProps: { href: "https://cartes.gouv.fr/actualites" },
-    },
-    {
-      menuLinks: [
-        {
-          linkProps: { href: "https://cartes.gouv.fr/faq" },
-          text: "questions fréquentes",
-        },
-        {
-          linkProps: { href: "https://cartes.gouv.fr/nous-ecrire" },
-          text: "nous écrire",
-        },
-        {
-          linkProps: { href: "https://cartes.gouv.fr/niveau-de-service" },
-          text: "Niveau de service",
-        },
-      ],
-      text: "Assistance",
-    },
-    {
-      text: "A propos",
-      linkProps: { href: "https://cartes.gouv.fr/a-propos" },
-    },
-  ];
+  const navItems: MainNavigationProps.Item[] =
+    propNavItems.length > 0
+      ? propNavItems
+      : [
+          {
+            menuLinks: [
+              {
+                linkProps: {
+                  href: "https://cartes.gouv.fr/documentation",
+                  target: "_self",
+                },
+                text: "Documentation",
+              },
+              {
+                linkProps: {
+                  href: "https://cartes.gouv.fr/offre",
+                  target: "_self",
+                },
+                text: "Offre",
+              },
+              {
+                linkProps: {
+                  href: "https://cartes.gouv.fr/nous-rejoindre",
+                  target: "_self",
+                },
+                text: "Nous rejoindre",
+              },
+            ],
+            text: "Commencer avec cartes.gouv.fr",
+          },
+          {
+            text: "Catalogue",
+            linkProps: {
+              href: "https://cartes.gouv.fr/catalogue/search",
+              target: "_self",
+            },
+          },
+          {
+            text: "Cartes",
+            linkProps: {
+              href: "https://cartes.gouv.fr/cartes",
+              target: "_self",
+            },
+          },
+          {
+            text: "Actualités",
+            linkProps: {
+              href: "https://cartes.gouv.fr/actualites",
+              target: "_self",
+            },
+          },
+          {
+            menuLinks: [
+              {
+                linkProps: {
+                  href: "https://cartes.gouv.fr/faq",
+                  target: "_self",
+                },
+                text: "questions fréquentes",
+              },
+              {
+                linkProps: {
+                  href: "https://cartes.gouv.fr/nous-ecrire",
+                  target: "_self",
+                },
+                text: "nous écrire",
+              },
+              {
+                linkProps: {
+                  href: "https://cartes.gouv.fr/niveau-de-service",
+                  target: "_self",
+                },
+                text: "Niveau de service",
+              },
+            ],
+            text: "Assistance",
+          },
+          {
+            text: "A propos",
+            linkProps: {
+              href: "https://cartes.gouv.fr/a-propos",
+              target: "_self",
+            },
+          },
+        ];
 
   return (
     <Header
