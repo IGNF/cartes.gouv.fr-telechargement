@@ -8,6 +8,9 @@ import {
 } from "@tanstack/react-router";
 import { routeTree } from "./routeTree.gen";
 import { startReactDsfr } from "@codegouvfr/react-dsfr/spa";
+
+import './styles/global.css' // Import du fichier global ici
+
 startReactDsfr({ defaultColorScheme: "system", Link });
 declare module "@codegouvfr/react-dsfr/spa" {
   interface RegisterLink {
@@ -18,6 +21,7 @@ declare module "@codegouvfr/react-dsfr/spa" {
 const router = createRouter({
   routeTree,
   defaultPreload: "intent",
+  basepath: "/telechargement", // Set the base path for the router
 });
 
 // Register things for typesafety

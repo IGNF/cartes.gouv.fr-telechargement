@@ -1,0 +1,20 @@
+.fr-footer__body,
+.fr-footer__partners,
+.fr-footer__bottom-copy {
+  display: none;
+}
+#footer {
+  padding-top: 0;
+  margin-top: -10px;
+}
+.fr-footer__bottom {
+  margin-top: 0;
+}
+#fr-footer-toggle {
+  display: none;
+}
+
+#fr-footer{
+  padding: 0;
+
+}

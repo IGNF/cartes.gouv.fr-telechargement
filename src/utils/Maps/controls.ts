@@ -1,10 +1,8 @@
 import { Map } from "ol";
 import {
-  GeoportalFullScreen,
   GeoportalZoom,
-  Legends,
   SearchEngine,
-  LayerSwitcher
+  Territories,
 } from "geopf-extensions-openlayers";
 
 /**
@@ -15,10 +13,15 @@ export const addControls = (map: Map) => {
   map.addControl(new GeoportalZoom({ position: "bottom-left" }));
   map.addControl(new SearchEngine({ position: "top-right" }));
   map.addControl(
-    new LayerSwitcher({
-      options: {
-        position: "top-right",
-      },
+    new Territories({
+      collapsed: true,
+      draggable: true,
+      position: "top-right",
+      panel: true,
+      auto: true,
+      thumbnail: false,
+      reduce: false,
+      tiles: 3,
     })
   );
 };

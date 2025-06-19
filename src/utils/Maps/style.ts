@@ -61,38 +61,6 @@ export const getStyleForDalle = (type: keyof typeof styleDalle): Style => {
 };
 
 
-/**
- * Retourne le style d'une feature en fonction de son état.
- * @param feature - La feature dont on veut déterminer le style.
- * @returns Un objet `Style` pour OpenLayers.
- */
-export const getStyleForFeature = (feature: any, selectedDalles) => {
-
-  const isSelected = selectedDalles.findIndex((f) => f.name === feature.name);
-  const isHovered = feature.get("hovered");
-
-  if (isSelected!==-1) {
-    const config = styleDalle["selected"];
-    return new Style({
-      fill: config.fill,
-      stroke: config.stroke,
-    });
-  }
-
-  if (isHovered) {
-    const config = styleDalle["hovered"];
-    return new Style({
-      fill: config.fill,
-      stroke: config.stroke,
-    });
-  }
-  const config = styleDalle["default"];
-  return new Style({
-    fill: config.fill,
-    stroke: config.stroke,
-  });
-};
-
 
 
 /**
@@ -119,35 +87,5 @@ export const getStyleForBlocs = (feature: any) => {
   });
 };
 
-/**
- * Retourne le style d'une feature en fonction de son état.
- * @param feature - La feature dont on veut déterminer le style.
- * @returns Un objet `Style` pour OpenLayers.
- */
-export const getStyleForDalles = (feature: any, selectedDalles) => {
 
-  const isSelected = selectedDalles.findIndex((f) => f.name === feature.name);
-  const isHovered = feature.get("hovered");
-
-  if (isSelected!==-1) {
-    const config = styleDalle["selected"];
-    return new Style({
-      fill: config.fill,
-      stroke: config.stroke,
-    });
-  }
-
-  if (isHovered) {
-    const config = styleDalle["hovered"];
-    return new Style({
-      fill: config.fill,
-      stroke: config.stroke,
-    });
-  }
-  const config = styleDalle["default"];
-  return new Style({
-    fill: config.fill,
-    stroke: config.stroke,
-  });
-};
 

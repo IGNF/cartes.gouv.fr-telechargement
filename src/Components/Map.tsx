@@ -1,36 +1,35 @@
 import React, { useRef, useState } from "react";
 import { useMap } from "../hooks/Maps/useMap";
+import { useDalleStore } from "../hooks/Store/useDalleStore";
 
 import "ol/ol.css";
 import "@gouvfr/dsfr/dist/dsfr.css";
 import "@gouvfr/dsfr/dist/utility/icons/icons.css";
 import "geopf-extensions-openlayers/css/Dsfr.css";
 import { getRouteApi } from "@tanstack/react-router";
-import Menu from "./Menu";
-const route = getRouteApi("/download/$downloadUrl");
+const route = getRouteApi("/telechargement/$downloadUrl");
 
-function MapComponent() {
+const MapComponent = () => {
   const { downloadUrl } = route.useParams();
+
+  const selectedDalle = useDalleStore((state)=> state.selectedProduits)
+  const addProduit = useDalleStore((state)=> state.addProduit);
+  const isDalleSelected = useDalleStore((state) => state.isProduitSelected)
+  const removeDalle = useDalleStore((state)=>state.removeProduit)
+  const addProduitLayer = useDalleStore((state)=>state.addProduitLayer)
+
 
   const mapContainerRef = useRef<HTMLDivElement>(null);
 
-  // État pour les dalles sélectionnées
-  const [selectedDalles, setSelectedDalles] = useState<any[]>([]);
-
-  useMap(mapContainerRef, downloadUrl, setSelectedDalles, selectedDalles);
+  useMap(mapContainerRef, downloadUrl,selectedDalle, addProduit, isDalleSelected, removeDalle,addProduitLayer);
 
   return (
-    <div className="fr-container--fluid fr-grid-row">
-      <div
-        ref={mapContainerRef}
-        className="map-container fr-col-10"
-        style={{ height: "70vh", width: "100%" }}
-      />
-      <div className="fr-col-2" >
-      <Menu selectedDalles={selectedDalles} title={downloadUrl}></Menu>
-      </div>
-    </div>
+    <div
+      ref={mapContainerRef}
+      className="map-container fr-col-8"
+      style={{ height: "80vh", width: "100%" }}
+    />
   );
-}
+};
 
 export default MapComponent;
