@@ -63,7 +63,7 @@ const Menu = () => {
                       </div>
                       <Button
                         iconId="fr-icon-delete-line"
-                        onClick={() => removeDalle(dalle.id)}
+                        onClick={() => removeDalle(dalle.name)}
                         priority="tertiary no outline"
                         size="small"
                         title={`Supprimer la dalle ${dalle.name}`}

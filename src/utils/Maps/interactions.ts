@@ -117,7 +117,6 @@ export const addSelectedProduitInteraction = (
     map.forEachFeatureAtPixel(pixel, function (feature, layer) {
       if (index === 0) {
         if (layer.getMaxZoom() === 16) {
-          console.log(feature.getProperties());
             handleFeatureClick(
               feature.getProperties().name,
               feature.getProperties().url,
@@ -147,10 +146,10 @@ const handleFeatureClick = (
 ) => {
   const dalle = { name: dalleName, url: dalleUrl, id: dalleId };
 
-  if (!isProduitSelected(dalle.id)) {
+  if (!isProduitSelected(dalle.name)) {
     addProduit(dalle);
   } else {
-    removeProduit(dalle.id);
+    removeProduit(dalle.name);
   }
 };
 

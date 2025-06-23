@@ -18,3 +18,15 @@
   padding: 0;
 
 }
+
+ /* mini header */
+ .fr-header__service-tagline {
+  display: none;
+}
+.fr-header__service {
+  position: absolute;
+  left: 100px;
+}
+.fr-header__service::before {
+  display: none;
+}

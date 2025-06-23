@@ -14,9 +14,7 @@ import { LayerWMTS } from "geopf-extensions-openlayers";
 
 // Custom Utils
 import { addControls } from "../../utils/Maps/controls";
-import {
-  tmsLayer
-} from "../../utils/Maps/Layers";
+import { tmsLayer } from "../../utils/Maps/Layers";
 import {
   addHoveredInteraction,
   addSelectedProduitInteraction,
@@ -45,8 +43,6 @@ export const useMap = (
 ) => {
   const [map, setMap] = useState<Map | null>(null);
 
- 
-
   // Define and register the projection
   proj4.defs(
     "EPSG:3857",
@@ -54,18 +50,21 @@ export const useMap = (
   );
   register(proj4);
 
-  
-  const chantierLayer = tmsLayer(`https://data.geopf.fr/tms/1.0.0/${downloadUrl}-chantier/{z}/{x}/{y}.pbf`, 10);
+  const chantierLayer = tmsLayer(
+    `https://data.geopf.fr/tms/1.0.0/${downloadUrl}-chantier/{z}/{x}/{y}.pbf`,
+    10
+  );
 
-  const produitLayer = tmsLayer(`https://data.geopf.fr/tms/1.0.0/${downloadUrl}-produit/{z}/{x}/{y}.pbf`, 16);
-
+  const produitLayer = tmsLayer(
+    `https://data.geopf.fr/tms/1.0.0/${downloadUrl}-produit/{z}/{x}/{y}.pbf`,
+    16
+  );
 
   const selectionProduitLayer = new VectorTileLayer({
     renderMode: "vector",
     source: produitLayer.getSource(),
     style: function (feature) {
-      if (isProduitSelected(feature.getProperties().id)) {console.log(`Feature selected: ${feature.getProperties().id}`);
-      
+      if (isProduitSelected(feature.getProperties().name)) {
         return getStyleForDalle("selected");
       }
     },
@@ -107,9 +106,17 @@ export const useMap = (
         removeProduit,
         downloadUrl
       );
-      addHoveredInteraction(mapInstance, selectionProduitLayer, isProduitSelected);
+      addHoveredInteraction(
+        mapInstance,
+        selectionProduitLayer,
+        isProduitSelected
+      );
 
-      addHoveredInteraction(mapInstance, selectionProduitLayer, isProduitSelected);
+      addHoveredInteraction(
+        mapInstance,
+        selectionProduitLayer,
+        isProduitSelected
+      );
       setMap(mapInstance);
     };
 
@@ -131,4 +138,3 @@ export const useMap = (
 
   return map;
 };
-
