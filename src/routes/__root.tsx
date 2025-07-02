@@ -1,5 +1,5 @@
 import { Outlet, createRootRoute } from "@tanstack/react-router";
-import AppHeader from "../components/AppHeader";
+import AppHeader from "../Components/AppHeader";
 import { Footer } from "@codegouvfr/react-dsfr/Footer";
 
 export const Route = createRootRoute({
