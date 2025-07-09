@@ -65,7 +65,19 @@ Scripts disponibles :
 
 ## Affichage de l'interface dans le catalogue Geonetwork-ui
 
-Pour les instructions sur l'intégration dans les métadonnées des produits, consultez le fichier [METADATA_INTEGRATION.md](./METADATA_INTEGRATION.md).
+Pour les instructions sur l'intégration dans les métadonnées des produits, consultez le fichier [METADATA_INTEGRATION.md](./docs/METADATA_INTEGRATION.md).
+
+## Détails techniques sur le flux TMS utilisé pour le Téléchargement à la Carte
+
+Ce projet utilise un flux TMS exposé par data.geopf.fr, basé sur des couches tuilées vectorielles MVT.
+
+Trois couches sont exposées pour chaque produit :
+
+1. `-chantier` : emprises de production
+2. `-filtre` : métadonnées dynamiques pour l’interface
+3. `-produit` : dalles téléchargeables
+
+[Voir la documentation complète ici → TMS_TA_SPEC.md](./docs/TMS_TA_SPEC.md)
 
 ## L'arborescence du projet
 
@@ -76,6 +88,7 @@ Pour les instructions sur l'intégration dans les métadonnées des produits, co
 │   ├── hooks/          # Hooks personnalisés
 │   ├── utils/          # Fonctions utilitaires
 │   └── styles/         # Fichiers de style
+├── docs/               # Documentation du projet
 ├── public/             # Fichiers statiques
 ├── .docker/            # Configuration Docker et Nginx
 ├── tests/              # Tests unitaires et d'intégration
