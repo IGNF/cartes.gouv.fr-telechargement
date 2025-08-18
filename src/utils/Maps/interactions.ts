@@ -12,6 +12,11 @@ import {
   generateDownloadLinkMNX,
   generateDownloadLinkPPK,
 } from "../flux/generateDownloadLink";
+import { Draw } from "ol/interaction";
+import { bbox } from "ol/loadingstrategy";
+import { Vector as VectorSource } from "ol/source";
+import { Vector as VectorLayer } from "ol/layer";
+import GeoJSON from "ol/format/GeoJSON";
 
 proj4.defs(
   "EPSG:2154",
@@ -169,4 +174,80 @@ const centerOnFeatureSmooth = (map: Map, feature: any, zoomLevel?: number) => {
     zoom: zoomLevel ?? map.getView().getZoom(),
     duration: 500, // 0.5 seconde
   });
+};
+
+/**
+ * Ajoute une interaction de sélection par polygone.
+ * @param map - L'instance OpenLayers de la carte.
+ * @param selectionLayer - La couche où les entités sélectionnées seront affichées.
+ * @param onFeaturesSelected - Callback appelé avec les entités sélectionnées.
+ */
+export const addPolygonSelectionInteraction = (
+  map: Map,
+  selectionLayer: any,
+  onFeaturesSelected: (features: any[]) => void
+) => {
+  const drawPolygon = new Draw({
+    source: new VectorSource(),
+    type: "Polygon",
+  });
+
+  drawPolygon.on("drawend", (event) => {
+    const polygon = event.feature.getGeometry();
+    const selectedFeatures: any[] = [];
+
+    map.getLayers().forEach((layer) => {
+      if (layer instanceof VectorLayer) {
+        const source = layer.getSource();
+        source.forEachFeatureIntersectingExtent(polygon.getExtent(), (feature) => {
+          selectedFeatures.push(feature);
+        });
+      }
+    });
+
+    onFeaturesSelected(selectedFeatures);
+    selectionLayer.getSource().addFeatures(selectedFeatures);
+  });
+
+  map.addInteraction(drawPolygon);
+};
+
+/**
+ * Ajoute une interaction de sélection par upload.
+ * @param map - L'instance OpenLayers de la carte.
+ * @param selectionLayer - La couche où les entités sélectionnées seront affichées.
+ * @param onFeaturesSelected - Callback appelé avec les entités sélectionnées.
+ */
+export const addUploadSelectionInteraction = (
+  map: Map,
+  selectionLayer: any,
+  onFeaturesSelected: (features: any[]) => void
+) => {
+  const input = document.createElement("input");
+  input.type = "file";
+  input.accept = ".geojson,.json";
+
+  input.addEventListener("change", (event: any) => {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const geojsonData = e.target?.result;
+      if (!geojsonData) return;
+
+      const format = new GeoJSON();
+      const features = format.readFeatures(geojsonData, {
+        featureProjection: map.getView().getProjection(),
+      });
+
+      selectionLayer.getSource().addFeatures(features);
+      onFeaturesSelected(features);
+    };
+
+    reader.readAsText(file);
+  });
+
+  // Simule un clic pour ouvrir la boîte de dialogue de fichier
+  input.click();
 };

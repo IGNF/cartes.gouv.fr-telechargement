@@ -4,6 +4,7 @@ import {
   SearchEngine,
   Territories,
 } from "geopf-extensions-openlayers";
+import { SelectionModeControl } from "./Controls/SelectionModeContro";
 
 /**
  * Ajoute les contrôles OpenLayers à une carte.
@@ -22,6 +23,13 @@ export const addControls = (map: Map) => {
       thumbnail: false,
       reduce: false,
       tiles: 3,
+    })
+  );
+  map.addControl(
+    new SelectionModeControl({
+      onChange: (mode) => {
+        console.log("Mode de sélection changé :", mode);
+      }
     })
   );
 };
