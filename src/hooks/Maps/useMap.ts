@@ -16,7 +16,6 @@ import { LayerWMTS } from "geopf-extensions-openlayers";
 import { addControls } from "../../utils/Maps/controls";
 import { tmsLayer } from "../../utils/Maps/Layers";
 import {
-  addHoveredInteraction,
   addSelectedProduitInteraction,
   addZoomInteraction,
 } from "../../utils/Maps/interactions";
@@ -26,6 +25,7 @@ import useMapStore from "../Store/useMapStore";
 
 import { addPolygonSelectionInteraction } from "../../utils/Maps/interactions";
 import { addUploadSelectionInteraction } from "../../utils/Maps/interactions";
+import { HoveredInteraction, SelectedClickInteraction } from "../../utils/interactions";
 
 /**
  * Custom hook to initialize and manage an OpenLayers map.
@@ -103,25 +103,30 @@ export const useMap = (
       addProduitLayer(selectionProduitLayer);
       addControls(mapInstance);
       addZoomInteraction(mapInstance, chantierLayer, 11);
-      addSelectedProduitInteraction(
-        mapInstance,
-        selectionProduitLayer,
-        isProduitSelected,
-        addProduit,
-        removeProduit,
-        downloadUrl
-      );
-      addHoveredInteraction(
-        mapInstance,
-        selectionProduitLayer,
-        isProduitSelected
+      // addSelectedProduitInteraction(
+      //   mapInstance,
+      //   selectionProduitLayer,
+      //   isProduitSelected,
+      //   addProduit,
+      //   removeProduit,
+      //   downloadUrl
+      // );
+      mapInstance.addInteraction(
+        new SelectedClickInteraction(
+          mapInstance,
+          selectionProduitLayer,
+          11,
+          isProduitSelected,
+          addProduit,
+          removeProduit
+        )
       );
 
-      addHoveredInteraction(
-        mapInstance,
-        selectionProduitLayer,
-        isProduitSelected
-      );
+      // mapInstance.addInteraction(new HoveredInteraction(
+      //   mapInstance,
+      //   selectionProduitLayer,
+      //   isProduitSelected
+      // ));
       setMap(mapInstance);
     };
 

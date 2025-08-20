@@ -21,6 +21,8 @@ export const useDalleStore = create<DalleStore>((set, get) => ({
     set((state) => ({ selectedProduits: [...state.selectedProduits, produit] })),
   addProduitLayer: (produitLayer) => set((state) => ({ produitLayer: produitLayer })),
   removeProduit: (name) => {
+    console.log('hello from removeProduit', name);
+    
     get().produitLayer?.changed();
     set((state) => ({
       selectedProduits: state.selectedProduits.filter((produit) => produit.name !== name),
