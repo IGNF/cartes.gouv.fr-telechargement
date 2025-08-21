@@ -25,7 +25,11 @@ import useMapStore from "../Store/useMapStore";
 
 import { addPolygonSelectionInteraction } from "../../utils/Maps/interactions";
 import { addUploadSelectionInteraction } from "../../utils/Maps/interactions";
-import { HoveredInteraction, SelectedClickInteraction } from "../../utils/interactions";
+import {
+  HoveredInteraction,
+  SelectedClickInteraction,
+} from "../../utils/interactions";
+import { SelectedPolygonInteraction } from "../../utils/interactions/selectedPolygonInteraction";
 
 /**
  * Custom hook to initialize and manage an OpenLayers map.
@@ -46,6 +50,7 @@ export const useMap = (
   addProduitLayer: any
 ) => {
   const [map, setMap] = useState<Map | null>(null);
+  const [selectedPolygonInteraction, setSelectecPolygonInteraction] = useState<SelectedPolygonInteraction | null>(null);
   const selectionMode = useMapStore((state) => state.selectionMode);
 
   // Define and register the projection
@@ -111,16 +116,24 @@ export const useMap = (
       //   removeProduit,
       //   downloadUrl
       // );
-      mapInstance.addInteraction(
-        new SelectedClickInteraction(
-          mapInstance,
-          selectionProduitLayer,
-          11,
-          isProduitSelected,
-          addProduit,
-          removeProduit
-        )
+      const selectedPolygonInteraction = new SelectedPolygonInteraction(
+        mapInstance,
+        selectionProduitLayer,
+        isProduitSelected,
+        addProduit,
+        removeProduit
       );
+
+      const selectedClickInteraction = new SelectedClickInteraction(
+        mapInstance,
+        selectionProduitLayer,
+        10,
+        isProduitSelected,
+        addProduit,
+        removeProduit
+      );
+
+      selectedPolygonInteraction.setActive(false);
 
       // mapInstance.addInteraction(new HoveredInteraction(
       //   mapInstance,
@@ -145,34 +158,6 @@ export const useMap = (
 
     getConfig();
   }, []);
-
-  useEffect(() => {
-    if (!map) return;
-
-    if (!map) {
-      console.error("Map instance is not set.");
-      return;
-    }
-
-    // Remove all interactions first
-    map.removeInteraction(addSelectedProduitInteraction);
-    map.removeInteraction(addPolygonSelectionInteraction);
-    map.removeInteraction(addUploadSelectionInteraction);
-
-    // Add the appropriate interaction based on the selection mode
-    switch (selectionMode) {
-      case "polygon":
-        // map.addInteraction(addPolygonSelectionInteraction);
-        console.log('Adding polygon selection interaction');
-        
-        break;
-      case "click":
-        map.addInteraction(addSelectedProduitInteraction);
-        break;
-      default:
-        console.warn("Unknown selection mode:", selectionMode);
-    }
-  }, [selectionMode]);
 
   return map;
 };

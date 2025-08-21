@@ -2,7 +2,6 @@ import { Map } from "ol";
 import { Interaction } from "ol/interaction";
 import { FeatureLike } from "ol/Feature";
 import { Layer } from "ol/layer";
-import { getStyleForDalle } from "../Maps/style";
 import { getCenter } from "ol/extent";
 
 /**
