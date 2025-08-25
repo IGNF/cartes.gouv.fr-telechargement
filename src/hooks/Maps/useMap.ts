@@ -50,7 +50,8 @@ export const useMap = (
   addProduitLayer: any
 ) => {
   const [map, setMap] = useState<Map | null>(null);
-  const [selectedPolygonInteraction, setSelectecPolygonInteraction] = useState<SelectedPolygonInteraction | null>(null);
+  const [selectedPolygonInteraction, setSelectecPolygonInteraction] =
+    useState<SelectedPolygonInteraction | null>(null);
   const selectionMode = useMapStore((state) => state.selectionMode);
 
   // Define and register the projection
@@ -108,32 +109,34 @@ export const useMap = (
       addProduitLayer(selectionProduitLayer);
       addControls(mapInstance);
       addZoomInteraction(mapInstance, chantierLayer, 11);
-      // addSelectedProduitInteraction(
-      //   mapInstance,
+
+
+      // const selectedClickInteraction = new SelectedClickInteraction(
       //   selectionProduitLayer,
+      //   10,
       //   isProduitSelected,
       //   addProduit,
       //   removeProduit,
-      //   downloadUrl
       // );
+
       const selectedPolygonInteraction = new SelectedPolygonInteraction(
-        mapInstance,
         selectionProduitLayer,
         isProduitSelected,
         addProduit,
         removeProduit
+      ).getDrawInteraction();
+      mapInstance.addInteraction(
+        selectedPolygonInteraction
       );
-
-      const selectedClickInteraction = new SelectedClickInteraction(
-        mapInstance,
-        selectionProduitLayer,
-        10,
-        isProduitSelected,
-        addProduit,
-        removeProduit
-      );
-
       selectedPolygonInteraction.setActive(false);
+      mapInstance.getView().on("change:resolution", () => {
+        const zoom = mapInstance.getView().getZoom();
+        if (zoom >= 11) {
+          selectedPolygonInteraction.setActive(true);
+        } else {
+          selectedPolygonInteraction.setActive(false);
+        }
+      });
 
       // mapInstance.addInteraction(new HoveredInteraction(
       //   mapInstance,

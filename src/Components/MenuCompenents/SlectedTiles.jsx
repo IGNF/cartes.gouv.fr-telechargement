@@ -80,7 +80,7 @@ const SelectedTiles = ({ selectedDalles, onDownload, removeDalle, clearDalles })
         >
           Tout supprimer
         </Button>
-        <ModalComponent></ModalComponent>
+        {/* <ModalComponent></ModalComponent> */}
       </div>
     </>
   );

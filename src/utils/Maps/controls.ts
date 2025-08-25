@@ -25,11 +25,11 @@ export const addControls = (map: Map) => {
       tiles: 3,
     })
   );
-  map.addControl(
-    new SelectionModeControl({
-      onChange: (mode) => {
-        console.log("Mode de sélection changé :", mode);
-      }
-    })
-  );
+  // map.addControl(
+  //   new SelectionModeControl({
+  //     onChange: (mode) => {
+  //       console.log("Mode de sélection changé :", mode);
+  //     }
+  //   })
+  // );
 };
