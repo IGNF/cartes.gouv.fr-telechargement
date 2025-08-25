@@ -14,7 +14,6 @@ const AppHeader: FC<AppHeaderProps> = ({ navItems: propNavItems = [] }) => {
     iconId: "fr-icon-arrow-right-line",
     linkProps: {
       href: "https://www.geoportail.gouv.fr/carte",
-      target: "_self",
       className: "fr-btn--icon-right",
       target: "_blank",
       rel: "noreferrer",

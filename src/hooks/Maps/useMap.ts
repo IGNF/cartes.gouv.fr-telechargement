@@ -16,12 +16,20 @@ import { LayerWMTS } from "geopf-extensions-openlayers";
 import { addControls } from "../../utils/Maps/controls";
 import { tmsLayer } from "../../utils/Maps/Layers";
 import {
-  addHoveredInteraction,
   addSelectedProduitInteraction,
   addZoomInteraction,
 } from "../../utils/Maps/interactions";
 import { getStyleForDalle } from "../../utils/Maps/style";
 import VectorTileLayer from "ol/layer/VectorTile";
+import useMapStore from "../Store/useMapStore";
+
+import { addPolygonSelectionInteraction } from "../../utils/Maps/interactions";
+import { addUploadSelectionInteraction } from "../../utils/Maps/interactions";
+import {
+  HoveredInteraction,
+  SelectedClickInteraction,
+} from "../../utils/interactions";
+import { SelectedPolygonInteraction } from "../../utils/interactions/selectedPolygonInteraction";
 
 /**
  * Custom hook to initialize and manage an OpenLayers map.
@@ -42,6 +50,9 @@ export const useMap = (
   addProduitLayer: any
 ) => {
   const [map, setMap] = useState<Map | null>(null);
+  const [selectedPolygonInteraction, setSelectecPolygonInteraction] =
+    useState<SelectedPolygonInteraction | null>(null);
+  const selectionMode = useMapStore((state) => state.selectionMode);
 
   // Define and register the projection
   proj4.defs(
@@ -98,25 +109,40 @@ export const useMap = (
       addProduitLayer(selectionProduitLayer);
       addControls(mapInstance);
       addZoomInteraction(mapInstance, chantierLayer, 11);
-      addSelectedProduitInteraction(
-        mapInstance,
+
+
+      // const selectedClickInteraction = new SelectedClickInteraction(
+      //   selectionProduitLayer,
+      //   10,
+      //   isProduitSelected,
+      //   addProduit,
+      //   removeProduit,
+      // );
+
+      const selectedPolygonInteraction = new SelectedPolygonInteraction(
         selectionProduitLayer,
         isProduitSelected,
         addProduit,
-        removeProduit,
-        downloadUrl
+        removeProduit
+      ).getDrawInteraction();
+      mapInstance.addInteraction(
+        selectedPolygonInteraction
       );
-      addHoveredInteraction(
-        mapInstance,
-        selectionProduitLayer,
-        isProduitSelected
-      );
+      selectedPolygonInteraction.setActive(false);
+      mapInstance.getView().on("change:resolution", () => {
+        const zoom = mapInstance.getView().getZoom();
+        if (zoom >= 11) {
+          selectedPolygonInteraction.setActive(true);
+        } else {
+          selectedPolygonInteraction.setActive(false);
+        }
+      });
 
-      addHoveredInteraction(
-        mapInstance,
-        selectionProduitLayer,
-        isProduitSelected
-      );
+      // mapInstance.addInteraction(new HoveredInteraction(
+      //   mapInstance,
+      //   selectionProduitLayer,
+      //   isProduitSelected
+      // ));
       setMap(mapInstance);
     };
 
