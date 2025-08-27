@@ -45,6 +45,7 @@ export class SelectedPolygonInteraction extends Interaction {
     this.drawInteraction.on("drawend", (event) => {
       const extent = event.feature.getGeometry()?.getExtent();
       const format = new GeoJSON();
+      const listAlreadyChecked: String[] = []; // Liste pour éviter de vérifier plusieurs fois la même entité
 
       // Parcourt les entités dans l'étendue du polygone dessiné
       this.selectionLayer.getFeaturesInExtent(extent).forEach((feature) => {
@@ -71,15 +72,22 @@ export class SelectedPolygonInteraction extends Interaction {
         ) {
           const properties = feature.getProperties();
 
+          if (listAlreadyChecked.includes(properties.name)) {
+            return; // Passe à l'entité suivante si déjà vérifiée 
+          }
           const dalle = {
             name: properties.name,
             url: properties.url,
             id: properties.id,
           };
+          
+          listAlreadyChecked.push(dalle.name);
 
           if (!this.isProduitSelected(dalle.name)) {
             this.addProduit(dalle);
-          }
+          }else{
+            this.removeProduit(dalle.name);
+          } 
         }
       });
 

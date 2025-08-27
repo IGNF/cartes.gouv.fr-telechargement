@@ -12,6 +12,12 @@ const EmptyState = () => {
         Cliquez sur une zone d'intérêt pour sélectionner des dalles et voir les
         options de téléchargement.
       </p>
+      <p>
+        Pour sélectionner les dalles il vous faudra dessiner la zone d'intérêt
+        en cliquant sur la carte. Un clic simple permet de commencer le dessin et
+        un double clic permet de terminer le dessin.
+        Vous pouvez également le terminer en cliquant sur le premier point.
+      </p>
     </div>
   );
 };
