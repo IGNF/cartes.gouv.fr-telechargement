@@ -16,20 +16,14 @@ import { LayerWMTS } from "geopf-extensions-openlayers";
 import { addControls } from "../../utils/Maps/controls";
 import { tmsLayer } from "../../utils/Maps/Layers";
 import {
-  addSelectedProduitInteraction,
   addZoomInteraction,
 } from "../../utils/Maps/interactions";
 import { getStyleForDalle } from "../../utils/Maps/style";
 import VectorTileLayer from "ol/layer/VectorTile";
 import useMapStore from "../Store/useMapStore";
 
-import { addPolygonSelectionInteraction } from "../../utils/Maps/interactions";
-import { addUploadSelectionInteraction } from "../../utils/Maps/interactions";
-import {
-  HoveredInteraction,
-  SelectedClickInteraction,
-} from "../../utils/interactions";
 import { SelectedPolygonInteraction } from "../../utils/interactions/selectedPolygonInteraction";
+import { HoverPopupInteraction } from "../../utils/interactions";
 
 /**
  * Custom hook to initialize and manage an OpenLayers map.
@@ -137,6 +131,11 @@ export const useMap = (
           selectedPolygonInteraction.setActive(false);
         }
       });
+
+      const HoveredInteractionBlock = new HoverPopupInteraction({
+        layer: chantierLayer,
+      });
+      mapInstance.addInteraction(HoveredInteractionBlock);
 
       // mapInstance.addInteraction(new HoveredInteraction(
       //   mapInstance,

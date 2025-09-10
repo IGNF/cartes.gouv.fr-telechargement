@@ -1,5 +1,6 @@
-export { HoveredInteraction } from "./hoveredInteractions";
-export {SelectedClickInteraction} from "./selectedClickInteraction";
+import HoverPopupInteraction from "./hoveredInteractionBloc";
+export { HoverPopupInteraction };
+export { SelectedClickInteraction } from "./selectedClickInteraction";
 // export { addZoomInteraction } from "./addZoomInteraction";
 // export { addSelectedProduitInteraction } from "./addSelectedProduitInteraction";
 // export { addPolygonSelectionInteraction } from "./addPolygonSelectionInteraction";
