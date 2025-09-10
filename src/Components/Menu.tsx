@@ -1,8 +1,10 @@
 import React, { useState } from "react";
 import { getRouteApi } from "@tanstack/react-router";
+import { Checkbox } from "@codegouvfr/react-dsfr/Checkbox";
 import { useDalleStore } from "../hooks/Store/useDalleStore";
 import SelectedTiles from "./MenuCompenents/SlectedTiles";
 import EmptyState from "./MenuCompenents/EmptyState";
+import SelectedOptions from "./MenuCompenents/SelectedOptions";
 
 const route = getRouteApi("/telechargement/$downloadUrl");
 
@@ -32,6 +34,7 @@ const Menu = () => {
     <div className="fr-container fr-mt-3w">
       <div className="fr-grid-row fr-grid-row--gutters">
         <div className="fr-col-12 fr-col-md-10 fr-col-lg-12">
+          <SelectedOptions/>
           {selectedDalles.length > 0 ? (
             <SelectedTiles
               selectedDalles={selectedDalles}
@@ -41,7 +44,7 @@ const Menu = () => {
             />
           ) : (
             <EmptyState />
-          )} 
+          )}
         </div>
       </div>
     </div>

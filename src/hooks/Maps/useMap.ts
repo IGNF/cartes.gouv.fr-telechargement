@@ -1,39 +1,24 @@
-// React Core
 import { useEffect, useState } from "react";
-
-// OpenLayers Core
 import Map from "ol/Map";
 import View from "ol/View";
 import proj4 from "proj4";
 import { register } from "ol/proj/proj4";
 import { get } from "ol/proj";
 
-// Geoportal Extensions
 import Gp from "geoportal-access-lib";
 import { LayerWMTS } from "geopf-extensions-openlayers";
 
-// Custom Utils
 import { addControls } from "../../utils/Maps/controls";
 import { tmsLayer } from "../../utils/Maps/Layers";
-import {
-  addZoomInteraction,
-} from "../../utils/Maps/interactions";
+import { addZoomInteraction } from "../../utils/Maps/interactions";
 import { getStyleForDalle } from "../../utils/Maps/style";
 import VectorTileLayer from "ol/layer/VectorTile";
 import useMapStore from "../Store/useMapStore";
 
 import { SelectedPolygonInteraction } from "../../utils/interactions/selectedPolygonInteraction";
+import { SelectedClickInteraction } from "../../utils/interactions/selectedClickInteraction";
 import { HoverPopupInteraction } from "../../utils/interactions";
 
-/**
- * Custom hook to initialize and manage an OpenLayers map.
- *
- * @param {React.RefObject<HTMLDivElement>} containerRef - The reference to the map container element.
- * @param {string} downloadUrl - The URL for downloading map data.
- * @param {Function} setSelectedDalles - Function to update the selected dalles.
- * @param {any[]} selectedProduits - Array of selected dalles.
- * @returns {Map | null} The initialized map instance.
- */
 export const useMap = (
   containerRef: React.RefObject<HTMLDivElement>,
   downloadUrl: string,
@@ -44,11 +29,11 @@ export const useMap = (
   addProduitLayer: any
 ) => {
   const [map, setMap] = useState<Map | null>(null);
-  const [selectedPolygonInteraction, setSelectecPolygonInteraction] =
-    useState<SelectedPolygonInteraction | null>(null);
+
+  // ton store a déjà un "selectionMode"
   const selectionMode = useMapStore((state) => state.selectionMode);
 
-  // Define and register the projection
+  // projection
   proj4.defs(
     "EPSG:3857",
     "+proj=lcc +lat_1=49.000000000 +lat_2=44.000000000 +lat_0=46.500000000 +lon_0=3.000000000 +x_0=700000.000 +y_0=6600000.000 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs"
@@ -68,7 +53,7 @@ export const useMap = (
   const selectionProduitLayer = new VectorTileLayer({
     renderMode: "vector",
     source: produitLayer.getSource(),
-    style: function (feature) {
+    style: (feature) => {
       if (isProduitSelected(feature.getProperties().name)) {
         return getStyleForDalle("selected");
       }
@@ -78,9 +63,6 @@ export const useMap = (
   useEffect(() => {
     if (!containerRef.current) return;
 
-    /**
-     * Create and initialize the map instance.
-     */
     const createMap = () => {
       const mapInstance = new Map({
         target: containerRef.current,
@@ -104,50 +86,48 @@ export const useMap = (
       addControls(mapInstance);
       addZoomInteraction(mapInstance, chantierLayer, 11);
 
-
-      // const selectedClickInteraction = new SelectedClickInteraction(
-      //   selectionProduitLayer,
-      //   10,
-      //   isProduitSelected,
-      //   addProduit,
-      //   removeProduit,
-      // );
-
-      const selectedPolygonInteraction = new SelectedPolygonInteraction(
+      // ajout interactions
+      const polygonInteraction = new SelectedPolygonInteraction(
         selectionProduitLayer,
         isProduitSelected,
         addProduit,
         removeProduit
       ).getDrawInteraction();
-      mapInstance.addInteraction(
-        selectedPolygonInteraction
+      mapInstance.addInteraction(polygonInteraction);
+      polygonInteraction.setActive(false);
+
+      const clickInteraction = new SelectedClickInteraction(
+        selectionProduitLayer,
+        10,
+        isProduitSelected,
+        addProduit,
+        removeProduit
       );
-      selectedPolygonInteraction.setActive(false);
-      mapInstance.getView().on("change:resolution", () => {
-        const zoom = mapInstance.getView().getZoom();
-        if (zoom >= 11) {
-          selectedPolygonInteraction.setActive(true);
+      mapInstance.addInteraction(clickInteraction);
+      clickInteraction.setActive(true);
+
+      const hoverInteraction = new HoverPopupInteraction({
+        layer: chantierLayer,
+      });
+      mapInstance.addInteraction(hoverInteraction);
+
+      // ⚡ bascule entre les interactions selon selectionMode
+      useMapStore.subscribe((state) => {
+        if (state.selectionMode === "polygon") {
+          polygonInteraction.setActive(true);
+          clickInteraction.setActive(false);
+        } else if (state.selectionMode === "click") {
+          polygonInteraction.setActive(false);
+          clickInteraction.setActive(true);
         } else {
-          selectedPolygonInteraction.setActive(false);
+          polygonInteraction.setActive(false);
+          clickInteraction.setActive(false);
         }
       });
 
-      const HoveredInteractionBlock = new HoverPopupInteraction({
-        layer: chantierLayer,
-      });
-      mapInstance.addInteraction(HoveredInteractionBlock);
-
-      // mapInstance.addInteraction(new HoveredInteraction(
-      //   mapInstance,
-      //   selectionProduitLayer,
-      //   isProduitSelected
-      // ));
       setMap(mapInstance);
     };
 
-    /**
-     * Fetch and apply Geoportal configuration.
-     */
     const getConfig = async () => {
       const config = new Gp.Services.Config({
         customConfigFile:
