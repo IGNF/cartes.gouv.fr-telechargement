@@ -27,9 +27,6 @@ export class SelectedClickInteraction extends Interaction {
     this.isProduitSelected = isProduitSelected;
     this.addProduit = addProduit;
     this.removeProduit = removeProduit;
-
-    // Ajout de l'événement de clic
-    this.handleEvent = this.handleClickEvent.bind(this);
   }
 
   /**
@@ -37,7 +34,7 @@ export class SelectedClickInteraction extends Interaction {
    * @param event - L'événement de clic de la carte.
    * @returns {boolean} - Retourne `true` pour continuer la propagation de l'événement.
    */
-  private handleClickEvent(event: MapBrowserEvent<MouseEvent>): boolean {
+  public override handleEvent(event: MapBrowserEvent<MouseEvent>): boolean {
     // Vérifie que l'événement est un clic
     if (event.type !== "click") {
       return true; // Continue la propagation pour les autres types d'événements
@@ -45,12 +42,10 @@ export class SelectedClickInteraction extends Interaction {
 
     const map = event.map;
     const pixel = map.getEventPixel(event.originalEvent);
-    let index = 0;
 
     // Parcourt les entités sous le clic
     map.forEachFeatureAtPixel(pixel, (feature, layer) => {
       if (
-        index === 0 &&
         layer?.getSource()["key_"] === this.selectionLayer.getSource()["key_"]
       ) {
         const properties = feature.getProperties();
@@ -67,33 +62,38 @@ export class SelectedClickInteraction extends Interaction {
           this.removeProduit(dalle.name);
         }
 
-        // Centre la carte sur l'entité sélectionnée
-        this.centerOnFeature(map, feature);
-
-        // Rafraîchit la couche de sélection
-        this.selectionLayer.changed();
-        index += 1;
+        // Déplace la carte de manière imperceptible
+        this.moveMapImperceptibly(map);
       }
     });
+
+    // Rafraîchit la couche de sélection
+    this.selectionLayer.changed();
 
     return true; // Continue la propagation de l'événement
   }
 
   /**
-   * Centre la carte sur une entité de manière fluide.
+   * Déplace la carte de manière imperceptible en ajustant légèrement le centre.
    * @param map - L'instance de la carte.
-   * @param feature - L'entité sur laquelle centrer la carte.
    */
-  private centerOnFeature(map: any, feature: FeatureLike) {
-    const geometry = feature.getGeometry();
-    if (!geometry) return;
+  private moveMapImperceptibly(map: any): void {
+    const view = map.getView();
+    const currentCenter = view.getCenter();
 
-    const center = getCenter(geometry.getExtent());
+    if (currentCenter) {
+      // Ajoute un léger décalage au centre actuel
+      const imperceptibleOffset = 0.00001; // Ajustez cette valeur si nécessaire
+      const newCenter = [
+        currentCenter[0] + imperceptibleOffset,
+        currentCenter[1] + imperceptibleOffset,
+      ];
 
-    map.getView().animate({
-      center: center,
-      zoom: this.zoomToGo,
-      duration: 500, // 0.5 seconde
-    });
+      // Anime la vue vers le nouveau centre
+      view.animate({
+        center: newCenter,
+        duration: 100, // Animation rapide (0.1 seconde)
+      });
+    }
   }
 }

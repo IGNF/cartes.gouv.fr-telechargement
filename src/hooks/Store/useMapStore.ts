@@ -37,27 +37,6 @@ const useMapStore = create<MapStore>((set, get) => ({
       console.log(interaction);
     });
 
-    // if (!mapInstance) {
-    //     console.error("Map instance is not set.");
-    //     return;
-    // }
-
-    // // Remove all interactions first
-    // mapInstance.removeInteraction(addSelectedProduitInteraction);
-    // mapInstance.removeInteraction(addPolygonSelectionInteraction);
-    // mapInstance.removeInteraction(addUploadSelectionInteraction);
-
-    // Add the appropriate interaction based on the selection mode
-    //     switch (selectionMode) {
-    //         case "polygon":
-    //             mapInstance.addInteraction(addPolygonSelectionInteraction);
-    //             break;
-    //         case "click":
-    //             mapInstance.addInteraction(addSelectedProduitInteraction);
-    //             break;
-    //         default:
-    //             console.warn("Unknown selection mode:", selectionMode);
-    //     }
   },
 }));
 
