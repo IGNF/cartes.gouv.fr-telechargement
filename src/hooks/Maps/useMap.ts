@@ -106,10 +106,16 @@ export const useMap = (
       mapInstance.addInteraction(clickInteraction);
       clickInteraction.setActive(true);
 
-      const hoverInteraction = new HoverPopupInteraction({
+      const hoverInteractionChantier = new HoverPopupInteraction({
         layer: chantierLayer,
       });
-      mapInstance.addInteraction(hoverInteraction);
+      mapInstance.addInteraction(hoverInteractionChantier);
+
+
+      const hoverInteractionProduit = new HoverPopupInteraction({
+        layer: produitLayer,
+      });
+      mapInstance.addInteraction(hoverInteractionProduit);
 
       // ⚡ bascule entre les interactions selon selectionMode
       useMapStore.subscribe((state) => {
