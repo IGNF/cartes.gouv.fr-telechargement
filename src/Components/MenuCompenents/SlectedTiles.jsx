@@ -2,7 +2,6 @@ import React from "react";
 import { Accordion } from "@codegouvfr/react-dsfr/Accordion";
 import { Button } from "@codegouvfr/react-dsfr/Button";
 import { Download } from "@codegouvfr/react-dsfr/Download";
-import ModalComponent from "./Modal/Modal";
 
 
 
@@ -80,7 +79,6 @@ const SelectedTiles = ({ selectedDalles, onDownload, removeDalle, clearDalles })
         >
           Tout supprimer
         </Button>
-        {/* <ModalComponent></ModalComponent> */}
       </div>
     </>
   );
