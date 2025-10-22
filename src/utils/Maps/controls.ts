@@ -11,13 +11,13 @@ import { SelectionModeControl } from "./Controls/SelectionModeContro";
  * @param map - Instance de la carte OpenLayers.
  */
 export const addControls = (map: Map) => {
-  map.addControl(new GeoportalZoom({ position: "bottom-left" }));
-  map.addControl(new SearchEngine({ position: "top-right" }));
+  map.addControl(new GeoportalZoom({ position: "bottom-right" }));
+  map.addControl(new SearchEngine({ position: "top-left" }));
   map.addControl(
     new Territories({
       collapsed: true,
       draggable: true,
-      position: "top-right",
+      position: "bottom-left",
       panel: true,
       auto: true,
       thumbnail: false,
