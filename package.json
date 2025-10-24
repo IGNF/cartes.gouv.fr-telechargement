@@ -21,6 +21,7 @@
     "@types/react-dom": "^18.3.0",
     "@vitejs/plugin-react": "^4.3.2",
     "cucumber": "^6.0.7",
+    "ign-dsfr-header": "github:IGNF/dsfr-extension",
     "vite": "^6.0.3"
   },
   "dependencies": {
@@ -30,6 +31,7 @@
     "@tanstack/router-devtools": "^1.87.7",
     "@turf/turf": "^7.2.0",
     "antd": "^5.26.4",
+    "dsfr-extension": "git@github.com:IGNF/dsfr-extension.git",
     "geopf-extensions-openlayers": "^1.0.0-beta.3",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
