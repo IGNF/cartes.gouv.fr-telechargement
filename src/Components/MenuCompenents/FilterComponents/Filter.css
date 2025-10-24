@@ -1,4 +1,11 @@
-.filter {
+filter {
+  display: flex;
+flex-direction: column;
+align-items: center;
+gap: 16px;
+align-self: stretch;
+}
+.filter-header {
   display: flex;
   width: 418px;
   height: 39px;

@@ -2,7 +2,7 @@ import React from "react";
 
 const EmptyState = () => {
   return (
-    <div className="fr-text--lead fr-mb-2w">
+    <div >
       <p>
         Cette interface vous permet de visualiser les données disponibles dans
         votre zone d'intérêt et de récupérer une liste de liens pour les

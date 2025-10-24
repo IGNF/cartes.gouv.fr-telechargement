@@ -30,10 +30,10 @@ const Menu = () => {
   };
 
   return (
-    <div className="fr-container fr-mt-3w">
-      <div className="fr-grid-row fr-grid-row--gutters">
+    <div className="menu">
+      <div >
         <Filter></Filter>
-        <div className="fr-col-12 fr-col-md-10 fr-col-lg-12">
+        <div >
           <SelectedOptions/>
           {selectedDalles.length > 0 ? (
             <SelectedTiles
