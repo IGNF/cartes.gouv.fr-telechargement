@@ -31,10 +31,8 @@ const useMapStore = create<MapStore>((set, get) => ({
   handleModeChange: () => {
     const selectionMode = get().selectionMode;
     const mapInstance = get().mapInstance;
-    console.log("helllo", selectionMode, mapInstance);
 
     mapInstance.getInteractions().forEach((interaction) => {
-      console.log(interaction);
     });
 
   },

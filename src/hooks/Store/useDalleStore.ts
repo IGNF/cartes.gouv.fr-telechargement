@@ -20,12 +20,12 @@ export const useDalleStore = create<DalleStore>((set, get) => ({
   addProduit: (produit) =>
     set((state) => ({ selectedProduits: [...state.selectedProduits, produit] })),
   addProduitLayer: (produitLayer) => set((state) => ({ produitLayer: produitLayer })),
-  removeProduit: (name) => {
-    console.log('hello from removeProduit', name);
+  removeProduit: (id) => {
+
     
     get().produitLayer?.changed();
     set((state) => ({
-      selectedProduits: state.selectedProduits.filter((produit) => produit.name !== name),
+      selectedProduits: state.selectedProduits.filter((produit) => produit.id !== id),
     }));
 
     // get().dalleLayer.getFeatureById(id)?.setStyle(getStyleForDalle("default"));
@@ -34,6 +34,6 @@ export const useDalleStore = create<DalleStore>((set, get) => ({
     get().produitLayer?.changed();
     set({ selectedProduits: [] });
   },
-  isProduitSelected: (name) =>
-    get().selectedProduits.some((produit) => produit.name === name),
+  isProduitSelected: (id) =>
+    get().selectedProduits.some((produit) => produit.id === id),
 }));

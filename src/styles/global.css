@@ -14,21 +14,47 @@
   display: var(--visible-toggle);
 }
 
-#fr-footer{
+#fr-footer {
   padding: 0;
+}
+.selected-options-container {
+  position: absolute;
+  top: 60px;
+  right: 605px;
+  z-index: 1000;
+  display: inline-flex;
+  padding: 8px;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 4px;
+  border-radius: 4px;
+  background: var(--light-decisions-background-background-default-grey, #fff);
+    --active: var(--background-default-grey-active);
 
 }
-.fr-footer__bottom-item--right {
+
+.fr-icon-polygon-icon::before,
+.fr-icon-polygon-icon::after {
+  -webkit-mask-image: url("../assets/icon/trace.svg");
+  mask-image: url("../assets/icon/trace.svg");
 }
 
-
-@media (min-width: 78em) {
-  .fr-container, .fr-container-sm, .fr-container-md, .fr-container-lg {
-    max-width: 100%;
+@media screen and (min-width: 0\0) and (min-resolution: 72dpi) {
+  .fr-icon-polygon-icon::before,
+  .fr-icon-polygon-icon::after {
+    background-image: url("../assets/icon/trace.svg");
   }
 }
 
-
+@media (min-width: 78em) {
+  .fr-container,
+  .fr-container-sm,
+  .fr-container-md,
+  .fr-container-lg {
+    max-width: 100%;
+  }
+}
 
 .gpf-btn-icon-widget {
   background-image: url("img/dsfr/widget.svg");

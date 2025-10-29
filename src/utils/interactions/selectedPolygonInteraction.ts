@@ -72,7 +72,7 @@ export class SelectedPolygonInteraction extends Interaction {
         ) {
           const properties = feature.getProperties();
 
-          if (listAlreadyChecked.includes(properties.name)) {
+          if (listAlreadyChecked.includes(properties.id)) {
             return; // Passe à l'entité suivante si déjà vérifiée 
           }
           const dalle = {
@@ -81,12 +81,12 @@ export class SelectedPolygonInteraction extends Interaction {
             id: properties.id,
           };
           
-          listAlreadyChecked.push(dalle.name);
+          listAlreadyChecked.push(dalle.id);
 
-          if (!this.isProduitSelected(dalle.name)) {
+          if (!this.isProduitSelected(dalle.id)) {
             this.addProduit(dalle);
           }else{
-            this.removeProduit(dalle.name);
+            this.removeProduit(dalle.id);
           } 
         }
       });

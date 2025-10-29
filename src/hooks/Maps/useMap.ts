@@ -22,7 +22,6 @@ import { HoverPopupInteraction } from "../../utils/interactions";
 export const useMap = (
   containerRef: React.RefObject<HTMLDivElement>,
   downloadUrl: string,
-  selectedProduits: any,
   addProduit: any,
   isProduitSelected: any,
   removeProduit: any,
@@ -54,7 +53,7 @@ export const useMap = (
     renderMode: "vector",
     source: produitLayer.getSource(),
     style: (feature) => {
-      if (isProduitSelected(feature.getProperties().name)) {
+      if (isProduitSelected(feature.getProperties().id)) {
         return getStyleForDalle("selected");
       }
     },

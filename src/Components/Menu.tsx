@@ -32,9 +32,8 @@ const Menu = () => {
   return (
     <div className="menu">
       <div >
-        <Filter></Filter>
+        {/* <Filter></Filter> */}
         <div >
-          <SelectedOptions/>
           {selectedDalles.length > 0 ? (
             <SelectedTiles
               selectedDalles={selectedDalles}

@@ -43,6 +43,8 @@ export class SelectedClickInteraction extends Interaction {
     const map = event.map;
     const pixel = map.getEventPixel(event.originalEvent);
 
+    let index = 0;
+
     // Parcourt les entités sous le clic
     map.forEachFeatureAtPixel(pixel, (feature, layer) => {
       if (
@@ -54,12 +56,15 @@ export class SelectedClickInteraction extends Interaction {
           url: properties.url,
           id: properties.id,
         };
-
         // Ajoute ou retire le produit en fonction de son état
-        if (!this.isProduitSelected(dalle.name)) {
+        if (!this.isProduitSelected(dalle.id) && index === 0) {
           this.addProduit(dalle);
+          index++;
         } else {
-          this.removeProduit(dalle.name);
+          if (index === 0) {
+            this.removeProduit(dalle.id);
+            index++;
+          }
         }
 
         // Déplace la carte de manière imperceptible
