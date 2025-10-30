@@ -1,9 +1,7 @@
-import { Map } from "ol";
 import { Interaction } from "ol/interaction";
 import { Draw } from "ol/interaction";
-import { FeatureLike } from "ol/Feature";
 import { Vector as VectorSource } from "ol/source";
-import { bboxPolygon, booleanIntersects } from "@turf/turf";
+import { booleanIntersects } from "@turf/turf";
 import GeoJSON from "ol/format/GeoJSON";
 import { Polygon } from "ol/geom";
 
@@ -73,21 +71,21 @@ export class SelectedPolygonInteraction extends Interaction {
           const properties = feature.getProperties();
 
           if (listAlreadyChecked.includes(properties.id)) {
-            return; // Passe à l'entité suivante si déjà vérifiée 
+            return; // Passe à l'entité suivante si déjà vérifiée
           }
           const dalle = {
             name: properties.name,
             url: properties.url,
             id: properties.id,
           };
-          
+
           listAlreadyChecked.push(dalle.id);
 
           if (!this.isProduitSelected(dalle.id)) {
             this.addProduit(dalle);
-          }else{
+          } else {
             this.removeProduit(dalle.id);
-          } 
+          }
         }
       });
 

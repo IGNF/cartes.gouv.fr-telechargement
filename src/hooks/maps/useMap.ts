@@ -13,7 +13,7 @@ import { tmsLayer } from "../../utils/maps/Layers";
 import { addZoomInteraction } from "../../utils/maps/interactions";
 import { getStyleForDalle } from "../../utils/maps/style";
 import VectorTileLayer from "ol/layer/VectorTile";
-import useMapStore from "../store/useDalleStore";
+import useMapStore from "../../hooks/store/useMapStore";
 
 import { SelectedPolygonInteraction } from "../../utils/interactions/selectedPolygonInteraction";
 import { SelectedClickInteraction } from "../../utils/interactions/selectedClickInteraction";
@@ -29,8 +29,6 @@ export const useMap = (
 ) => {
   const [map, setMap] = useState<Map | null>(null);
 
-  // ton store a déjà un "selectionMode"
-  const selectionMode = useMapStore((state) => state.selectionMode);
 
   // projection
   proj4.defs(
@@ -118,7 +116,7 @@ export const useMap = (
 
       // ⚡ bascule entre les interactions selon selectionMode
       useMapStore.subscribe((state) => {
-        if (state.selectionMode === "polygon") {
+        if (state.selectionMode === "polygon" ) {
           polygonInteraction.setActive(true);
           clickInteraction.setActive(false);
         } else if (state.selectionMode === "click") {
@@ -126,7 +124,7 @@ export const useMap = (
           clickInteraction.setActive(true);
         } else {
           polygonInteraction.setActive(false);
-          clickInteraction.setActive(false);
+          clickInteraction.setActive(true);
         }
       });
 

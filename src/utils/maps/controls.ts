@@ -4,7 +4,6 @@ import {
   SearchEngine,
   Territories,
 } from "geopf-extensions-openlayers";
-import { SelectionModeControl } from "./Controls/SelectionModeContro";
 
 /**
  * Ajoute les contrôles OpenLayers à une carte.

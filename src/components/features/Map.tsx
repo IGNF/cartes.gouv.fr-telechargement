@@ -16,7 +16,7 @@ const MapComponent = () => {
 
   const selectedDalle = useDalleStore((state) => state.selectedProduits);
   const addProduit = useDalleStore((state) => state.addProduit);
-  const isDalleSelected = useDalleStore((state) => state.isProduitSelected);
+  const isProduitSelected = useDalleStore((state) => state.isProduitSelected);
   const removeDalle = useDalleStore((state) => state.removeProduit);
   const addProduitLayer = useDalleStore((state) => state.addProduitLayer);
 
@@ -26,7 +26,7 @@ const MapComponent = () => {
     mapContainerRef,
     downloadUrl,
     addProduit,
-    isDalleSelected,
+    isProduitSelected,
     removeDalle,
     addProduitLayer
   );

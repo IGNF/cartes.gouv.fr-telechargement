@@ -1,8 +1,3 @@
-import VectorSource from "ol/source/Vector";
-import VectorLayer from "ol/layer/Vector";
-import GeoJSON from "ol/format/GeoJSON";
-import { getStyleForBlocs, getStyleForDalle } from "./style";
-import { XYZ } from "ol/source";
 
 import VectorTileSource from 'ol/source/VectorTile.js';
 import VectorTileLayer from "ol/layer/VectorTile";

@@ -1,8 +1,6 @@
 import { Interaction } from "ol/interaction";
-import { FeatureLike } from "ol/Feature";
 import { Layer } from "ol/layer";
 import { MapBrowserEvent } from "ol";
-import { getCenter } from "ol/extent";
 
 /**
  * Interaction de sélection par clic pour les entités d'une couche vectorielle.
@@ -34,7 +32,9 @@ export class SelectedClickInteraction extends Interaction {
    * @param event - L'événement de clic de la carte.
    * @returns {boolean} - Retourne `true` pour continuer la propagation de l'événement.
    */
-  public override handleEvent(event: MapBrowserEvent<MouseEvent>): boolean {
+  public override handleEvent(
+    event: MapBrowserEvent<KeyboardEvent | WheelEvent | PointerEvent>
+  ): boolean {
     // Vérifie que l'événement est un clic
     if (event.type !== "click") {
       return true; // Continue la propagation pour les autres types d'événements
@@ -44,6 +44,7 @@ export class SelectedClickInteraction extends Interaction {
     const pixel = map.getEventPixel(event.originalEvent);
 
     let index = 0;
+    console.log("click handled", map, pixel);
 
     // Parcourt les entités sous le clic
     map.forEachFeatureAtPixel(pixel, (feature, layer) => {
@@ -60,6 +61,7 @@ export class SelectedClickInteraction extends Interaction {
         if (!this.isProduitSelected(dalle.id) && index === 0) {
           this.addProduit(dalle);
           index++;
+        console.log("hello");
         } else {
           if (index === 0) {
             this.removeProduit(dalle.id);

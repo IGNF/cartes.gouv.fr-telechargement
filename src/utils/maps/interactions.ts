@@ -2,18 +2,10 @@ import { Map } from "ol";
 import { FeatureLike } from "ol/Feature";
 import { getStyleForDalle } from "./style";
 import { Select } from "ol/interaction";
-import { click, platformModifierKeyOnly } from "ol/events/condition";
-import { easeOut } from "ol/easing";
-import { buffer, getCenter } from "ol/extent";
-import { transformExtent } from "ol/proj";
+import {  getCenter } from "ol/extent";
 import proj4 from "proj4";
 import { register } from "ol/proj/proj4";
-import {
-  generateDownloadLinkMNX,
-  generateDownloadLinkPPK,
-} from "../flux/generateDownloadLink";
 import { Draw } from "ol/interaction";
-import { bbox } from "ol/loadingstrategy";
 import { Vector as VectorSource } from "ol/source";
 import { Vector as VectorLayer } from "ol/layer";
 import GeoJSON from "ol/format/GeoJSON";
