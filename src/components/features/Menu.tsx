@@ -43,16 +43,12 @@ const Menu = () => {
 
       <HelpModal />
 
-      {selectedDalles.length > 0 ? (
-        <SelectedTiles
-          selectedDalles={selectedDalles}
-          onDownload={onDownload}
-          removeDalle={removeDalle}
-          clearDalles={clearDalles}
-        />
-      ) : (
-        <EmptyState />
-      )}
+      <SelectedTiles
+        selectedDalles={selectedDalles}
+        onDownload={onDownload}
+        removeDalle={removeDalle}
+        clearDalles={clearDalles}
+      />
     </div>
   );
 };

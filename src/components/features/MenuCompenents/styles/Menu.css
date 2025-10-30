@@ -1,6 +1,5 @@
 .menu {
   display: flex;
-  width: 451px;
   height: 604px;
   padding: 24px 16px;
   flex-direction: column;
