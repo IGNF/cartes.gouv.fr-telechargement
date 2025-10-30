@@ -1,6 +1,5 @@
-import useMapStore from "../../hooks/Store/useMapStore";
+import useMapStore from "../../../hooks/store/useMapStore";
 import { Button } from "@codegouvfr/react-dsfr/Button";
-import { Tooltip } from "@codegouvfr/react-dsfr/Tooltip";
 
 export default function SelectedOptions() {
   const selectionMode = useMapStore((state) => state.selectionMode);
@@ -13,7 +12,9 @@ export default function SelectedOptions() {
         className=" gpf-btn-icon"
         iconId="fr-icon-cursor-line"
         priority="tertiary"
+        size="medium"
         onClick={() => setSelectionMode("click")}
+        disabled={selectionMode === "click"}
       />
       <Button
         className="gpf-btn-icon"

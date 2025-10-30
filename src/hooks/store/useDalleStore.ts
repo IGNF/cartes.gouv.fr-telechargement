@@ -11,7 +11,7 @@ type DalleStore = {
   addProduitLayer: (dalleLayer: DalleLayer) => void;
   removeProduit: (id: string) => void;
   removeAllProduits: () => void;
-  isProduitSelected: (dalle: Dalle) => boolean;
+  isProduitSelected: (id: string) => boolean;
 };
 
 export const useDalleStore = create<DalleStore>((set, get) => ({
@@ -37,3 +37,5 @@ export const useDalleStore = create<DalleStore>((set, get) => ({
   isProduitSelected: (id) =>
     get().selectedProduits.some((produit) => produit.id === id),
 }));
+
+export default useDalleStore;

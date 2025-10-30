@@ -8,12 +8,12 @@ import { get } from "ol/proj";
 import Gp from "geoportal-access-lib";
 import { LayerWMTS } from "geopf-extensions-openlayers";
 
-import { addControls } from "../../utils/Maps/controls";
-import { tmsLayer } from "../../utils/Maps/Layers";
-import { addZoomInteraction } from "../../utils/Maps/interactions";
-import { getStyleForDalle } from "../../utils/Maps/style";
+import { addControls } from "../../utils/maps/controls";
+import { tmsLayer } from "../../utils/maps/Layers";
+import { addZoomInteraction } from "../../utils/maps/interactions";
+import { getStyleForDalle } from "../../utils/maps/style";
 import VectorTileLayer from "ol/layer/VectorTile";
-import useMapStore from "../Store/useMapStore";
+import useMapStore from "../store/useDalleStore";
 
 import { SelectedPolygonInteraction } from "../../utils/interactions/selectedPolygonInteraction";
 import { SelectedClickInteraction } from "../../utils/interactions/selectedClickInteraction";

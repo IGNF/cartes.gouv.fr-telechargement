@@ -1,6 +1,6 @@
 import React, { useRef, useState } from "react";
-import { useMap } from "../hooks/Maps/useMap";
-import { useDalleStore } from "../hooks/Store/useDalleStore";
+import { useMap } from "../../hooks/maps/useMap";
+import { useDalleStore } from "../../hooks/store/useDalleStore";
 
 import "ol/ol.css";
 import "@gouvfr/dsfr/dist/dsfr.css";

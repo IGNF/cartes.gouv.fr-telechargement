@@ -1,16 +1,15 @@
-import React, { useState } from "react";
+import React from "react";
 import { getRouteApi } from "@tanstack/react-router";
-import { useDalleStore } from "../hooks/Store/useDalleStore";
+import { useDalleStore } from "../../hooks/store/useDalleStore";
 import SelectedTiles from "./MenuCompenents/SlectedTiles";
 import EmptyState from "./MenuCompenents/EmptyState";
-import SelectedOptions from "./MenuCompenents/SelectedOptions";
-import Filter from "./MenuCompenents/FilterComponents/Filter";
-import "./menu.css";
+import "./MenuCompenents/styles/Menu.css";
+import Button from "@codegouvfr/react-dsfr/Button";
+import HelpModal, { helpModal } from "./MenuCompenents/HelpModal";
 
 const route = getRouteApi("/telechargement/$downloadUrl");
 
 const Menu = () => {
-
   const selectedDalles = useDalleStore((state) => state.selectedProduits);
   const removeDalle = useDalleStore((state) => state.removeProduit);
   const clearDalles = useDalleStore((state) => state.removeAllProduits);
@@ -31,21 +30,29 @@ const Menu = () => {
 
   return (
     <div className="menu">
-      <div >
-        {/* <Filter></Filter> */}
-        <div >
-          {selectedDalles.length > 0 ? (
-            <SelectedTiles
-              selectedDalles={selectedDalles}
-              onDownload={onDownload}
-              removeDalle={removeDalle}
-              clearDalles={clearDalles}
-            />
-          ) : (
-            <EmptyState />
-          )}
-        </div>
+      <div className="title-menu">
+        <h4 className="fr-h4">Téléchargement de données</h4>
+        <Button
+          priority="tertiary no outline"
+          size="small"
+          iconId="fr-icon-information-line"
+          title="Informations sur le téléchargement de données"
+          onClick={() => helpModal.open()}
+        />
       </div>
+
+      <HelpModal />
+
+      {selectedDalles.length > 0 ? (
+        <SelectedTiles
+          selectedDalles={selectedDalles}
+          onDownload={onDownload}
+          removeDalle={removeDalle}
+          clearDalles={clearDalles}
+        />
+      ) : (
+        <EmptyState />
+      )}
     </div>
   );
 };

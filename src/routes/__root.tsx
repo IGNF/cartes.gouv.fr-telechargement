@@ -1,6 +1,6 @@
 import { Outlet, createRootRoute } from "@tanstack/react-router";
-import IgnfDsfrHeader from "../Components/Layout/IgnfDsfrHeader";
-import AppFooter from "../Components/Layout/AppFooter";
+import IgnfDsfrHeader from "../components/features/Layout/IgnfDsfrHeader.tsx";
+import AppFooter from "../components/features/Layout/AppFooter";
 
 export const Route = createRootRoute({
   component: RootComponent,
