@@ -22,6 +22,8 @@ export default function SelectedOptions() {
         priority="tertiary"
         title="Sélectionner par surface"
         onClick={() => setSelectionMode("polygon")}
+
+        disabled={selectionMode === "polygon"}
       />
     </div>
   );
