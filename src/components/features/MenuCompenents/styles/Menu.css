@@ -19,3 +19,20 @@
 .title-menu h4 {
   margin: 0;
 }
+
+.filter-menu {
+  display: flex;
+  align-items: flex-end;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 1rem 0;
+}
+
+.filter-menu .fr-input-group {
+  flex: 1;
+  margin-bottom: 0;
+}
+
+.filter-menu button {
+  height: 2.5rem;
+}

@@ -6,6 +6,7 @@ import EmptyState from "./MenuCompenents/EmptyState";
 import "./MenuCompenents/styles/Menu.css";
 import Button from "@codegouvfr/react-dsfr/Button";
 import HelpModal, { helpModal } from "./MenuCompenents/HelpModal";
+import { Input } from "@codegouvfr/react-dsfr/Input";
 
 const route = getRouteApi("/telechargement/$downloadUrl");
 
@@ -13,6 +14,7 @@ const Menu = () => {
   const selectedDalles = useDalleStore((state) => state.selectedProduits);
   const removeDalle = useDalleStore((state) => state.removeProduit);
   const clearDalles = useDalleStore((state) => state.removeAllProduits);
+  const { downloadUrl } = route.useParams();
 
   const onDownload = () => {
     const contenu = selectedDalles.map((dalle) => dalle.url).join("\n");
@@ -41,14 +43,36 @@ const Menu = () => {
         />
       </div>
 
-      <HelpModal />
+      <div className="filter-menu">
+        <Input
+          label="Jeu de données"
+          nativeInputProps={{
+            value: downloadUrl?.replace(/-/g, " "),
+            readOnly: true,
+            "aria-label": "Jeu de données sélectionné",
+          }}
+        />
+        {/* <Button
+          priority="secondary"
+          size="medium"
+          iconId="fr-icon-equalizer-line"
+          title="Filtrer"
+        >
+          Filtrer
+        </Button> */}
+      </div>
 
-      <SelectedTiles
-        selectedDalles={selectedDalles}
-        onDownload={onDownload}
-        removeDalle={removeDalle}
-        clearDalles={clearDalles}
-      />
+      <HelpModal />
+      {selectedDalles.length > 0 ? (
+        <SelectedTiles
+          selectedDalles={selectedDalles}
+          onDownload={onDownload}
+          removeDalle={removeDalle}
+          clearDalles={clearDalles}
+        />
+      ) : (
+        <EmptyState />
+      )}
     </div>
   );
 };

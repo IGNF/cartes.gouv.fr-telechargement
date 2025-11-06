@@ -20,14 +20,14 @@
 .selected-options-container {
   position: absolute;
   top: 60px;
-  right: 605px;
+  right: 640px;
   z-index: 1000;
   display: inline-flex;
   padding: 8px;
   flex-direction: column;
   justify-content: center;
   align-items: flex-start;
-  gap: 4px;
+  gap: 0.375rem;
   border-radius: 4px;
   background: var(--light-decisions-background-background-default-grey, #fff);
     --active: var(--background-default-grey-active);

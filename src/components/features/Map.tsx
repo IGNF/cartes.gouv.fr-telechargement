@@ -1,6 +1,8 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef } from "react";
 import { useMap } from "../../hooks/maps/useMap";
 import { useDalleStore } from "../../hooks/store/useDalleStore";
+import { Map } from "ol";
+import SelectionControl from "../../utils/maps/controls/SelectionControl";
 
 import "ol/ol.css";
 import "@gouvfr/dsfr/dist/dsfr.css";
@@ -22,7 +24,7 @@ const MapComponent = () => {
 
   const mapContainerRef = useRef<HTMLDivElement>(null);
 
-  useMap(
+  const mapInstance = useMap(
     mapContainerRef,
     downloadUrl,
     addProduit,
@@ -31,7 +33,16 @@ const MapComponent = () => {
     addProduitLayer
   );
 
-  
+  useEffect(() => {
+    if (mapInstance) {
+      const selectionControl = new SelectionControl();
+      mapInstance.addControl(selectionControl);
+
+      return () => {
+        mapInstance.removeControl(selectionControl);
+      };
+    }
+  }, [mapInstance]);
 
   return (
     <>
