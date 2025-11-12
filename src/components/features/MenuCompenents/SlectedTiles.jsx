@@ -1,6 +1,6 @@
 import { Button } from "@codegouvfr/react-dsfr/Button";
 import { Download } from "@codegouvfr/react-dsfr/Download";
-import { Checkbox } from "@codegouvfr/react-dsfr/Checkbox";
+import DownloadModal, {downloadModal} from "./DownloadModal";
 import "./styles/SelectedTiles.css";
 import EmptyState from "./EmptyState";
 
@@ -15,11 +15,12 @@ const SelectedTiles = ({ selectedDalles, onDownload, removeDalle, clearDalles })
           <Button
             size="small"
             iconId="fr-icon-download-line"
-            onClick={onDownload}
+            onClick={() => downloadModal.open()}
             priority="primary"
             title="Télécharger toutes les dalles sélectionnées"
             aria-label="Télécharger toutes les dalles sélectionnées"
           />
+          <DownloadModal />
           <Button
             size="small"
             iconId="fr-icon-delete-line"
