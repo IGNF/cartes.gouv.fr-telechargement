@@ -52,14 +52,14 @@ const Menu = () => {
             "aria-label": "Jeu de données sélectionné",
           }}
         />
-        {/* <Button
+        <Button
           priority="secondary"
           size="medium"
           iconId="fr-icon-equalizer-line"
           title="Filtrer"
         >
           Filtrer
-        </Button> */}
+        </Button>
       </div>
 
       <HelpModal />

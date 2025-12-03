@@ -18,6 +18,8 @@ import useMapStore from "../../hooks/store/useMapStore";
 import { SelectedPolygonInteraction } from "../../utils/interactions/selectedPolygonInteraction";
 import { SelectedClickInteraction } from "../../utils/interactions/selectedClickInteraction";
 import { HoverPopupInteraction } from "../../utils/interactions";
+import {createSelectionControls} from "../../utils/maps/controls";
+import { set } from "ol/transform";
 
 export const useMap = (
   containerRef: React.RefObject<HTMLDivElement>,
@@ -25,7 +27,8 @@ export const useMap = (
   addProduit: any,
   isProduitSelected: any,
   removeProduit: any,
-  addProduitLayer: any
+  addProduitLayer: any,
+  setIsMetadata: any
 ) => {
   const [map, setMap] = useState<Map | null>(null);
 
@@ -82,6 +85,7 @@ export const useMap = (
       addProduitLayer(selectionProduitLayer);
       addControls(mapInstance);
       addZoomInteraction(mapInstance, chantierLayer, 11);
+      createSelectionControls(mapInstance, selectionProduitLayer);
 
       // ajout interactions
       const polygonInteraction = new SelectedPolygonInteraction(
@@ -98,7 +102,8 @@ export const useMap = (
         10,
         isProduitSelected,
         addProduit,
-        removeProduit
+        removeProduit,
+        setIsMetadata
       );
       mapInstance.addInteraction(clickInteraction);
       clickInteraction.setActive(true);

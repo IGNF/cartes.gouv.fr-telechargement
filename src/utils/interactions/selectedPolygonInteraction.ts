@@ -73,6 +73,7 @@ export class SelectedPolygonInteraction extends Interaction {
           if (listAlreadyChecked.includes(properties.id)) {
             return; // Passe à l'entité suivante si déjà vérifiée
           }
+          console.log("Selected entity:", properties);
           const dalle = {
             name: properties.name,
             url: properties.url,

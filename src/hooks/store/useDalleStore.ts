@@ -1,12 +1,14 @@
 import { create } from "zustand";
 
-type Dalle = { name: string; url: string; id: string };
+type Dalle = { name: string; url: string; id: string, size: number , metadata?: any };
 
 type DalleLayer = any;
 
 type DalleStore = {
   selectedProduits: Dalle[];
   produitLayer: DalleLayer;
+  isMetadata: boolean;
+  setIsMetadata: (v: boolean) => void; // <-- ajout
   addProduit: (dalle: Dalle) => void;
   addProduitLayer: (dalleLayer: DalleLayer) => void;
   removeProduit: (id: string) => void;
@@ -17,6 +19,8 @@ type DalleStore = {
 export const useDalleStore = create<DalleStore>((set, get) => ({
   selectedProduits: [],
   produitLayer: null,
+  isMetadata: false,
+  setIsMetadata: (v: boolean) => set({ isMetadata: v }),
   addProduit: (produit) =>
     set((state) => ({ selectedProduits: [...state.selectedProduits, produit] })),
   addProduitLayer: (produitLayer) => set((state) => ({ produitLayer: produitLayer })),

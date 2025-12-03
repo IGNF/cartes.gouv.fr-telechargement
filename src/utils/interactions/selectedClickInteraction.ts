@@ -1,6 +1,7 @@
 import { Interaction } from "ol/interaction";
 import { Layer } from "ol/layer";
 import { MapBrowserEvent } from "ol";
+import { getRemoteFileSize } from "../getRemoteFileSize";
 
 /**
  * Interaction de sélection par clic pour les entités d'une couche vectorielle.
@@ -11,13 +12,15 @@ export class SelectedClickInteraction extends Interaction {
   private isProduitSelected: (id: string | number | undefined) => boolean;
   private addProduit: (produit: any) => void;
   private removeProduit: (id: string | number | undefined) => void;
+  private setIsMetadata: (v: boolean) => void;
 
   constructor(
     selectionLayer: Layer<any>,
     zoomToGo: number = 10,
     isProduitSelected: (id: string | number | undefined) => boolean,
     addProduit: (produit: any) => void,
-    removeProduit: (id: string | number | undefined) => void
+    removeProduit: (id: string | number | undefined) => void,
+    setIsMetadata: (v: boolean) => void
   ) {
     super();
     this.selectionLayer = selectionLayer;
@@ -25,6 +28,7 @@ export class SelectedClickInteraction extends Interaction {
     this.isProduitSelected = isProduitSelected;
     this.addProduit = addProduit;
     this.removeProduit = removeProduit;
+    this.setIsMetadata = setIsMetadata;
   }
 
   /**
@@ -52,11 +56,21 @@ export class SelectedClickInteraction extends Interaction {
         layer?.getSource()["key_"] === this.selectionLayer.getSource()["key_"]
       ) {
         const properties = feature.getProperties();
+        if (properties.metadata !== undefined) {
+          this.setIsMetadata(true);
+        }
+
+
+        
         const dalle = {
           name: properties.name,
           url: properties.url,
           id: properties.id,
+          size: getRemoteFileSize(properties.url),
+          metadata: properties.metadata,
         };
+        console.log("dalle clicked :", properties);
+        
         // Ajoute ou retire le produit en fonction de son état
         if (!this.isProduitSelected(dalle.id) && index === 0) {
           this.addProduit(dalle);

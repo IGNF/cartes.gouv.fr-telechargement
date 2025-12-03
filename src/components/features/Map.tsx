@@ -11,6 +11,7 @@ import "geopf-extensions-openlayers/css/Dsfr.css";
 import { getRouteApi } from "@tanstack/react-router";
 import { GeoJSON } from "ol/format";
 import SelectedOptions from "./MenuCompenents/SelectedOptions";
+import { set } from "ol/transform";
 const route = getRouteApi("/telechargement/$downloadUrl");
 
 const MapComponent = () => {
@@ -21,6 +22,7 @@ const MapComponent = () => {
   const isProduitSelected = useDalleStore((state) => state.isProduitSelected);
   const removeDalle = useDalleStore((state) => state.removeProduit);
   const addProduitLayer = useDalleStore((state) => state.addProduitLayer);
+  const setIsMetadata = useDalleStore((state) => state.setIsMetadata);
 
   const mapContainerRef = useRef<HTMLDivElement>(null);
 
@@ -30,7 +32,8 @@ const MapComponent = () => {
     addProduit,
     isProduitSelected,
     removeDalle,
-    addProduitLayer
+    addProduitLayer,
+    setIsMetadata
   );
 
   useEffect(() => {
