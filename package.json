@@ -19,20 +19,22 @@
     "@types/react": "^19.2.2",
     "@types/react-dom": "^19.2.2",
     "@vitejs/plugin-react": "^5.0.4",
-    "ign-dsfr-header": "github:IGNF/dsfr-extension",
     "vite": "^7.1.12"
   },
   "dependencies": {
     "@codegouvfr/react-dsfr": "^1.28.0",
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.1",
+    "@mui/material": "^7.3.6",
     "@openapitools/openapi-generator-cli": "^2.25.0",
     "@tanstack/react-router": "^1.133.27",
     "@tanstack/router-devtools": "^1.133.27",
     "@turf/turf": "^7.2.0",
-    "dsfr-extension": "github:IGNF/dsfr-extension",
     "geopf-extensions-openlayers": "^1.0.0-beta.6",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "react-icons": "^5.5.0",
+    "tss-react": "^4.9.19",
     "turf": "^3.0.14",
     "zustand": "^5.0.8"
   }
