@@ -12,17 +12,17 @@ export function HeaderMenuHelp() {
                 {
                     iconId: "fr-icon-question-mark",
                     children: "Questions fréquentes",
-                    linkProps: { href: "/aide"},
+                    linkProps: { href: "/aide", target:"_blank"},
                 },
                 {
                     iconId: "fr-icon-book-2-line",
                     children: "Guide d'utilisation",
-                    linkProps: { href: "/aide/fr/guides-utilisateur/rechercher-une-donnee/"},
+                    linkProps: { href: "/aide/fr/guides-utilisateur/rechercher-une-donnee/", target:"_blank"},
                 },
                 {
                     iconId: "fr-icon-mail-line",
                     children: "Nous contacter",
-                    linkProps: { href: "/nous-ecrire"},
+                    linkProps: { href: "/nous-ecrire", target:"_blank"},
                 },
             ]}
         />
