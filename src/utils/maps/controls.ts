@@ -50,18 +50,17 @@ export function createSelectionControls(
 
   const polygonInteraction = new SelectedPolygonInteraction(
     selectionLayer,
-    10,
     store.isProduitSelected,
     store.addProduit,
     store.removeProduit,
     store.setIsMetadata
-  );
+  ).getDrawInteraction();
   (polygonInteraction as any).setActive(false);
 
   const clickToggle = new ToggleControl({
     className: "select-click",
     title: "Sélection par clic",
-    html: "🔘",
+    html: "hello",
     interaction: clickInteraction,
     active: false,
     onToggle: (active) => {
@@ -85,8 +84,8 @@ export function createSelectionControls(
     },
   });
 
-  map.addControl(clickToggle);
-  map.addControl(polygonToggle);
+  // map.addControl(clickToggle);
+  // map.addControl(polygonToggle);
 
   return { clickToggle, polygonToggle, clickInteraction, polygonInteraction };
 }

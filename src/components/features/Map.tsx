@@ -51,6 +51,7 @@ const MapComponent = () => {
     <>
       <div
         ref={mapContainerRef}
+        id="map"
         className="map-container fr-col-8"
         style={{ height: "80vh", width: "100%" }}
       ></div>
