@@ -1,0 +1,71 @@
+.SelectedTilesContainer {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  padding: 1rem;
+}
+
+/* Header avec titre et boutons */
+.SelectedTilesContainer-title {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  padding: 0.5rem 0;
+}
+
+.SelectedTilesContainer-title h5 {
+  margin: 0;
+}
+
+.SelectedTilesContainer-title-buttons {
+  display: flex;
+  gap: 0.5rem;
+  margin-left: auto;
+}
+
+/* Liste des éléments */
+.SelectedTilesContainer ul {
+  list-style: none;
+  padding: 0;
+  margin: 1rem 0;
+  width: 100%;
+  max-height: 288px;
+  overflow-y: auto;
+}
+
+/* Élément individuel de la liste */
+.SelectedTilesContainer-list-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  padding: 0.75rem;
+  margin-bottom: 0.5rem;
+  border-radius: 4px;
+}
+
+.SelectedTilesContainer-list-item-content {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex: 1;
+}
+
+.SelectedTilesContainer-list-item-actions {
+  margin-left: auto;
+  padding-left: 1rem;
+}
+
+/* Scrollbar personnalisée */
+.SelectedTilesContainer ul::-webkit-scrollbar {
+  width: 6px;
+}
+
+.SelectedTilesContainer ul::-webkit-scrollbar-track {
+  border-radius: 3px;
+}
+
+.SelectedTilesContainer ul::-webkit-scrollbar-thumb {
+  border-radius: 3px;
+}

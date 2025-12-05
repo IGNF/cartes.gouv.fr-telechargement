@@ -1,0 +1,27 @@
+.selection-control {
+  top: 0.5em;
+  right: 0.5em;
+  display: flex;
+  gap: 0.5rem;
+  background: var(--background-default-grey);
+  padding: 0.5rem;
+  border-radius: 4px;
+}
+
+.selection-control button {
+  margin: 0;
+  padding: 0.5rem;
+  font-size: 1rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.selection-control button.active {
+  background-color: var(--background-action-high-blue-france);
+  color: var(--text-inverted-blue-france);
+}
+
+.selection-control button:hover:not(.active) {
+  background-color: var(--background-action-low-blue-france);
+}

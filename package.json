@@ -13,22 +13,29 @@
     "prebuild": "react-dsfr update-icons"
   },
   "devDependencies": {
-    "@tanstack/router-plugin": "^1.87.7",
-    "@types/jest": "^29.5.14",
-    "@types/proj4": "^2.5.6",
-    "@types/react": "^18.3.3",
-    "@types/react-dom": "^18.3.0",
-    "@vitejs/plugin-react": "^4.3.2",
-    "vite": "^6.0.3"
+    "@tanstack/router-plugin": "^1.133.27",
+    "@types/jest": "^30.0.0",
+    "@types/proj4": "^2.19.0",
+    "@types/react": "^19.2.2",
+    "@types/react-dom": "^19.2.2",
+    "@vitejs/plugin-react": "^5.0.4",
+    "vite": "^7.1.12"
   },
   "dependencies": {
-    "@codegouvfr/react-dsfr": "^1.16.7",
-    "@openapitools/openapi-generator-cli": "^2.15.3",
-    "@tanstack/react-router": "^1.87.7",
-    "@tanstack/router-devtools": "^1.87.7",
-    "geopf-extensions-openlayers": "^1.0.0-beta.3",
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1",
-    "zustand": "^5.0.3"
+    "@codegouvfr/react-dsfr": "^1.28.0",
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.1",
+    "@mui/material": "^7.3.6",
+    "@openapitools/openapi-generator-cli": "^2.25.0",
+    "@tanstack/react-router": "^1.133.27",
+    "@tanstack/router-devtools": "^1.133.27",
+    "@turf/turf": "^7.2.0",
+    "geopf-extensions-openlayers": "^1.0.0-beta.6",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "react-icons": "^5.5.0",
+    "tss-react": "^4.9.19",
+    "turf": "^3.0.14",
+    "zustand": "^5.0.8"
   }
 }

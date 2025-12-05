@@ -2,7 +2,7 @@ import { DefaultApi } from "@/api-client"; // Généré automatiquement
 
 const api = new DefaultApi();
 api.getChantier({
-  service: "WFS",
+  service: "TMS",
   version: "2.0.0",
   apiKey: "interface_catalogue",
   request: "GetFeature",

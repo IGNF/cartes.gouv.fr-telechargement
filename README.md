@@ -1,127 +1,57 @@
-# Interface Diffusion - Carte Téléchargement
+# Interface de Diffusion - Carte de Téléchargement
 
-## Description/Résumé du projet
+## 🌟 Fonctionnalités
 
-Ce projet est une interface web permettant de visualiser et de télécharger des produites géographiques à l'aide de cartes interactives. Il utilise **React**, **Vite**, et **OpenLayers** pour offrir une expérience utilisateur fluide et performante. L'objectif principal est de fournir une interface intuitive pour sélectionner et télécharger des données géographiques.
+- Carte interactive pour la visualisation des données
+- Multiples méthodes de sélection (clic, polygone, import)
+- Options de filtrage avancées
+- Capacités de téléchargement direct
 
-### Fonctionnalités principales :
+## 🚀 Démarrage Rapide
 
-- Visualisation des données géographiques via une carte interactive.
-- Sélection multiple de données géographiques.
-- Téléchargement des données sélectionnées.
+```bash
+# Cloner le dépôt
+git clone <url-du-depot>
 
----
+# Installer les dépendances
+npm install
 
-## Installation
+# Démarrer le serveur de développement
+npm run dev
+```
 
-### Prérequis :
-- **Node.js** (version 20 ou supérieure)
-- **npm** (version 8 ou supérieure)
-- **Docker** (pour le déploiement)
+## 📚 Documentation
 
-### Étapes d'installation :
-1. Clonez le dépôt :
-   ```bash
-   git clone https://github.com/votre-utilisateur/votre-repo.git
-   cd votre-repo
-   ```
-2. Installez les dépendances
-   ```bash
-   npm install
-   ```
-3. Lancez l'application 
-   ```bash
-   npm start
-   ```
-4. Accédez à l'application dans votre navigateur à l'adresse:
-   ```
-   http://localhost:5173/
-   ```
+- [Architecture Technique](./docs/architecture/TECHNICAL.md)
+- [Guide de Développement](./docs/development/CONTRIBUTING.md)
+- [Spécifications TMS](./docs/TMS_TA_SPEC.md)
+- [Intégration des Métadonnées](./docs/METADATA_INTEGRATION.md)
 
-### Déploiement avec Docker
-Etapes pour construire et exécuter l'image Docker :
+## 🧪 Tests
 
-1. Construisez l'image Docker :
+```bash
+# Exécuter tous les tests
+npm run test
 
-   ```bash
-   docker build -t interface-carte-telechargement
-   ```
+# Exécuter un fichier de test spécifique
+npm run test -- <nom-du-fichier-test>
+```
 
-## Documentation développeurs
+## 📦 Déploiement
 
-Stack technique :
+```bash
+# Construction pour la production
+npm run build
 
-- Frontend : React, Vite, TanStack Router
-- Cartographie : OpenLayers, Geoportal Extensions
-- Déploiement : Docker, Nginx
+# Construction de l'image Docker
+docker build -t interface-carte-telechargement .
+```
 
-Scripts disponibles :
+## 🤝 Contribution
 
-- npm run start : Lance l'application en mode développement.
-- npm run build : Construit l'application pour la production.
-- npm run serve : Prévisualise l'application construite.
-- npm run typecheck : Vérifie les types TypeScript.
+Consultez notre [Guide de Contribution](./docs/development/CONTRIBUTING.md) pour plus de détails.
 
+## 📝 Licence
 
-## Affichage de l'interface dans le catalogue Geonetwork-ui
-
-Pour les instructions sur l'intégration dans les métadonnées des produits, consultez le fichier [METADATA_INTEGRATION.md](./METADATA_INTEGRATION.md).
-
-## L'arborescence du projet
-
-
-.
-├── src/                # Code source de l'application
-│   ├── Components/     # Composants React
-│   ├── hooks/          # Hooks personnalisés
-│   ├── utils/          # Fonctions utilitaires
-│   └── styles/         # Fichiers de style
-├── public/             # Fichiers statiques
-├── .docker/            # Configuration Docker et Nginx
-├── tests/              # Tests unitaires et d'intégration
-├── [package.json](./package.json)        # Dépendances et scripts npm
-├── Dockerfile          # Fichier Docker pour le déploiement
-└── [README.md](./README.md)           # Documentation du projet
-
-## API/flux utilisés
-
-- **GetCapabilities flux tms** :  https://data.geopf.fr/tms/1.0.0/{layer}/
-
-
-## Contribution
-
-Comment contribuer ?
-
-1. Forkez le depôt
-2. Créez une branche pour votre fonctionnalité ou correction :
-   ```bash
-   git checkout -b feature/ma-fonctionnalite
-   ```
-3. Faites vos modfication et ajoutez un commit :
-   ```bash
-   git commit -m "add(localisation)Ajout de ma fonctionnalité"
-   ```
-4. Poussez vos modification :
-   ```bash
-   git push origin feature/ma-fonctionnalite
-   ```
-
-5. Ouvrez une PullRequest.
-
-Vous pouvez également faire des issues pour discuter en amont de votre besoin.
-
-
-
-## Contacts du projets
-
-
-
-|Nom|Prénom|mail|fonction|
-|---|---|---|---|
-|Thauvin|Xavier|   |Chef de projet|
-|Mohad|Mélodia|   |Conceptrice developpeuse|
-
-## Licence
-
-Ce projet est sous license **GNU Alfredo General Public License**. Consultez le fichier [License](./LICENSE) pour plus d'informations.
+Licence GNU Affero General Public
 

@@ -1,0 +1,27 @@
+filter {
+  display: flex;
+flex-direction: column;
+align-items: center;
+gap: 16px;
+align-self: stretch;
+}
+.filter-header {
+  display: flex;
+  width: 418px;
+  height: 39px;
+  justify-content: space-between;
+  align-items: flex-end;
+}
+
+.filter-label {
+  width: 99px;
+  flex-shrink: 0;
+  color: #000;
+
+  /* 1.Titres/H4 - SM/Desktop */
+  font-family: Marianne;
+  font-size: 24px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: 32px; /* 133.333% */
+}
