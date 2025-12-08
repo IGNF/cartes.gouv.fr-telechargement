@@ -12,17 +12,18 @@ export function HeaderMenuHelp() {
                 {
                     iconId: "fr-icon-question-mark",
                     children: "Questions fréquentes",
-                    linkProps: { href: "https://www.cartes.gouv.fr/aide", target:"_blank"},
+                    linkProps: { href: "https://cartes.gouv.fr//aide/fr", target:"_blank"},
+
                 },
                 {
                     iconId: "fr-icon-book-2-line",
                     children: "Guide d'utilisation",
-                    linkProps: { href: "/aide/fr/guides-utilisateur/rechercher-une-donnee/", target:"_blank"},
+                    linkProps: { href: "https://cartes.gouv.fr/aide/fr/guides-utilisateur/rechercher-une-donnee/", target:"_blank"},
                 },
                 {
                     iconId: "fr-icon-mail-line",
                     children: "Nous contacter",
-                    linkProps: { href: "/nous-ecrire", target:"_blank"},
+                    linkProps: { href: "https://cartes.gouv.fr/nous-ecrire/", target:"_blank"},
                 },
             ]}
         />
