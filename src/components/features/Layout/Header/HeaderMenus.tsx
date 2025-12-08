@@ -12,7 +12,7 @@ export function HeaderMenuHelp() {
                 {
                     iconId: "fr-icon-question-mark",
                     children: "Questions fréquentes",
-                    linkProps: { href: "/aide", target:"_blank"},
+                    linkProps: { href: "https://www.cartes.gouv.fr/aide", target:"_blank"},
                 },
                 {
                     iconId: "fr-icon-book-2-line",

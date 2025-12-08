@@ -18,8 +18,8 @@ import useMapStore from "../../hooks/store/useMapStore";
 import { SelectedPolygonInteraction } from "../../utils/interactions/selectedPolygonInteraction";
 import { SelectedClickInteraction } from "../../utils/interactions/selectedClickInteraction";
 import { HoverPopupInteraction } from "../../utils/interactions";
-import {createSelectionControls} from "../../utils/maps/controls";
-import { set } from "ol/transform";
+// import {createSelectionControls} from "../../utils/maps/controls";
+// import { set } from "ol/transform";
 
 export const useMap = (
   containerRef: React.RefObject<HTMLDivElement>,
@@ -85,7 +85,7 @@ export const useMap = (
       addProduitLayer(selectionProduitLayer);
       addControls(mapInstance);
       addZoomInteraction(mapInstance, chantierLayer, 11);
-      createSelectionControls(mapInstance, selectionProduitLayer);
+      // createSelectionControls(mapInstance, selectionProduitLayer);
 
       // ajout interactions
       const polygonInteraction = new SelectedPolygonInteraction(
