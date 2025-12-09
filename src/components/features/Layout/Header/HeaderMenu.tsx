@@ -76,15 +76,10 @@ export default function HeaderMenu({ openButtonProps, actionButtonProps, items, 
                                                 </>
                                             );
 
-                                            const handleLinkClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
-                                                handleClose();
-                                                linkProps?.onClick?.(e);
-                                            };
-
                                             return (
                                                 <li key={i} className={cx(classes.menuItem, !linkProps && classes.menuItemUnclickable)}>
                                                     {linkProps ? (
-                                                        <Link {...linkProps} className={cx(fr.cx("fr-text--sm"))} onClick={handleLinkClick}>
+                                                        <Link {...linkProps} className={cx(fr.cx("fr-text--sm"))} >
                                                             {content}
                                                         </Link>
                                                     ) : (
