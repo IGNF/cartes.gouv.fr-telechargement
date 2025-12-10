@@ -12,17 +12,18 @@ export function HeaderMenuHelp() {
                 {
                     iconId: "fr-icon-question-mark",
                     children: "Questions fréquentes",
-                    linkProps: { href: "/aide"},
+                    linkProps: { href: "https://cartes.gouv.fr//aide/fr", target:"_blank"},
+
                 },
                 {
                     iconId: "fr-icon-book-2-line",
                     children: "Guide d'utilisation",
-                    linkProps: { href: "/aide/fr/guides-utilisateur/rechercher-une-donnee/"},
+                    linkProps: { href: "https://cartes.gouv.fr/aide/fr/guides-utilisateur/rechercher-une-donnee/", target:"_blank"},
                 },
                 {
                     iconId: "fr-icon-mail-line",
                     children: "Nous contacter",
-                    linkProps: { href: "/nous-ecrire"},
+                    linkProps: { href: "https://cartes.gouv.fr/nous-ecrire/", target:"_blank"},
                 },
             ]}
         />
@@ -40,17 +41,17 @@ export function HeaderMenuServices() {
                 {
                     iconId: "fr-icon-road-map-line",
                     children: "Explorer les cartes",
-                    linkProps: { href: "/explorer-les-cartes"},
+                    linkProps: { href: "https://cartes.gouv.fr/explorer-les-cartes", target:"_self"},
                 },
                 {
                     iconId: "fr-icon-search-line",
                     children: "Rechercher une donnée",
-                    linkProps: { href: "/rechercher-une-donne"},
+                    linkProps: { href: "https://cartes.gouv.fr/rechercher-une-donnee", target:"_self"},
                 },
                 {
                     iconId: "fr-icon-database-line",
                     children: "Publier une donnée",
-                    linkProps: { href: "/publier-une-donnee"},
+                    linkProps: { href: "https://cartes.gouv.fr/publier-une-donnee", target:"_self"},
                 },
                 // {
                 //     iconId: "fr-icon-brush-line",
@@ -67,7 +68,7 @@ export function HeaderMenuServices() {
             ]}
             actionButtonProps={{
                 children: "Découvrir cartes.gouv",
-                linkProps: { href: "/decouvrir "},
+                linkProps: { href: "https://cartes.gouv.fr/decouvrir" },
             }}
         />
     );
@@ -87,12 +88,12 @@ export function HeaderMenuUser() {
                 {
                     children: "Tableau de bord",
                     iconId: "fr-icon-dashboard-3-line",
-                    linkProps: { href: "/tableau-de-bord"},
+                    linkProps: { href: "https://cartes.gouv.fr/tableau-de-bord", target:"_self"},
                 },
                 {
                     children: "Mon compte",
                     iconId: "fr-icon-user-line",
-                    linkProps: { href: "/mon-compte"},
+                    linkProps: { href: "https://cartes.gouv.fr/mon-compte", target:"_self"},
                 },
             ]}
         />

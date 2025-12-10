@@ -1,8 +1,6 @@
 import React, { useEffect, useRef } from "react";
 import { useMap } from "../../hooks/maps/useMap";
 import { useDalleStore } from "../../hooks/store/useDalleStore";
-import { Map } from "ol";
-import SelectionControl from "../../utils/maps/controls/SelectionControl";
 
 import "ol/ol.css";
 import "@gouvfr/dsfr/dist/dsfr.css";
@@ -36,21 +34,12 @@ const MapComponent = () => {
     setIsMetadata
   );
 
-  useEffect(() => {
-    if (mapInstance) {
-      const selectionControl = new SelectionControl();
-      mapInstance.addControl(selectionControl);
-
-      return () => {
-        mapInstance.removeControl(selectionControl);
-      };
-    }
-  }, [mapInstance]);
 
   return (
     <>
       <div
         ref={mapContainerRef}
+        id="map"
         className="map-container fr-col-8"
         style={{ height: "80vh", width: "100%" }}
       ></div>

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { getRouteApi } from "@tanstack/react-router";
 import { useDalleStore } from "../../hooks/store/useDalleStore";
 import SelectedTiles from "./MenuCompenents/SlectedTiles";
@@ -7,6 +7,7 @@ import "./MenuCompenents/styles/Menu.css";
 import Button from "@codegouvfr/react-dsfr/Button";
 import HelpModal, { helpModal } from "./MenuCompenents/HelpModal";
 import { Input } from "@codegouvfr/react-dsfr/Input";
+import Filter from "./MenuCompenents/FilterComponents/Filter"; // ajuster si chemin différent
 
 const route = getRouteApi("/telechargement/$downloadUrl");
 
@@ -15,6 +16,7 @@ const Menu = () => {
   const removeDalle = useDalleStore((state) => state.removeProduit);
   const clearDalles = useDalleStore((state) => state.removeAllProduits);
   const { downloadUrl } = route.useParams();
+  const [showFilter, setShowFilter] = useState(false);
 
   const onDownload = () => {
     const contenu = selectedDalles.map((dalle) => dalle.url).join("\n");
@@ -31,49 +33,56 @@ const Menu = () => {
   };
 
   return (
-    <div className="menu">
-      <div className="title-menu">
-        <h4 className="fr-h4">Téléchargement de données</h4>
-        <Button
-          priority="tertiary no outline"
-          size="small"
-          iconId="fr-icon-information-line"
-          title="Informations sur le téléchargement de données"
-          onClick={() => helpModal.open()}
-        />
-      </div>
-
-      <div className="filter-menu">
-        <Input
-          label="Jeu de données"
-          nativeInputProps={{
-            value: downloadUrl?.replace(/-/g, " "),
-            readOnly: true,
-            "aria-label": "Jeu de données sélectionné",
-          }}
-        />
-        <Button
-          priority="secondary"
-          size="medium"
-          iconId="fr-icon-equalizer-line"
-          title="Filtrer"
-        >
-          Filtrer
-        </Button>
-      </div>
-
-      <HelpModal />
-      {selectedDalles.length > 0 ? (
-        <SelectedTiles
-          selectedDalles={selectedDalles}
-          onDownload={onDownload}
-          removeDalle={removeDalle}
-          clearDalles={clearDalles}
-        />
+    <>
+      {showFilter ? (
+        <Filter onClose={() => setShowFilter(false)} />
       ) : (
-        <EmptyState />
+        <div className="menu">
+          <div className="title-menu">
+            <h4 className="fr-h4">Téléchargement de données</h4>
+            <Button
+              priority="tertiary no outline"
+              size="small"
+              iconId="fr-icon-information-line"
+              title="Informations sur le téléchargement de données"
+              onClick={() => helpModal.open()}
+            />
+          </div>
+
+          <div className="filter-menu">
+            <Input
+              label="Jeu de données"
+              nativeInputProps={{
+                value: downloadUrl?.replace(/-/g, " "),
+                readOnly: true,
+                "aria-label": "Jeu de données sélectionné",
+              }}
+            />
+            <Button
+              priority="secondary"
+              size="medium"
+              iconId="fr-icon-equalizer-line"
+              title="Filtrer"
+              onClick={() => setShowFilter(true)}
+            >
+              Filtrer
+            </Button>
+          </div>
+
+          <HelpModal />
+          {selectedDalles.length > 0 ? (
+            <SelectedTiles
+              selectedDalles={selectedDalles}
+              onDownload={onDownload}
+              removeDalle={removeDalle}
+              clearDalles={clearDalles}
+            />
+          ) : (
+            <EmptyState />
+          )}
+        </div>
       )}
-    </div>
+    </>
   );
 };
 

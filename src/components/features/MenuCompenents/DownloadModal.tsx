@@ -2,10 +2,10 @@ import { createModal } from "@codegouvfr/react-dsfr/Modal";
 import { useDalleStore } from "../../../hooks/store/useDalleStore";
 import "./styles/DownloadModal.css";
 import { Select } from "@codegouvfr/react-dsfr/Select";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { RadioButtons } from "@codegouvfr/react-dsfr/RadioButtons";
 import Button from "@codegouvfr/react-dsfr/Button";
-import { useDownload } from "../../../hooks/useDownload";
+import {  formatBytes } from "../../../utils/formatters";
 
 export const downloadModal = createModal({
   id: "download-modal",
@@ -17,6 +17,29 @@ const DownloadModal = () => {
   const isMetadata = useDalleStore((s) => s.isMetadata);
   const [value, setValue] = useState("");
   const [downloadMethod, setDownloadMethod] = useState("");
+  const [totalSize, setTotalSize] = useState(0);
+
+  useEffect(() => {
+    const resolveSizes = async () => {
+      let sum = 0;
+      for (const dalle of selectedDalles) {
+        try {
+          const size = await dalle.size;
+          const humanStr = size["human"] || "0";
+          const numericValue = parseFloat(humanStr.split(" ")[0]);
+          sum += numericValue || 0;
+        } catch (e) {
+          console.error(
+            `Erreur lors de la récupération de la taille pour ${dalle.name}:`,
+            e
+          );
+        }
+      }
+      setTotalSize(sum);
+
+    };
+    resolveSizes();
+  }, [selectedDalles]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -50,16 +73,21 @@ const DownloadModal = () => {
   };
 
   const count = selectedDalles.length;
+
+
   return (
     <downloadModal.Component title="Télécharger" iconId="fr-icon-download-fill">
       <form className="download-modal-form" onSubmit={handleSubmit}>
-        {/* <p className="fr-message fr-message--info">
-          {count} {count === 1 ? "dalle sélectionnée" : "dalles sélectionnées"},{" "}
-          {count === 1
-            ? "taille du fichier : "
-            : "tailles totales des fichiers : "}
-          {formattedTotal}
-        </p> */}
+        {
+          <p className="fr-message fr-message--info">
+            {count}{" "}
+            {count === 1 ? "dalle sélectionnée" : "dalles sélectionnées"},{" "}
+            {count === 1
+              ? "taille du fichier : "
+              : "tailles totales des fichiers : "}
+            {formatBytes(totalSize * 1024 * 1024)}
+          </p>
+        }
 
         <div className="download-modal-content">
           {isMetadata && (
@@ -96,7 +124,7 @@ const DownloadModal = () => {
                   },
                 },
                 {
-                  label: "Lien de téléchargement",
+                  label: "Liens de téléchargement",
                   hintText:
                     "Télécharger la liste des liens de téléchargement associés aux données",
                   nativeInputProps: {
@@ -106,6 +134,17 @@ const DownloadModal = () => {
                 },
               ]}
             />
+            {downloadMethod === "all" ? (
+              <>
+                <p className="fr-message fr-message--warning">
+                  <small>
+                    Ce téléchargement peut nécessiter un certain temps.
+                    Assurez-vous de disposer d’une connexion Internet stable
+                    avant de continuer.
+                  </small>
+                </p>
+              </>
+            ) : null}
           </div>
         </div>
 
@@ -118,14 +157,7 @@ const DownloadModal = () => {
             gap: 12,
           }}
         >
-          {downloadMethod === "all" ? (
-            // <p className="fr-message fr-message--warning" style={{ margin: 0 }}>
-            //   <small>Temps de téléchargement estimé: {estimatedTime}</small>
-            // </p>
-            <div /> /* placeholder to keep spacing when no warning */
-          ) : (
-            <div /> /* placeholder to keep spacing when no warning */
-          )}
+          <div />
           <div style={{ display: "flex", gap: 12 }}>
             <Button priority="primary" type="submit">
               Télécharger
