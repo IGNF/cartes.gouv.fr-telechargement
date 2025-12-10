@@ -42,9 +42,14 @@ const AppFooter = () => {
       if (!partnersMain) {
         partnersMain = document.createElement("div");
         partnersMain.className = "fr-footer__partners-main";
-        const partnersSection = footer.querySelector(".fr-footer__partners-logos");
+        const partnersSection = footer.querySelector(
+          ".fr-footer__partners-logos"
+        );
         if (partnersSection) {
-          partnersSection.insertBefore(partnersMain, partnersSection.firstChild);
+          partnersSection.insertBefore(
+            partnersMain,
+            partnersSection.firstChild
+          );
         }
       }
       setPartnersMainElement(partnersMain);
@@ -104,6 +109,7 @@ const AppFooter = () => {
         accessibility="partially compliant"
         accessibilityLinkProps={{
           href: "https://www.gouv.fr/accessibilite",
+          target: "_self",
         }}
         brandTop={
           <>
@@ -116,12 +122,6 @@ const AppFooter = () => {
             Cartes.gouv.fr est développé par l'Institut national de l'information géographique et forestière (IGN) et ses partenaires. Le site s'appuie sur la Géoplateforme, la nouvelle infrastructure publique, ouverte et collaborative des données géographiques.
           "
         bottomItems={[
-          {
-            linkProps: {
-              href: "https://cartes.gouv.fr/cgu",
-            },
-            text: "Conditions générales d'utilisation",
-          },
           <FooterPersonalDataPolicyItem key="footer-personal-data-policy-item" />,
           <FooterConsentManagementItem key="footer-consent-management-item" />,
           headerFooterDisplayItem,
@@ -129,23 +129,22 @@ const AppFooter = () => {
             key="toggle-footer"
             className="fr-footer__bottom-item--right"
             priority="tertiary no outline"
-            iconId={
-              isExpanded
-                ? "fr-icon-arrow-up-s-line"
-                : null
-            }
+            iconId={isExpanded ? null : "fr-icon-arrow-down-s-line"}
             onClick={toggleFooter}
           />,
         ]}
         homeLinkProps={{
           href: "https://cartes.gouv.fr/",
           title: "Accueil - cartes.gouv.fr",
+          target: "_self",
         }}
         termsLinkProps={{
           href: "https://cartes.gouv.fr/mentions-legales",
+          target: "_self",
         }}
         websiteMapLinkProps={{
           href: "https://cartes.gouv.fr/plan-du-site",
+          target: "_self",
         }}
         partnersLogos={{
           sub: [

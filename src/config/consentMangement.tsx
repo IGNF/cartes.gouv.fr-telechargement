@@ -23,6 +23,7 @@ export const { ConsentBannerAndConsentManagement, FooterConsentManagementItem, F
     }),
     personalDataPolicyLinkProps: {
         href: "https://cartes.gouv.fr/donnees-personnelles",
+        target: "_self",
     },
 
     consentCallback: async ({ finalityConsent }) => {
