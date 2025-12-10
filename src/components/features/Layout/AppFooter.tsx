@@ -5,98 +5,178 @@ import {
   FooterConsentManagementItem,
   FooterPersonalDataPolicyItem,
 } from "../../../config/consentMangement";
-import Button from "@codegouvfr/react-dsfr/Button";
+import React from "react";
+import { createPortal } from "react-dom";
+import { Button } from "@codegouvfr/react-dsfr/Button";
 
 const AppFooter = () => {
   const [isExpanded, setIsExpanded] = useState(false);
+  const [footerBodyElement, setFooterBodyElement] =
+    useState<HTMLElement | null>(null);
+  const [partnersMainElement, setPartnersMainElement] =
+    useState<HTMLElement | null>(null);
 
   const toggleFooter = () => {
     setIsExpanded(!isExpanded);
   };
 
+  // Récupérer la div .fr-footer du DOM
   useEffect(() => {
-    document.documentElement.style.setProperty('--visible', isExpanded ? 'flex' : 'none');
-    document.documentElement.style.setProperty('--visible-toggle', isExpanded ? 'block' : 'none');
-    document.documentElement.style.setProperty('--padding', isExpanded ? '2rem' : '0px');
-    document.documentElement.style.setProperty('--margin', isExpanded ? '0px' : '-10px');
+    const footer = document.querySelector(".fr-footer") as HTMLElement | null;
+    if (footer) {
+      // créer ou récupérer un conteneur pour le toggle (en haut à droite)
+      let toggleContainer = footer.querySelector(
+        ".fr-footer__toggle-container"
+      ) as HTMLElement | null;
+      if (!toggleContainer) {
+        toggleContainer = document.createElement("div");
+        toggleContainer.className = "fr-footer__toggle-container";
+        footer.insertBefore(toggleContainer, footer.firstChild);
+      }
+      setFooterBodyElement(toggleContainer);
+
+      // créer ou récupérer un conteneur pour le logo principal IGN
+      let partnersMain = footer.querySelector(
+        ".fr-footer__partners-main"
+      ) as HTMLElement | null;
+      if (!partnersMain) {
+        partnersMain = document.createElement("div");
+        partnersMain.className = "fr-footer__partners-main";
+        const partnersSection = footer.querySelector(".fr-footer__partners-logos");
+        if (partnersSection) {
+          partnersSection.insertBefore(partnersMain, partnersSection.firstChild);
+        }
+      }
+      setPartnersMainElement(partnersMain);
+    }
+  }, []);
+
+  useEffect(() => {
+    document.documentElement.style.setProperty(
+      "--visible",
+      isExpanded ? "flex" : "none"
+    );
+    document.documentElement.style.setProperty(
+      "--visible-toggle",
+      isExpanded ? "block" : "none"
+    );
+    document.documentElement.style.setProperty(
+      "--padding",
+      isExpanded ? "2rem" : "0px"
+    );
+    document.documentElement.style.setProperty(
+      "--margin",
+      isExpanded ? "0px" : "-10px"
+    );
   }, [isExpanded]);
 
+  const toggleButton = isExpanded ? (
+    <Button
+      key="toggle-footer"
+      className="fr-footer__toggle-btn"
+      priority="tertiary no outline"
+      iconId="fr-icon-close-line"
+      onClick={toggleFooter}
+      title="Fermer"
+    >
+      Fermer
+    </Button>
+  ) : null;
+
+  const ignLogo = (
+    <a
+      href="https://www.ign.fr"
+      title="Institut national de l'information géographique et forestière"
+      className="fr-footer__partners-link fr-raw-link"
+    >
+      <img
+        src="https://data.geopf.fr/annexes/ressources/footer/ign.png"
+        alt="IGN"
+        className="fr-footer__partner-logo"
+        style={{ height: "5.625rem" }}
+      />
+    </a>
+  );
+
   return (
-    <Footer
-      accessibility="partially compliant"
-      accessibilityLinkProps={{
-        href: "https://www.gouv.fr/accessibilite",
-      }}
-      brandTop={
-        <>
-          République
-          <br />
-          Française
-        </>
-      }
-      contentDescription="
-            Cartes.gouv.fr est développé par l’Institut national de l’information géographique et forestière (IGN) et ses partenaires. Le site s’appuie sur la Géoplateforme, la nouvelle infrastructure publique, ouverte et collaborative des données géographiques.
+    <>
+      <Footer
+        accessibility="partially compliant"
+        accessibilityLinkProps={{
+          href: "https://www.gouv.fr/accessibilite",
+        }}
+        brandTop={
+          <>
+            République
+            <br />
+            Française
+          </>
+        }
+        contentDescription="
+            Cartes.gouv.fr est développé par l'Institut national de l'information géographique et forestière (IGN) et ses partenaires. Le site s'appuie sur la Géoplateforme, la nouvelle infrastructure publique, ouverte et collaborative des données géographiques.
           "
-      bottomItems={[
-        {
-          linkProps: {
-            href: "https://cartes.gouv.fr/cgu",
-          },
-          text: "Conditions générales d’utilisation",
-        },
-        <FooterPersonalDataPolicyItem key="footer-personal-data-policy-item" />,
-        <FooterConsentManagementItem key="footer-consent-management-item" />,
-        headerFooterDisplayItem,
-        <Button
-          key="toggle-footer"
-          className="fr-footer__bottom-item--right"
-          priority="tertiary no outline"
-          iconId={
-            isExpanded
-              ? "fr-icon-arrow-up-s-line"
-              : "fr-icon-arrow-down-s-line"
-          }
-          onClick={toggleFooter}
-        />,
-      ]}
-      homeLinkProps={{
-        href: "https://cartes.gouv.fr/",
-        title: "Accueil - cartes.gouv.fr",
-      }}
-      termsLinkProps={{
-        href: "https://cartes.gouv.fr/mentions-legales",
-      }}
-      websiteMapLinkProps={{
-        href: "https://cartes.gouv.fr/plan-du-site",
-      }}
-      partnersLogos={{
-        sub: [
+        bottomItems={[
           {
-            alt: "IGN",
-            href: "https://www.ign.fr",
-            imgUrl: "https://data.geopf.fr/annexes/ressources/footer/ign.png",
+            linkProps: {
+              href: "https://cartes.gouv.fr/cgu",
+            },
+            text: "Conditions générales d'utilisation",
           },
-          {
-            alt: "MINISTÈRE DE LA TRANSFORMATION ET DE LA FONCTION PUBLIQUES",
-            href: "https://www.transformation.gouv.fr/",
-            imgUrl:
-              "https://data.geopf.fr/annexes/ressources/footer/min_fp.jpg",
-          },
-          {
-            alt: "MINISTÈRE DE LA TRANSITION ÉCOLOGIQUE ET DE LA COHÉSION DES TERRITOIRES",
-            href: "https://www.ecologie.gouv.fr/",
-            imgUrl:
-              "https://data.geopf.fr/annexes/ressources/footer/min_ecologie.jpg",
-          },
-          {
-            alt: "Conseil National de l’Information Géolocalisée",
-            href: "https://cnig.gouv.fr/",
-            imgUrl:
-              "https://data.geopf.fr/annexes/ressources/footer/rf_cnig.jpg",
-          },
-        ],
-      }}
-    />
+          <FooterPersonalDataPolicyItem key="footer-personal-data-policy-item" />,
+          <FooterConsentManagementItem key="footer-consent-management-item" />,
+          headerFooterDisplayItem,
+          <Button
+            key="toggle-footer"
+            className="fr-footer__bottom-item--right"
+            priority="tertiary no outline"
+            iconId={
+              isExpanded
+                ? "fr-icon-arrow-up-s-line"
+                : "fr-icon-arrow-down-s-line"
+            }
+            onClick={toggleFooter}
+          />,
+        ]}
+        homeLinkProps={{
+          href: "https://cartes.gouv.fr/",
+          title: "Accueil - cartes.gouv.fr",
+        }}
+        termsLinkProps={{
+          href: "https://cartes.gouv.fr/mentions-legales",
+        }}
+        websiteMapLinkProps={{
+          href: "https://cartes.gouv.fr/plan-du-site",
+        }}
+        partnersLogos={{
+          sub: [
+            {
+              alt: "MINISTÈRE DE LA TRANSFORMATION ET DE LA FONCTION PUBLIQUES",
+              href: "https://www.transformation.gouv.fr/",
+              imgUrl:
+                "https://data.geopf.fr/annexes/ressources/footer/min_fp.jpg",
+            },
+            {
+              alt: "MINISTÈRE DE LA TRANSITION ÉCOLOGIQUE ET DE LA COHÉSION DES TERRITOIRES",
+              href: "https://www.ecologie.gouv.fr/",
+              imgUrl:
+                "https://data.geopf.fr/annexes/ressources/footer/min_ecologie.jpg",
+            },
+            {
+              alt: "Conseil National de l'Information Géolocalisée",
+              href: "https://cnig.gouv.fr/",
+              imgUrl:
+                "https://data.geopf.fr/annexes/ressources/footer/rf_cnig.jpg",
+            },
+          ],
+        }}
+      />
+
+      {/* Ajouter le bouton toggle en haut à droite via portal */}
+      {footerBodyElement && createPortal(toggleButton, footerBodyElement)}
+
+      {/* Ajouter le logo IGN via portal */}
+      {partnersMainElement && createPortal(ignLogo, partnersMainElement)}
+    </>
   );
 };
 
