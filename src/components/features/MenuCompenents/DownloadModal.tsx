@@ -2,7 +2,7 @@ import { createModal } from "@codegouvfr/react-dsfr/Modal";
 import { useDalleStore } from "../../../hooks/store/useDalleStore";
 import "./styles/DownloadModal.css";
 import { Select } from "@codegouvfr/react-dsfr/Select";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { RadioButtons } from "@codegouvfr/react-dsfr/RadioButtons";
 import Button from "@codegouvfr/react-dsfr/Button";
 import { useDownload } from "../../../hooks/useDownload";
@@ -17,6 +17,34 @@ const DownloadModal = () => {
   const isMetadata = useDalleStore((s) => s.isMetadata);
   const [value, setValue] = useState("");
   const [downloadMethod, setDownloadMethod] = useState("");
+  const [totalSize, setTotalSize] = useState(0);
+
+  useEffect(() => {
+    const resolveSizes = async () => {
+      let sum = 0;
+      for (const dalle of selectedDalles) {
+        try {
+          const size = await dalle.size; // attendre la Promise
+          console.log(dalle.size);
+          console.log(size);
+
+          sum += size["human"] || 0;
+        } catch (e) {
+          // fallback si la Promise échoue
+        }
+      }
+      setTotalSize(sum);
+    };
+    resolveSizes();
+  }, [selectedDalles]);
+
+  const formatBytes = (bytes = 0): string => {
+    if (!bytes) return "0 octets";
+    const k = 1024;
+    const sizes = ["octets", "KB", "MB", "GB"];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return `${parseFloat((bytes / Math.pow(k, i)).toFixed(2))} ${sizes[i]}`;
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -53,13 +81,13 @@ const DownloadModal = () => {
   return (
     <downloadModal.Component title="Télécharger" iconId="fr-icon-download-fill">
       <form className="download-modal-form" onSubmit={handleSubmit}>
-        {/* <p className="fr-message fr-message--info">
+        {<p className="fr-message fr-message--info">
           {count} {count === 1 ? "dalle sélectionnée" : "dalles sélectionnées"},{" "}
           {count === 1
             ? "taille du fichier : "
             : "tailles totales des fichiers : "}
-          {formattedTotal}
-        </p> */}
+          {formatBytes(totalSize)}
+        </p>}
 
         <div className="download-modal-content">
           {isMetadata && (
@@ -96,7 +124,7 @@ const DownloadModal = () => {
                   },
                 },
                 {
-                  label: "Lien de téléchargement",
+                  label: "Liens de téléchargement",
                   hintText:
                     "Télécharger la liste des liens de téléchargement associés aux données",
                   nativeInputProps: {

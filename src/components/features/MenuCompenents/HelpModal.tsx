@@ -28,7 +28,7 @@ const HelpModal = () => {
         <div>
           <div className="modal-title-wrapper">
             <span className="fr-icon-france-fill"></span>
-            <h6>Séléctionnez vos dalles</h6>
+            <h6>Sélectionnez vos dalles</h6>
           </div>
           <p>
             Après avoir choisi le mode de sélection (clic, surface, import d'emprise), 

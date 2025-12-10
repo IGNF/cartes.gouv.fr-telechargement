@@ -132,7 +132,7 @@ const AppFooter = () => {
             iconId={
               isExpanded
                 ? "fr-icon-arrow-up-s-line"
-                : "fr-icon-arrow-down-s-line"
+                : null
             }
             onClick={toggleFooter}
           />,
