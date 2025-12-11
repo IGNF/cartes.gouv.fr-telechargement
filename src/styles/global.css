@@ -35,6 +35,7 @@
 
 #fr-footer {
   padding: 0;
+  display: flex;
 }
 
 .fr-footer__partners-sub,

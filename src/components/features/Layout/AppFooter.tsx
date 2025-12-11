@@ -31,7 +31,7 @@ const AppFooter = () => {
       if (!toggleContainer) {
         toggleContainer = document.createElement("div");
         toggleContainer.className = "fr-footer__toggle-container";
-        footer.insertBefore(toggleContainer, footer.firstChild);
+        footer.appendChild(toggleContainer);
       }
       setFooterBodyElement(toggleContainer);
 
@@ -75,18 +75,18 @@ const AppFooter = () => {
     );
   }, [isExpanded]);
 
-  const toggleButton = isExpanded ? (
+  const toggleButton = (
     <Button
       key="toggle-footer"
       className="fr-footer__toggle-btn"
       priority="tertiary no outline"
-      iconId="fr-icon-close-line"
+      iconId={isExpanded ? "fr-icon-close-line" : "fr-icon-arrow-down-s-line"}
       onClick={toggleFooter}
       title="Fermer"
     >
-      Fermer
+      {isExpanded ? "Fermer" : null}
     </Button>
-  ) : null;
+  );
 
   const ignLogo = (
     <a
@@ -122,16 +122,13 @@ const AppFooter = () => {
             Cartes.gouv.fr est développé par l'Institut national de l'information géographique et forestière (IGN) et ses partenaires. Le site s'appuie sur la Géoplateforme, la nouvelle infrastructure publique, ouverte et collaborative des données géographiques.
           "
         bottomItems={[
+          {
+            linkProps: { href: "https://cartes.gouv.fr/cgu", target: "_self" },
+            text: "Conditions générales d’utilisation",
+          },
           <FooterPersonalDataPolicyItem key="footer-personal-data-policy-item" />,
           <FooterConsentManagementItem key="footer-consent-management-item" />,
           headerFooterDisplayItem,
-          <Button
-            key="toggle-footer"
-            className="fr-footer__bottom-item--right"
-            priority="tertiary no outline"
-            iconId={isExpanded ? null : "fr-icon-arrow-down-s-line"}
-            onClick={toggleFooter}
-          />,
         ]}
         homeLinkProps={{
           href: "https://cartes.gouv.fr/",
@@ -146,6 +143,11 @@ const AppFooter = () => {
           href: "https://cartes.gouv.fr/plan-du-site",
           target: "_self",
         }}
+        cguLinkProps={{
+          href: "https://cartes.gouv.fr/conditions-generales-dutilisation",
+          target: "_self",
+        }}
+        partnersMainLogos={[]}
         partnersLogos={{
           sub: [
             {
