@@ -30,7 +30,7 @@
     "@tanstack/react-router": "^1.133.27",
     "@tanstack/router-devtools": "^1.133.27",
     "@turf/turf": "^7.2.0",
-    "geopf-extensions-openlayers": "^1.0.0-beta.6",
+    "geopf-extensions-openlayers": "^1.0.0-beta.7",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "react-icons": "^5.5.0",
