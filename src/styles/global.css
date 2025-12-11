@@ -4,6 +4,9 @@
   display: var(--visible);
   padding: 1.5rem;
 }
+.GPSearchPopup {
+opacity:0
+}
 
 .fr-footer__partners {
   display: var(--visible);
