@@ -1,13 +1,9 @@
 import { Map } from "ol";
 import {
   GeoportalZoom,
-  SearchEngine,
+  SearchEngineAdvanced,
   Territories,
 } from "geopf-extensions-openlayers";
-import ToggleControl from "../controls/ToggleControl";
-import { SelectedClickInteraction } from "../interactions/selectedClickInteraction";
-import {SelectedPolygonInteraction} from "../interactions/selectedPolygonInteraction";
-import useDalleStore from "../../hooks/store/useDalleStore";
 
 /**
  * Ajoute les contrôles OpenLayers à une carte.
@@ -15,7 +11,11 @@ import useDalleStore from "../../hooks/store/useDalleStore";
  */
 export const addControls = (map: Map) => {
   map.addControl(new GeoportalZoom({ position: "bottom-right" }));
-  map.addControl(new SearchEngine({ position: "top-left" }));
+  const search = new SearchEngineAdvanced({
+    position: "top-left",
+    returnTrueGeometry: false,
+  });
+  map.addControl(search);
   map.addControl(
     new Territories({
       collapsed: true,
@@ -28,6 +28,13 @@ export const addControls = (map: Map) => {
       tiles: 3,
     })
   );
+
+  // On désactive les styles pour avoir une recherche simple
+  search.selectInteraction.style = null;
+  search.layer.setMap();
+  search.popup.setMap();
+  search.selectInteraction.setMap();
+  search.layer.setStyle(null); // désactive le style par défaut des résultats de recherche
 };
 
 // // appel depuis ton init map : createSelectionControls(map, selectionLayer)
@@ -37,55 +44,55 @@ export const addControls = (map: Map) => {
 // ) {
 //   const store = useDalleStore.getState();
 
-  // const clickInteraction = new SelectedClickInteraction(
-  //   selectionLayer,
-  //   10,
-  //   store.isProduitSelected,
-  //   store.addProduit,
-  //   store.removeProduit,
-  //   store.setIsMetadata
-  // );
-  // // start inactive
-  // (clickInteraction as any).setActive(false);
+// const clickInteraction = new SelectedClickInteraction(
+//   selectionLayer,
+//   10,
+//   store.isProduitSelected,
+//   store.addProduit,
+//   store.removeProduit,
+//   store.setIsMetadata
+// );
+// // start inactive
+// (clickInteraction as any).setActive(false);
 
-  // const polygonInteraction = new SelectedPolygonInteraction(
-  //   selectionLayer,
-  //   store.isProduitSelected,
-  //   store.addProduit,
-  //   store.removeProduit,
-  //   store.setIsMetadata
-  // ).getDrawInteraction();
-  // (polygonInteraction as any).setActive(false);
+// const polygonInteraction = new SelectedPolygonInteraction(
+//   selectionLayer,
+//   store.isProduitSelected,
+//   store.addProduit,
+//   store.removeProduit,
+//   store.setIsMetadata
+// ).getDrawInteraction();
+// (polygonInteraction as any).setActive(false);
 
-  // const clickToggle = new ToggleControl({
-  //   className: "select-click",
-  //   title: "Sélection par clic",
-  //   html: "hello",
-  //   interaction: clickInteraction,
-  //   active: false,
-  //   onToggle: (active) => {
-  //     // si on active un toggle, on désactive l'autre interaction et son toggle
-  //     if (active) {
-  //       polygonToggle.setActive(false);
-  //     }
-  //   },
-  // });
+// const clickToggle = new ToggleControl({
+//   className: "select-click",
+//   title: "Sélection par clic",
+//   html: "hello",
+//   interaction: clickInteraction,
+//   active: false,
+//   onToggle: (active) => {
+//     // si on active un toggle, on désactive l'autre interaction et son toggle
+//     if (active) {
+//       polygonToggle.setActive(false);
+//     }
+//   },
+// });
 
-  // const polygonToggle = new ToggleControl({
-  //   className: "select-polygon",
-  //   title: "Sélection polygone",
-  //   html: "▭",
-  //   interaction: polygonInteraction,
-  //   active: false,
-  //   onToggle: (active) => {
-  //     if (active) {
-  //       clickToggle.setActive(false);
-  //     }
-  //   },
-  // });
+// const polygonToggle = new ToggleControl({
+//   className: "select-polygon",
+//   title: "Sélection polygone",
+//   html: "▭",
+//   interaction: polygonInteraction,
+//   active: false,
+//   onToggle: (active) => {
+//     if (active) {
+//       clickToggle.setActive(false);
+//     }
+//   },
+// });
 
-  // map.addControl(clickToggle);
-  // map.addControl(polygonToggle);
+// map.addControl(clickToggle);
+// map.addControl(polygonToggle);
 
 //   return { clickToggle, polygonToggle, clickInteraction, polygonInteraction };
 // }
