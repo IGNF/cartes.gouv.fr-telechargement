@@ -4,6 +4,7 @@ import { Vector as VectorSource } from "ol/source";
 import { booleanIntersects } from "@turf/turf";
 import GeoJSON from "ol/format/GeoJSON";
 import { Polygon } from "ol/geom";
+import { useFilterStore } from "../../hooks/store/useFilterStore";
 
 /**
  * Interaction de sélection par polygone pour les entités d'une couche vectorielle.
@@ -60,6 +61,7 @@ export class SelectedPolygonInteraction extends Interaction {
 
         // Crée une géométrie Polygon OL
         const polygon = new Polygon(coords);
+        const setFilter = useFilterStore.getState().setFilter;
 
         // Vérifie si le polygone dessiné intersecte l'entité
         if (
@@ -73,17 +75,20 @@ export class SelectedPolygonInteraction extends Interaction {
           if (listAlreadyChecked.includes(properties.id)) {
             return; // Passe à l'entité suivante si déjà vérifiée
           }
-          console.log("Selected entity:", properties);
           const dalle = {
             name: properties.name,
             url: properties.url,
             id: properties.id,
+            date: properties.timestamp,
+            size: properties.size,
+            metadata: properties.metadata,
           };
 
           listAlreadyChecked.push(dalle.id);
 
           if (!this.isProduitSelected(dalle.id)) {
             this.addProduit(dalle);
+            setFilter({ dateStart: dalle.timestamp, dateEnd: dalle.timestamp });
           } else {
             this.removeProduit(dalle.id);
           }

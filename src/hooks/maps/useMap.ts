@@ -18,8 +18,7 @@ import useMapStore from "../../hooks/store/useMapStore";
 import { SelectedPolygonInteraction } from "../../utils/interactions/selectedPolygonInteraction";
 import { SelectedClickInteraction } from "../../utils/interactions/selectedClickInteraction";
 import { HoverPopupInteraction } from "../../utils/interactions";
-// import {createSelectionControls} from "../../utils/maps/controls";
-// import { set } from "ol/transform";
+import useDalleStore from "../store/useDalleStore";
 
 export const useMap = (
   containerRef: React.RefObject<HTMLDivElement>,
@@ -31,6 +30,7 @@ export const useMap = (
   setIsMetadata: any
 ) => {
   const [map, setMap] = useState<Map | null>(null);
+  const isProduitFiltered = useDalleStore((state) => state.isProduitFiltered);
 
 
   // projection
@@ -54,9 +54,11 @@ export const useMap = (
     renderMode: "vector",
     source: produitLayer.getSource(),
     style: (feature) => {
+
       if (isProduitSelected(feature.getProperties().id)) {
         return getStyleForDalle("selected");
       }
+      return getStyleForDalle("default");
     },
   });
 

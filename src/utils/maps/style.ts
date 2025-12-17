@@ -28,6 +28,18 @@ const styleDalle = {
       width: 2,
     }),
   },
+  /**
+   * Style appliqué lorsqu'une dalle est sélectionnée.
+   */
+  filtered: {
+    fill: new Fill({
+      color: "rgba(173, 191, 10, 0.5)", // Vert clair pour indiquer une sélection
+    }),
+    stroke: new Stroke({
+      color: "rgba(112, 119, 122)", // Gris pour les contours
+      width: 2,
+    }),
+  },
 
   /**
    * Style appliqué au survole

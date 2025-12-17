@@ -1,10 +1,17 @@
-import React from "react";
+import React, { use } from "react";
 import { Button } from "@codegouvfr/react-dsfr/Button";
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
 import "./Filter.css";
 import FilterDate from "./FilterDate";
+import { useFilterStore } from "../../../../hooks/store/useFilterStore";
 
 const Filter = ({ onClose } = {}) => {
+
+    const isFiltered = useFilterStore((state) => state.isFiltered);
+
+
+
+
     return (
         <div className="filter">
 
@@ -18,15 +25,10 @@ const Filter = ({ onClose } = {}) => {
                     Retour
                 </Button>
             ) : null}
+                <>
+                    <FilterDate />
+                </>
 
-            <div className="filter-body" style={{ marginTop: 12 }}>
-                <strong>Aucun filtre disponible</strong>
-                <div style={{ marginTop: 6 }}>
-                    Pour cette donnée, aucun critère de filtrage n'est proposé pour l'instant.
-                </div>
-
-
-            </div>
         </div>
     );
 };

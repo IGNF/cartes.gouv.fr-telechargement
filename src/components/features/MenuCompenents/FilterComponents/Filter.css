@@ -25,3 +25,29 @@ align-self: stretch;
   font-weight: 700;
   line-height: 32px; /* 133.333% */
 }
+
+.filter-date {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-left: 1rem;
+  margin-right: 1rem;
+}
+
+/* Largeur fixe en desktop */
+.filter-date > .fr-input-group {
+  width: 17rem;
+}
+
+/* Responsive : en-dessous de 768px, on passe en colonne */
+@media (max-width: 768px) {
+  .filter-date {
+    flex-direction: column;
+  }
+
+  /* largeur 100% en mobile */
+  .filter-date > .fr-input-group {
+    width: 100%;
+  }
+}
