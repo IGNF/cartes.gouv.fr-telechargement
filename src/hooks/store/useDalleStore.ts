@@ -79,7 +79,10 @@ export const useDalleStore = create<DalleStore>((set, get) => ({
       ) {
         get().removeProduit(produit.id);
         set((state) => ({
-          selectedProduitsFiltered: [...state.selectedProduitsFiltered, produit],
+          selectedProduitsFiltered: [
+            ...state.selectedProduitsFiltered,
+            produit,
+          ],
         }));
       }
     });
@@ -102,6 +105,7 @@ export const useDalleStore = create<DalleStore>((set, get) => ({
       }
     });
 
+    get().produitLayer?.changed();
   },
   isProduitFiltered: (id) =>
     get().selectedProduitsFiltered.some((produit) => produit.id === id),

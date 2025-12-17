@@ -58,6 +58,9 @@ export const useMap = (
       if (isProduitSelected(feature.getProperties().id)) {
         return getStyleForDalle("selected");
       }
+      if (isProduitFiltered(feature.getProperties().id)) {
+        return getStyleForDalle("filtered");
+      }
       return getStyleForDalle("default");
     },
   });
