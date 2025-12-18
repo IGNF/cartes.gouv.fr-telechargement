@@ -55,13 +55,6 @@ export const useMap = (
     source: produitLayer.getSource(),
     style: (feature) => {
       const filter = useFilterStore.getState().filter;
-
-        console.log("feature filtered by date test", feature.getProperties().timestamp < filter.dateStart );
-
-        console.log("feature filtered by date", feature.getProperties().timestamp );
-
-        console.log("feature filtered date", filter.dateStart );
-
       if (isProduitSelected(feature.getProperties().id)) {
         return getStyleForDalle("selected");
       }

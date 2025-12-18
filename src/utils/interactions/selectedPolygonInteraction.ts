@@ -81,8 +81,6 @@ export class SelectedPolygonInteraction extends Interaction {
             size: properties.size,
             metadata: properties.metadata,
           };
-          console.log("dalle polygone selected", dalle);
-          
 
           listAlreadyChecked.push(dalle.id);
 

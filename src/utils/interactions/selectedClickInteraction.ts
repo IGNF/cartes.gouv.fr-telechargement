@@ -74,7 +74,6 @@ export class SelectedClickInteraction extends Interaction {
         // Ajoute ou retire le produit en fonction de son état
         if (!this.isProduitSelected(dalle.id) && index === 0) {
           this.addProduit(dalle);
-          console.log("dalle.timestamp", dalle.timestamp);
           
           index++;
         } else {
