@@ -14,7 +14,9 @@ const FilterDate = () => {
 
   useEffect(() => {
     filteredProduits({ dateStart, dateEnd });
-  }, [selectedDalles]);
+    setDateStart(filter.dateStart);
+    setDateEnd(filter.dateEnd);
+  }, [selectedDalles, filter]);
 
   return (
     <div className="filter-date">
