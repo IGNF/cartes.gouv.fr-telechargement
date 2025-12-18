@@ -19,6 +19,7 @@ import { SelectedPolygonInteraction } from "../../utils/interactions/selectedPol
 import { SelectedClickInteraction } from "../../utils/interactions/selectedClickInteraction";
 import { HoverPopupInteraction } from "../../utils/interactions";
 import useDalleStore from "../store/useDalleStore";
+import useFilterStore from "../store/useFilterStore";
 
 export const useMap = (
   containerRef: React.RefObject<HTMLDivElement>,
@@ -31,8 +32,6 @@ export const useMap = (
 ) => {
   const [map, setMap] = useState<Map | null>(null);
   const isProduitFiltered = useDalleStore((state) => state.isProduitFiltered);
-  
-
 
   // projection
   proj4.defs(
@@ -55,11 +54,22 @@ export const useMap = (
     renderMode: "vector",
     source: produitLayer.getSource(),
     style: (feature) => {
+      const filter = useFilterStore.getState().filter;
+
+        console.log("feature filtered by date test", feature.getProperties().timestamp < filter.dateStart );
+
+        console.log("feature filtered by date", feature.getProperties().timestamp );
+
+        console.log("feature filtered date", filter.dateStart );
 
       if (isProduitSelected(feature.getProperties().id)) {
         return getStyleForDalle("selected");
       }
       if (isProduitFiltered(feature.getProperties().id)) {
+        return getStyleForDalle("filtered");
+      }
+      if (feature.getProperties().timestamp < filter.dateStart || feature.getProperties().timestamp > filter.dateEnd) {
+        
         return getStyleForDalle("filtered");
       }
       return getStyleForDalle("default");
