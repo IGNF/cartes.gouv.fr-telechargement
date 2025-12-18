@@ -8,6 +8,7 @@ import { useFilterStore } from "../../../../hooks/store/useFilterStore";
 const Filter = ({ onClose } = {}) => {
 
     const isFiltered = useFilterStore((state) => state.isFiltered);
+    const resetFilter = useFilterStore((state) => state.resetFilter);
 
 
 
@@ -15,16 +16,26 @@ const Filter = ({ onClose } = {}) => {
     return (
         <div className="filter">
 
-            {onClose ? (
                 <Button
                     iconId="fr-icon-arrow-left-line"
                     iconPosition="left"
                     priority="tertiary no outline"
                     size="medium"
-                    onClick={onClose}>
+                    onClick={onClose}
+                    className="filter-back-button">
                     Retour
                 </Button>
-            ) : null}
+
+            <div className="filter-header">
+                <h5>Filtrer</h5>
+                <Button
+                    iconPosition="left"
+                    priority="secondary"
+                    size="medium"
+                    onClick={resetFilter}>
+                    Réinitialiser
+                </Button>
+                </div>
                 <>
                     <FilterDate />
                 </>

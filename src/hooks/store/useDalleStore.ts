@@ -37,6 +37,7 @@ export const useDalleStore = create<DalleStore>((set, get) => ({
   setIsMetadata: (v: boolean) => set({ isMetadata: v }),
   addProduit: (produit) => {
     const filter = useFilterStore.getState().filter;
+    console.log("filter in addProduit", filter);
     set((state) => ({
       selectedProduits: [...state.selectedProduits, produit],
     }));
@@ -71,7 +72,10 @@ export const useDalleStore = create<DalleStore>((set, get) => ({
   isProduitSelected: (id) =>
     get().selectedProduits.some((produit) => produit.id === id),
   filteredProduits: (filter) => {
-    let produitsFiltered: Dalle[] = [];
+    console.log("filter in filteredProduits", filter);
+    console.log("selectedProduits before filtering", get().selectedProduits);
+    
+
     get().selectedProduits.forEach((produit) => {
       if (
         produit.timestamp <= filter.dateStart ||

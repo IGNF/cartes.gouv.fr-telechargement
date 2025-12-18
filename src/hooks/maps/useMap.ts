@@ -31,6 +31,7 @@ export const useMap = (
 ) => {
   const [map, setMap] = useState<Map | null>(null);
   const isProduitFiltered = useDalleStore((state) => state.isProduitFiltered);
+  
 
 
   // projection

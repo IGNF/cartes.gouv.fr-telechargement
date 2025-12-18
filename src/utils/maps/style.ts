@@ -1,5 +1,28 @@
 import { Style, Fill, Stroke } from "ol/style";
 
+function createHatchPattern({
+  size = 8,
+  strokeStyle = "rgba(0, 0, 0, 0.4)",
+  lineWidth = 1,
+} = {}) {
+  const canvas = document.createElement("canvas");
+  canvas.width = size;
+  canvas.height = size;
+
+  const ctx = canvas.getContext("2d");
+
+  ctx.strokeStyle = strokeStyle;
+  ctx.lineWidth = lineWidth;
+
+  // diagonale /
+  ctx.beginPath();
+  ctx.moveTo(0, size);
+  ctx.lineTo(size, 0);
+  ctx.stroke();
+
+  return ctx.createPattern(canvas, "repeat");
+}
+
 /**
  * Définit les styles pour les entités WFS en fonction de l'état ou de l'interaction.
  */
@@ -33,7 +56,11 @@ const styleDalle = {
    */
   filtered: {
     fill: new Fill({
-      color: "rgba(173, 191, 10, 0.5)", // Vert clair pour indiquer une sélection
+      color: createHatchPattern({
+        size: 10,
+        strokeStyle: "rgba(0, 100, 200, 0.5)",
+        lineWidth: 1,
+      }), // Vert clair pour indiquer une sélection
     }),
     stroke: new Stroke({
       color: "rgba(112, 119, 122)", // Gris pour les contours
@@ -46,16 +73,14 @@ const styleDalle = {
    */
   hovered: {
     fill: new Fill({
-      color: 'rgba(32, 191, 10, 0.5)'  // Couleur de remplissage verte transparente pour le survol
+      color: "rgba(32, 191, 10, 0.5)", // Couleur de remplissage verte transparente pour le survol
     }),
     stroke: new Stroke({
-      color: '#35432e',  // Bordure verte pour le survol
-      width: 2
+      color: "#35432e", // Bordure verte pour le survol
+      width: 2,
     }),
-  }
-
+  },
 };
-
 
 /**
  * Génère un style OpenLayers basé sur le type d'interaction ou d'état.
@@ -72,18 +97,13 @@ export const getStyleForDalle = (type: keyof typeof styleDalle): Style => {
   });
 };
 
-
-
-
 /**
  * Retourne le style d'une feature en fonction de son état.
  * @param feature - La feature dont on veut déterminer le style.
  * @returns Un objet `Style` pour OpenLayers.
  */
 export const getStyleForBlocs = (feature: any) => {
-
   const isHovered = feature.get("hovered");
-
 
   if (isHovered) {
     const config = styleDalle["hovered"];
@@ -98,6 +118,3 @@ export const getStyleForBlocs = (feature: any) => {
     stroke: config.stroke,
   });
 };
-
-
-

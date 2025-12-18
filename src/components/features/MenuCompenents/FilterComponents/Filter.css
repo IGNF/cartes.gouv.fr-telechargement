@@ -1,16 +1,29 @@
 filter {
   display: flex;
-flex-direction: column;
-align-items: center;
-gap: 16px;
-align-self: stretch;
+  width: 28.1875rem;
+  height: 37.75rem;
+  padding: 1rem;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.5rem;
+}
+.filter-back-button {
+  display: flex;
+  padding: 0.25rem 0.75rem 0.25rem 0.25rem;
+  margin-top: auto;
+  margin-bottom: 0.7rem;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
 }
 .filter-header {
   display: flex;
-  width: 418px;
-  height: 39px;
+  height: 2.4375rem;
   justify-content: space-between;
   align-items: flex-end;
+  align-self: stretch;
+  margin-right: 0.5rem;
+  margin-left: 0.5rem;
 }
 
 .filter-label {

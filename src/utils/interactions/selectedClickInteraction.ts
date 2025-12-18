@@ -47,7 +47,6 @@ export class SelectedClickInteraction extends Interaction {
 
     const map = event.map;
     const pixel = map.getEventPixel(event.originalEvent);
-    const setFilter = useFilterStore.getState().setFilter;
 
     let index = 0;
 
@@ -77,7 +76,6 @@ export class SelectedClickInteraction extends Interaction {
           this.addProduit(dalle);
           console.log("dalle.timestamp", dalle.timestamp);
           
-          setFilter({dateStart: dalle.timestamp, dateEnd: dalle.timestamp});
           index++;
         } else {
           if (index === 0) {
