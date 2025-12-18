@@ -32,10 +32,10 @@ const styleDalle = {
    */
   default: {
     fill: new Fill({
-      color: "rgba(220, 220, 252, 0.5)", // Vert clair pour indiquer une sélection
+      color: "rgba(220, 220, 252, 0.5)", // Couleur de remplissage bleue transparente
     }),
     stroke: new Stroke({
-      color: "#3a3a68", // Gris pour les contours
+      color: "#3a3a68", // Bordure bleue
       width: 1,
     }),
   },
@@ -44,7 +44,7 @@ const styleDalle = {
    */
   selected: {
     fill: new Fill({
-      color: "rgba(32, 191, 10, 0.5)", // Vert clair pour indiquer une sélection
+      color: "rgba(167, 252, 98, 0.5)", // Vert clair pour indiquer une sélection
     }),
     stroke: new Stroke({
       color: "rgba(112, 119, 122)", // Gris pour les contours
@@ -57,14 +57,14 @@ const styleDalle = {
   filtered: {
     fill: new Fill({
       color: createHatchPattern({
-        size: 10,
+        size: 15,
         strokeStyle: "rgba(0, 100, 200, 0.5)",
-        lineWidth: 1,
+        lineWidth: 2,
       }), // Vert clair pour indiquer une sélection
     }),
     stroke: new Stroke({
       color: "rgba(112, 119, 122)", // Gris pour les contours
-      width: 2,
+      width: 0.5,
     }),
   },
 
