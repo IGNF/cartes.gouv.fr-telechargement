@@ -74,7 +74,7 @@ export default function SelectedOptions() {
         onClick={() => setSelectionMode("polygon")}
         disabled={selectionMode === "polygon"}
       />
-      <input
+      {/* <input
         ref={fileInputRef}
         type="file"
         iconId="fr-icon-file-upload-line"
@@ -89,7 +89,7 @@ export default function SelectedOptions() {
         priority="tertiary"
         title="Importer une emprise (GeoJSON)"
         onClick={() => fileInputRef.current?.click()}
-      />
+      /> */}
     </div>
   );
 
