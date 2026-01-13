@@ -2,7 +2,6 @@ import { Interaction } from "ol/interaction";
 import { Layer } from "ol/layer";
 import { MapBrowserEvent } from "ol";
 import { getRemoteFileSize } from "../getRemoteFileSize";
-import { useFilterStore } from "../../hooks/store/useFilterStore";
 
 /**
  * Interaction de sélection par clic pour les entités d'une couche vectorielle.
@@ -67,7 +66,7 @@ export class SelectedClickInteraction extends Interaction {
           url: properties.url,
           id: properties.id,
           size: getRemoteFileSize(properties.url),
-          timestamp: properties.timestamp,
+          timestamp: new Date(properties.timestamp).getTime(),
           metadata: properties.metadata,
         };
         

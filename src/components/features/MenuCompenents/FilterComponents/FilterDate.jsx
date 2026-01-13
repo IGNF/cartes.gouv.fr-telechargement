@@ -25,9 +25,9 @@ const FilterDate = () => {
           type: 'date',
 
           onChange: (e) => {
-            setDateStart(e.target.value);
-            filteredProduits({ dateStart: e.target.value, dateEnd: dateEnd });
-            setFilterOnChange({ dateStart: e.target.value, dateEnd: dateEnd });
+            setDateStart(new Date(e.target.value).getTime());
+            filteredProduits({ dateStart: new Date(e.target.value).getTime(), dateEnd: dateEnd });
+            setFilterOnChange({ dateStart: new Date(e.target.value).getTime(), dateEnd: dateEnd });
           },
           defaultValue: dateStart
         }}
@@ -37,9 +37,9 @@ const FilterDate = () => {
         nativeInputProps={{
           type: 'date',
           onChange: (e) => {
-            setDateEnd(e.target.value);
-            filteredProduits({ dateStart: dateStart, dateEnd: e.target.value });
-            setFilterOnChange({ dateStart: dateStart, dateEnd: e.target.value });
+            setDateEnd(new Date(e.target.value).getTime());
+            filteredProduits({ dateStart: dateStart, dateEnd: new Date(e.target.value).getTime() });
+            setFilterOnChange({ dateStart: dateStart, dateEnd: new Date(e.target.value).getTime() });
           },
           defaultValue: dateEnd
         }}

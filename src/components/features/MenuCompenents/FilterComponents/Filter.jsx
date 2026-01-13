@@ -3,14 +3,18 @@ import "./Filter.css";
 import FilterDate from "./FilterDate";
 import { useFilterStore } from "../../../../hooks/store/useFilterStore";
 import { useState } from "react";
+import useDalleStore from "../../../../hooks/store/useDalleStore";
 
 const Filter = ({ onClose } = {}) => {
 
     const isFiltered = useFilterStore((state) => state.isFiltered);
     const resetFilter = useFilterStore((state) => state.resetFilter);
+    const filter = useFilterStore((state) => state.filter);
+    const filteredProduits = useDalleStore((state) => state.filteredProduits);
     const [resetKey, setResetKey] = useState(0);
     const handleReset = () => {
         resetFilter();        // logique store si nécessaire
+        filteredProduits(filter);   // re-applique les filtres
         setResetKey((k) => k + 1); // force le reset du composant enfant
     };
 

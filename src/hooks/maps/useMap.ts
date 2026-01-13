@@ -61,8 +61,8 @@ export const useMap = (
       if (isProduitFiltered(feature.getProperties().id)) {
         return getStyleForDalle("filtered");
       }
-      if (feature.getProperties().timestamp < filter.dateStart || feature.getProperties().timestamp > filter.dateEnd) {
-        
+      if (new Date(feature.getProperties().timestamp).getTime() < filter.dateStart || new Date(feature.getProperties().timestamp).getTime() > filter.dateEnd) {
+
         return getStyleForDalle("filtered");
       }
       return getStyleForDalle("default");

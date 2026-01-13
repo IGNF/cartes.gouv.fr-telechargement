@@ -16,7 +16,7 @@ type filterDate = { dateStart: number; dateEnd: number };
 
 type DalleStore = {
   selectedProduits: Dalle[];
-  selectedProduitsFiltered: Dalle[];
+  selectedProduitsFiltered: Dalle[]; // liste des produits selectionnées mis de coté après filtre
   produitLayer: DalleLayer;
   isMetadata: boolean;
   setIsMetadata: (v: boolean) => void; // <-- ajout
@@ -89,6 +89,8 @@ export const useDalleStore = create<DalleStore>((set, get) => ({
     });
     // on réajoute les produits qui sont dans l'intervalle de date
     get().selectedProduitsFiltered.forEach((produit) => {
+        console.log('hello je rajoute avant test', produit);
+        console.log('hello je rajoute avant filter', filter);
       if (
         produit.timestamp >= filter.dateStart &&
         produit.timestamp <= filter.dateEnd
@@ -97,6 +99,8 @@ export const useDalleStore = create<DalleStore>((set, get) => ({
         set((state) => ({
           selectedProduits: [...state.selectedProduits, produit],
         }));
+        console.log('hello je rajoute après test', produit);
+
         // on les supprime de selectedProduitsFiltered
         set((state) => ({
           selectedProduitsFiltered: state.selectedProduitsFiltered.filter(
