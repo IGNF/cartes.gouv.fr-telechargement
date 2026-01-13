@@ -15,7 +15,6 @@ const route = getRouteApi("/telechargement/$downloadUrl");
 const MapComponent = () => {
   const { downloadUrl } = route.useParams();
 
-  const selectedDalle = useDalleStore((state) => state.selectedProduits);
   const addProduit = useDalleStore((state) => state.addProduit);
   const isProduitSelected = useDalleStore((state) => state.isProduitSelected);
   const removeDalle = useDalleStore((state) => state.removeProduit);
@@ -24,7 +23,7 @@ const MapComponent = () => {
 
   const mapContainerRef = useRef<HTMLDivElement>(null);
 
-  const mapInstance = useMap(
+useMap(
     mapContainerRef,
     downloadUrl,
     addProduit,

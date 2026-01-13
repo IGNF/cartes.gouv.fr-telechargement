@@ -5,7 +5,6 @@ import {
   FooterConsentManagementItem,
   FooterPersonalDataPolicyItem,
 } from "../../../config/consentMangement";
-import React from "react";
 import { createPortal } from "react-dom";
 import { Button } from "@codegouvfr/react-dsfr/Button";
 
