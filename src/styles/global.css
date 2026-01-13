@@ -145,3 +145,7 @@ opacity:0
   /* conserver l'ombre existante */
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
 }
+
+.ol-scale-line {
+  left: 58px;
+}

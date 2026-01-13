@@ -4,6 +4,7 @@ import {
   SearchEngineAdvanced,
   Territories,
 } from "geopf-extensions-openlayers";
+import { ScaleLine } from "ol/control";
 
 /**
  * Ajoute les contrôles OpenLayers à une carte.
@@ -28,6 +29,9 @@ export const addControls = (map: Map) => {
       tiles: 3,
     })
   );
+  map.addControl(new ScaleLine(
+    
+  ));
 
   // On désactive les styles pour avoir une recherche simple
   search.selectInteraction.style = null;
