@@ -1,27 +1,5 @@
 import { Style, Fill, Stroke } from "ol/style";
 
-function createHatchPattern({
-  size = 8,
-  strokeStyle = "rgba(0, 0, 0, 0.4)",
-  lineWidth = 1,
-} = {}) {
-  const canvas = document.createElement("canvas");
-  canvas.width = size;
-  canvas.height = size;
-
-  const ctx = canvas.getContext("2d");
-
-  ctx.strokeStyle = strokeStyle;
-  ctx.lineWidth = lineWidth;
-
-  // diagonale /
-  ctx.beginPath();
-  ctx.moveTo(0, size);
-  ctx.lineTo(size, 0);
-  ctx.stroke();
-
-  return ctx.createPattern(canvas, "repeat");
-}
 
 /**
  * Définit les styles pour les entités WFS en fonction de l'état ou de l'interaction.
@@ -55,17 +33,8 @@ const styleDalle = {
    * Style appliqué lorsqu'une dalle est sélectionnée.
    */
   filtered: {
-    fill: new Fill({
-      color: createHatchPattern({
-        size: 15,
-        strokeStyle: "rgba(0, 100, 200, 0.5)",
-        lineWidth: 2,
-      }), // Vert clair pour indiquer une sélection
-    }),
-    stroke: new Stroke({
-      color: "rgba(112, 119, 122)", // Gris pour les contours
-      width: 0.5,
-    }),
+    fill: null,
+    stroke: null
   },
 
   /**

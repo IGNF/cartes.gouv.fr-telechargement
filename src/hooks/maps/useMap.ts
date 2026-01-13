@@ -49,6 +49,7 @@ export const useMap = (
     `https://data.geopf.fr/tms/1.0.0/${downloadUrl}-produit/{z}/{x}/{y}.pbf`,
     16
   );
+  produitLayer.setVisible(false);
 
   const selectionProduitLayer = new VectorTileLayer({
     renderMode: "vector",
@@ -80,7 +81,7 @@ export const useMap = (
             layer: "GEOGRAPHICALGRIDSYSTEMS.PLANIGNV2",
           }),
           chantierLayer,
-          produitLayer,
+          // produitLayer,
           selectionProduitLayer,
         ],
         view: new View({
