@@ -11,7 +11,7 @@ import { LayerWMTS } from "geopf-extensions-openlayers";
 import { addControls } from "../../utils/maps/controls";
 import { tmsLayer } from "../../utils/maps/Layers";
 import { addZoomInteraction } from "../../utils/maps/interactions";
-import { getStyleForDalle } from "../../utils/maps/style";
+import { getStyleForBlocs, getStyleForDalle } from "../../utils/maps/style";
 import VectorTileLayer from "ol/layer/VectorTile";
 import useMapStore from "../../hooks/store/useMapStore";
 
@@ -28,6 +28,7 @@ export const useMap = (
   isProduitSelected: any,
   removeProduit: any,
   addProduitLayer: any,
+  addChantierLayer: any,
   setIsMetadata: any
 ) => {
   const [map, setMap] = useState<Map | null>(null);
@@ -44,6 +45,17 @@ export const useMap = (
     `https://data.geopf.fr/tms/1.0.0/${downloadUrl}-chantier/{z}/{x}/{y}.pbf`,
     10
   );
+  chantierLayer.setStyle((feature) => {
+    const filter = useFilterStore.getState().filter;
+    if (
+      new Date(feature.getProperties().timestamp).getTime() <
+        filter.dateStart ||
+      new Date(feature.getProperties().timestamp).getTime() > filter.dateEnd
+    ) {
+      return getStyleForDalle("filtered");
+    }
+    return getStyleForBlocs(feature);
+  });
 
   const produitLayer = tmsLayer(
     `https://data.geopf.fr/tms/1.0.0/${downloadUrl}-produit/{z}/{x}/{y}.pbf`,
@@ -62,8 +74,11 @@ export const useMap = (
       if (isProduitFiltered(feature.getProperties().id)) {
         return getStyleForDalle("filtered");
       }
-      if (new Date(feature.getProperties().timestamp).getTime() < filter.dateStart || new Date(feature.getProperties().timestamp).getTime() > filter.dateEnd) {
-
+      if (
+        new Date(feature.getProperties().timestamp).getTime() <
+          filter.dateStart ||
+        new Date(feature.getProperties().timestamp).getTime() > filter.dateEnd
+      ) {
         return getStyleForDalle("filtered");
       }
       return getStyleForDalle("default");
@@ -93,6 +108,7 @@ export const useMap = (
       });
 
       addProduitLayer(selectionProduitLayer);
+      addChantierLayer(chantierLayer);
       addControls(mapInstance);
       addZoomInteraction(mapInstance, chantierLayer, 11);
       // createSelectionControls(mapInstance, selectionProduitLayer);
@@ -123,7 +139,6 @@ export const useMap = (
       });
       mapInstance.addInteraction(hoverInteractionChantier);
 
-
       const hoverInteractionProduit = new HoverPopupInteraction({
         layer: produitLayer,
       });
@@ -131,7 +146,7 @@ export const useMap = (
 
       // ⚡ bascule entre les interactions selon selectionMode
       useMapStore.subscribe((state) => {
-        if (state.selectionMode === "polygon" ) {
+        if (state.selectionMode === "polygon") {
           polygonInteraction.setActive(true);
           clickInteraction.setActive(false);
         } else if (state.selectionMode === "click") {

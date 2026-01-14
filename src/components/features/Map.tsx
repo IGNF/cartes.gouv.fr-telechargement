@@ -19,6 +19,7 @@ const MapComponent = () => {
   const isProduitSelected = useDalleStore((state) => state.isProduitSelected);
   const removeDalle = useDalleStore((state) => state.removeProduit);
   const addProduitLayer = useDalleStore((state) => state.addProduitLayer);
+  const addChantierLayer = useDalleStore((state) => state.addChantierLayer);
   const setIsMetadata = useDalleStore((state) => state.setIsMetadata);
 
   const mapContainerRef = useRef<HTMLDivElement>(null);
@@ -30,6 +31,7 @@ useMap(
     isProduitSelected,
     removeDalle,
     addProduitLayer,
+    addChantierLayer,
     setIsMetadata
   );
 

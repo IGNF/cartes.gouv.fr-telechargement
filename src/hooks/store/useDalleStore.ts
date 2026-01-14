@@ -11,6 +11,7 @@ type Dalle = {
 };
 
 type DalleLayer = any;
+type ChantierLayer = any;
 
 type filterDate = { dateStart: number; dateEnd: number };
 
@@ -18,10 +19,12 @@ type DalleStore = {
   selectedProduits: Dalle[];
   selectedProduitsFiltered: Dalle[]; // liste des produits selectionnées mis de coté après filtre
   produitLayer: DalleLayer;
+  chantierLayer: ChantierLayer;
   isMetadata: boolean;
   setIsMetadata: (v: boolean) => void; // <-- ajout
   addProduit: (dalle: Dalle) => void;
   addProduitLayer: (dalleLayer: DalleLayer) => void;
+  addChantierLayer: (chantierLayer: ChantierLayer) => void;
   removeProduit: (id: string) => void;
   removeAllProduits: () => void;
   isProduitSelected: (id: string) => boolean;
@@ -33,6 +36,7 @@ export const useDalleStore = create<DalleStore>((set, get) => ({
   selectedProduits: [],
   selectedProduitsFiltered: [],
   produitLayer: null,
+  chantierLayer: null,
   isMetadata: false,
   setIsMetadata: (v: boolean) => set({ isMetadata: v }),
   addProduit: (produit) => {
@@ -47,6 +51,8 @@ export const useDalleStore = create<DalleStore>((set, get) => ({
   },
   addProduitLayer: (produitLayer) =>
     set((state) => ({ produitLayer: produitLayer })),
+  addChantierLayer: (chantierLayer) =>
+    set((state) => ({ chantierLayer: chantierLayer })),
   removeProduit: (id) => {
     get().produitLayer?.changed();
     set((state) => ({
@@ -61,7 +67,6 @@ export const useDalleStore = create<DalleStore>((set, get) => ({
       ),
     }));
 
-    // get().dalleLayer.getFeatureById(id)?.setStyle(getStyleForDalle("default"));
   },
   removeAllProduits: () => {
     get().produitLayer?.changed();
@@ -89,8 +94,6 @@ export const useDalleStore = create<DalleStore>((set, get) => ({
     });
     // on réajoute les produits qui sont dans l'intervalle de date
     get().selectedProduitsFiltered.forEach((produit) => {
-        console.log('hello je rajoute avant test', produit);
-        console.log('hello je rajoute avant filter', filter);
       if (
         produit.timestamp >= filter.dateStart &&
         produit.timestamp <= filter.dateEnd
@@ -111,6 +114,7 @@ export const useDalleStore = create<DalleStore>((set, get) => ({
     });
 
     get().produitLayer?.changed();
+    get().chantierLayer?.changed();
   },
   isProduitFiltered: (id) =>
     get().selectedProduitsFiltered.some((produit) => produit.id === id),
