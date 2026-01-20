@@ -68,6 +68,10 @@ export const useMap = (
     source: produitLayer.getSource(),
     style: (feature) => {
       const filter = useFilterStore.getState().filter;
+      const isDalleHovered = useDalleStore.getState().isDalleHovered;
+      if (isDalleHovered(feature.getProperties().id)) {
+        return getStyleForDalle("hovered");
+      }
       if (isProduitSelected(feature.getProperties().id)) {
         return getStyleForDalle("selected");
       }

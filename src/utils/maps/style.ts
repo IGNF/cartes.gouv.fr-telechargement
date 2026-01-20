@@ -42,7 +42,7 @@ const styleDalle = {
    */
   hovered: {
     fill: new Fill({
-      color: "rgba(32, 191, 10, 0.5)", // Couleur de remplissage verte transparente pour le survol
+      color: "rgba(9, 71, 1, 0.5)", // Couleur de remplissage verte transparente pour le survol
     }),
     stroke: new Stroke({
       color: "#35432e", // Bordure verte pour le survol

@@ -8,6 +8,7 @@ type Dalle = {
   size: number;
   timestamp?: any;
   metadata?: any;
+  isHovered?: boolean;
 };
 
 type DalleLayer = any;
@@ -30,6 +31,8 @@ type DalleStore = {
   isProduitSelected: (id: string) => boolean;
   filteredProduits: (filter: filterDate) => void;
   isProduitFiltered: (id: string) => boolean;
+  isDalleHovered: (id: string) => boolean;
+  setIsHovered: (id: string, isHovered: boolean) => void;
 };
 
 export const useDalleStore = create<DalleStore>((set, get) => ({
@@ -118,6 +121,18 @@ export const useDalleStore = create<DalleStore>((set, get) => ({
   },
   isProduitFiltered: (id) =>
     get().selectedProduitsFiltered.some((produit) => produit.id === id),
+  isDalleHovered: (id) => {
+    const produit = get().selectedProduits.find((produit) => produit.id === id);
+    return produit ? produit.isHovered || false : false;
+  },
+  setIsHovered : (id, isHovered) => {
+    set((state) => ({
+      selectedProduits: state.selectedProduits.map((produit) =>
+        produit.id === id ? { ...produit, isHovered:isHovered } : produit
+      ),
+    }));
+    get().produitLayer?.changed();
+  }
 }));
 
 export default useDalleStore;
