@@ -77,7 +77,7 @@ export class SelectedPolygonInteraction extends Interaction {
             name: properties.name,
             url: properties.url,
             id: properties.id,
-            timestamp: properties.timestamp,
+            timestamp: new Date(properties.timestamp).getTime(),
             size: properties.size,
             metadata: properties.metadata,
           };

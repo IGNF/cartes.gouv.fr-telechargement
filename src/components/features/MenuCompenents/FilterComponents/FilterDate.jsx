@@ -6,7 +6,7 @@ import { useDalleStore } from "../../../../hooks/store/useDalleStore";
 const FilterDate = () => {
 
   const filter = useFilterStore((state) => state.filter);
-  const selectedDalles = useDalleStore((state) => state.selectedDalles);
+  const selectedProduits = useDalleStore((state) => state.selectedProduits);
   const filteredProduits = useDalleStore((state) => state.filteredProduits);
   const setFilterOnChange = useFilterStore((state) => state.setFilterOnChange);
   const [dateStart, setDateStart] = useState(filter.dateStart);
