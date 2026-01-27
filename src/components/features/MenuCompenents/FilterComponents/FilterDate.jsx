@@ -11,12 +11,7 @@ const FilterDate = () => {
   const setFilterOnChange = useFilterStore((state) => state.setFilterOnChange);
   const [dateStart, setDateStart] = useState(filter.dateStart);
   const [dateEnd, setDateEnd] = useState(filter.dateEnd);
-
-  useEffect(() => {
-    filteredProduits({ dateStart, dateEnd });
-    setDateStart(filter.dateStart);
-    setDateEnd(filter.dateEnd);
-  }, [selectedDalles, filter]);
+  
 
   return (
     <div className="filter-date">
@@ -29,9 +24,11 @@ const FilterDate = () => {
             filteredProduits({ dateStart: new Date(e.target.value).getTime(), dateEnd: dateEnd });
             setFilterOnChange({ dateStart: new Date(e.target.value).getTime(), dateEnd: dateEnd });
           },
-          defaultValue: dateStart
+          value: dateStart ? new Date(dateStart).toISOString().slice(0, 10) : null,
         }}
-        label="Date de début" />
+        label="Date de début"
+      />
+
 
       <Input
         nativeInputProps={{
@@ -41,7 +38,7 @@ const FilterDate = () => {
             filteredProduits({ dateStart: dateStart, dateEnd: new Date(e.target.value).getTime() });
             setFilterOnChange({ dateStart: dateStart, dateEnd: new Date(e.target.value).getTime() });
           },
-          defaultValue: dateEnd
+          value: new Date(dateEnd).toISOString().slice(0, 10)
         }}
         label="Date de fin" />
     </div>
