@@ -33,9 +33,16 @@ export const useDalleStore = create<DalleStore>((set, get) => ({
   setIsMetadata: (v: boolean) => set({ isMetadata: v }),
   addProduit: (produit) => {
     const filter = useFilterStore.getState().filter;
+     
+        if (
+          produit.timestamp >= filter.dateStart &&
+          produit.timestamp <= filter.dateEnd
+        ) {
+      
+    
     set((state) => ({
       selectedProduits: [...state.selectedProduits, produit],
-    }));
+    }));}
     get().filteredProduits({
       dateStart: filter.dateStart,
       dateEnd: filter.dateEnd,
