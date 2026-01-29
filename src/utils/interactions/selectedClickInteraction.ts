@@ -2,6 +2,7 @@ import { Interaction } from "ol/interaction";
 import { Layer } from "ol/layer";
 import { MapBrowserEvent } from "ol";
 import { getRemoteFileSize } from "../getRemoteFileSize";
+import { Dalle } from "../../assets/@types/types";
 
 /**
  * Interaction de sélection par clic pour les entités d'une couche vectorielle.
@@ -61,11 +62,10 @@ export class SelectedClickInteraction extends Interaction {
 
 
         
-        const dalle = {
+        const dalle : Dalle = {
           name: properties.name,
           url: properties.url,
           id: properties.id,
-          size: getRemoteFileSize(properties.url),
           timestamp: new Date(properties.timestamp).getTime(),
           metadata: properties.metadata,
         };

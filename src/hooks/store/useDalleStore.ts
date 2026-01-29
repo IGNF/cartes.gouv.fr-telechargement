@@ -1,20 +1,10 @@
 import { create } from "zustand";
 import useFilterStore from "./useFilterStore";
-
-type Dalle = {
-  name: string;
-  url: string;
-  id: string;
-  size: number;
-  timestamp?: any;
-  metadata?: any;
-  isHovered?: boolean;
-};
+import { Dalle, FilterDate } from "../../assets/@types/types";
 
 type DalleLayer = any;
 type ChantierLayer = any;
 
-type filterDate = { dateStart: number; dateEnd: number };
 
 type DalleStore = {
   selectedProduits: Dalle[];
@@ -29,7 +19,7 @@ type DalleStore = {
   removeProduit: (id: string) => void;
   removeAllProduits: () => void;
   isProduitSelected: (id: string) => boolean;
-  filteredProduits: (filter: filterDate) => void;
+  filteredProduits: (filter: FilterDate) => void;
   isProduitFiltered: (id: string) => boolean;
   isDalleHovered: (id: string) => boolean;
   setIsHovered: (id: string, isHovered: boolean) => void;
@@ -97,6 +87,7 @@ export const useDalleStore = create<DalleStore>((set, get) => ({
     });
     // on réajoute les produits qui sont dans l'intervalle de date
     get().selectedProduitsFiltered.forEach((produit) => {
+      
       if (
         produit.timestamp >= filter.dateStart &&
         produit.timestamp <= filter.dateEnd

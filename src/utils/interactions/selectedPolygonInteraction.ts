@@ -4,6 +4,8 @@ import { Vector as VectorSource } from "ol/source";
 import { booleanIntersects } from "@turf/turf";
 import GeoJSON from "ol/format/GeoJSON";
 import { Polygon } from "ol/geom";
+import { Dalle } from "../../assets/@types/types";
+import { getRemoteFileSize } from "../getRemoteFileSize";
 
 /**
  * Interaction de sélection par polygone pour les entités d'une couche vectorielle.
@@ -73,12 +75,11 @@ export class SelectedPolygonInteraction extends Interaction {
           if (listAlreadyChecked.includes(properties.id)) {
             return; // Passe à l'entité suivante si déjà vérifiée
           }
-          const dalle = {
+          const dalle :Dalle = {
             name: properties.name,
             url: properties.url,
             id: properties.id,
             timestamp: new Date(properties.timestamp).getTime(),
-            size: properties.size,
             metadata: properties.metadata,
           };
 
