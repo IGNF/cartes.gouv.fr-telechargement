@@ -5,7 +5,8 @@ import { Select } from "@codegouvfr/react-dsfr/Select";
 import { useState, useEffect } from "react";
 import { RadioButtons } from "@codegouvfr/react-dsfr/RadioButtons";
 import Button from "@codegouvfr/react-dsfr/Button";
-import {  formatBytes } from "../../../utils/formatters";
+import { formatBytes } from "../../../utils/formatters";
+import { downloadZip } from "../../../utils/dowload";
 
 export const downloadModal = createModal({
   id: "download-modal",
@@ -18,6 +19,7 @@ const DownloadModal = () => {
   const [value, setValue] = useState("");
   const [downloadMethod, setDownloadMethod] = useState("");
   const [totalSize, setTotalSize] = useState(0);
+  const [downloadLoading, setDownloadLoading] = useState(false);
 
   useEffect(() => {
     const resolveSizes = async () => {
@@ -31,12 +33,11 @@ const DownloadModal = () => {
         } catch (e) {
           console.error(
             `Erreur lors de la récupération de la taille pour ${dalle.name}:`,
-            e
+            e,
           );
         }
       }
       setTotalSize(sum);
-
     };
     resolveSizes();
   }, [selectedDalles]);
@@ -45,12 +46,20 @@ const DownloadModal = () => {
     e.preventDefault();
     if (!downloadMethod) {
       alert(
-        "Veuillez sélectionner une option et une méthode de téléchargement"
+        "Veuillez sélectionner une option et une méthode de téléchargement",
       );
       return;
     }
     if (downloadMethod === "all") {
-      selectedDalles.forEach((d: any) => window.open(d.url, "_blank"));
+      setDownloadLoading(true);
+      downloadZip(
+        selectedDalles.map((d: any) => ({ url: d.url, name: d.name })),
+      ).then(() => {
+        setDownloadLoading(false);
+        downloadModal.close();
+      });
+
+      // selectedDalles.forEach((d: any) => window.open(d.url, "_blank"));
     } else {
       const contenu = selectedDalles.map((d: any) => d.url).join("\n");
       const blob = new Blob([contenu], { type: "text/plain" });
@@ -62,8 +71,8 @@ const DownloadModal = () => {
       a.click();
       URL.revokeObjectURL(url);
       a.remove();
+      downloadModal.close();
     }
-    downloadModal.close();
   };
 
   const handleReset = () => {
@@ -74,100 +83,103 @@ const DownloadModal = () => {
 
   const count = selectedDalles.length;
 
-
   return (
     <downloadModal.Component title="Télécharger" iconId="fr-icon-download-fill">
-      <form className="download-modal-form" onSubmit={handleSubmit}>
-        {
-          <p className="fr-message fr-message--info">
-            {count}{" "}
-            {count === 1 ? "dalle sélectionnée" : "dalles sélectionnées"},{" "}
-            {count === 1
-              ? "taille du fichier : "
-              : "tailles totales des fichiers : "}
-            {formatBytes(totalSize * 1024 * 1024)}
-          </p>
-        }
+      {downloadLoading ? (
+        <p>Calcul de la taille des fichiers...</p>
+      ) : (
+        <form className="download-modal-form" onSubmit={handleSubmit}>
+          {
+            <p className="fr-message fr-message--info">
+              {count}{" "}
+              {count === 1 ? "dalle sélectionnée" : "dalles sélectionnées"},{" "}
+              {count === 1
+                ? "taille du fichier : "
+                : "tailles totales des fichiers : "}
+              {formatBytes(totalSize * 1024 * 1024)}
+            </p>
+          }
 
-        <div className="download-modal-content">
-          {isMetadata && (
-            <div className="download-options">
-              <Select
-                label="Donnée associée"
-                nativeSelectProps={{
-                  onChange: (event) => setValue(event.target.value),
-                  value,
-                }}
-              >
-                <option value="" disabled hidden>
-                  Selectionnez une option
-                </option>
-                <option value="1">Option 1</option>
-                <option value="2">Option 2</option>
-                <option value="3">Option 3</option>
-                <option value="4">Option 4</option>
-              </Select>
+          <div className="download-modal-content">
+            {isMetadata && (
+              <div className="download-options">
+                <Select
+                  label="Donnée associée"
+                  nativeSelectProps={{
+                    onChange: (event) => setValue(event.target.value),
+                    value,
+                  }}
+                >
+                  <option value="" disabled hidden>
+                    Selectionnez une option
+                  </option>
+                  <option value="1">Option 1</option>
+                  <option value="2">Option 2</option>
+                  <option value="3">Option 3</option>
+                  <option value="4">Option 4</option>
+                </Select>
+              </div>
+            )}
+
+            <div className="download-method">
+              <RadioButtons
+                name="my-radio"
+                options={[
+                  {
+                    label: "Téléchargement automatique",
+                    hintText:
+                      "Lancer le téléchargement automatiquement de l'ensemble des données",
+                    nativeInputProps: {
+                      value: "all",
+                      onChange: (e) => setDownloadMethod(e.target.value),
+                    },
+                  },
+                  {
+                    label: "Liens de téléchargement",
+                    hintText:
+                      "Télécharger la liste des liens de téléchargement associés aux données",
+                    nativeInputProps: {
+                      value: "file",
+                      onChange: (e) => setDownloadMethod(e.target.value),
+                    },
+                  },
+                ]}
+              />
+              {downloadMethod === "all" ? (
+                <>
+                  <p className="fr-message fr-message--warning">
+                    <small>
+                      Ce téléchargement peut nécessiter un certain temps.
+                      Assurez-vous de disposer d’une connexion Internet stable
+                      avant de continuer.
+                    </small>
+                  </p>
+                </>
+              ) : null}
             </div>
-          )}
-
-          <div className="download-method">
-            <RadioButtons
-              name="my-radio"
-              options={[
-                {
-                  label: "Téléchargement automatique",
-                  hintText:
-                    "Lancer le téléchargement automatiquement de l'ensemble des données",
-                  nativeInputProps: {
-                    value: "all",
-                    onChange: (e) => setDownloadMethod(e.target.value),
-                  },
-                },
-                {
-                  label: "Liens de téléchargement",
-                  hintText:
-                    "Télécharger la liste des liens de téléchargement associés aux données",
-                  nativeInputProps: {
-                    value: "file",
-                    onChange: (e) => setDownloadMethod(e.target.value),
-                  },
-                },
-              ]}
-            />
-            {downloadMethod === "all" ? (
-              <>
-                <p className="fr-message fr-message--warning">
-                  <small>
-                    Ce téléchargement peut nécessiter un certain temps.
-                    Assurez-vous de disposer d’une connexion Internet stable
-                    avant de continuer.
-                  </small>
-                </p>
-              </>
-            ) : null}
           </div>
-        </div>
 
-        <div
-          className="download-modal-actions"
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            gap: 12,
-          }}
-        >
-          <div />
-          <div style={{ display: "flex", gap: 12 }}>
-            <Button priority="primary" type="submit">
-              Télécharger
-            </Button>
-            <Button priority="secondary" type="button" onClick={handleReset}>
-              Annuler
-            </Button>
+          <div
+            className="download-modal-actions"
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              gap: 12,
+            }}
+          >
+            <div />
+            <div style={{ display: "flex", gap: 12 }}>
+              <Button priority="primary" type="submit">
+                Télécharger
+              </Button>
+              <Button priority="secondary" type="button" onClick={handleReset}>
+                Annuler
+              </Button>
+            </div>
           </div>
-        </div>
-      </form>
+        </form>
+      )}
     </downloadModal.Component>
   );
 };
