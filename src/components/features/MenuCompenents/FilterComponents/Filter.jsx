@@ -14,7 +14,8 @@ const Filter = ({ onClose } = {}) => {
     const [resetKey, setResetKey] = useState(0);
     const handleReset = () => {
         resetFilter();        // logique store si nécessaire
-        filteredProduits(filter);   // re-applique les filtres
+
+        filteredProduits({ dateStart: null, dateEnd: Date.now() });   // re-applique les filtres
         setResetKey((k) => k + 1); // force le reset du composant enfant
     };
 

@@ -37,7 +37,6 @@ export default function SelectedOptions() {
       try {
         const geojson = JSON.parse(event.target.result);
         if (geojson.type === "FeatureCollection" || geojson.type === "Feature") {
-          console.log("GeoJSON importé :", geojson);
           // Ajouter la logique pour traiter le GeoJSON
           // Exemple : ajouter à la carte, au store, etc.
         } else {

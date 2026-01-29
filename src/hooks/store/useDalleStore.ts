@@ -5,7 +5,6 @@ import { Dalle, FilterDate } from "../../assets/@types/types";
 type DalleLayer = any;
 type ChantierLayer = any;
 
-
 type DalleStore = {
   selectedProduits: Dalle[];
   selectedProduitsFiltered: Dalle[]; // liste des produits selectionnées mis de coté après filtre
@@ -50,16 +49,15 @@ export const useDalleStore = create<DalleStore>((set, get) => ({
     get().produitLayer?.changed();
     set((state) => ({
       selectedProduits: state.selectedProduits.filter(
-        (produit) => produit.id !== id
+        (produit) => produit.id !== id,
       ),
     }));
 
     set((state) => ({
       selectedProduitsFiltered: state.selectedProduitsFiltered.filter(
-        (produit) => produit.id !== id
+        (produit) => produit.id !== id,
       ),
     }));
-
   },
   removeAllProduits: () => {
     get().produitLayer?.changed();
@@ -69,7 +67,6 @@ export const useDalleStore = create<DalleStore>((set, get) => ({
   isProduitSelected: (id) =>
     get().selectedProduits.some((produit) => produit.id === id),
   filteredProduits: (filter) => {
-    
 
     get().selectedProduits.forEach((produit) => {
       if (
@@ -87,23 +84,44 @@ export const useDalleStore = create<DalleStore>((set, get) => ({
     });
     // on réajoute les produits qui sont dans l'intervalle de date
     get().selectedProduitsFiltered.forEach((produit) => {
-      
-      if (
-        produit.timestamp >= filter.dateStart &&
-        produit.timestamp <= filter.dateEnd
-      ) {
-        // on réajoute les produits qui sont dans l'intervalle de date
-        set((state) => ({
-          selectedProduits: [...state.selectedProduits, produit],
-        }));
-        console.log('hello je rajoute après test', produit);
+      if (filter.dateStart == null) {
+        const dateStart = 0;
 
-        // on les supprime de selectedProduitsFiltered
-        set((state) => ({
-          selectedProduitsFiltered: state.selectedProduitsFiltered.filter(
-            (p) => p.id !== produit.id
-          ),
-        }));
+        if (
+          produit.timestamp >= dateStart &&
+          produit.timestamp <= filter.dateEnd
+        ) {
+          // on réajoute les produits qui sont dans l'intervalle de date
+          set((state) => ({
+            selectedProduits: [...state.selectedProduits, produit],
+          }));
+
+          // on les supprime de selectedProduitsFiltered
+          set((state) => ({
+            selectedProduitsFiltered: state.selectedProduitsFiltered.filter(
+              (p) => p.id !== produit.id,
+            ),
+          }));
+        }
+      } else {
+        const dateStart = filter.dateStart;
+
+        if (
+          produit.timestamp >= dateStart &&
+          produit.timestamp <= filter.dateEnd
+        ) {
+          // on réajoute les produits qui sont dans l'intervalle de date
+          set((state) => ({
+            selectedProduits: [...state.selectedProduits, produit],
+          }));
+
+          // on les supprime de selectedProduitsFiltered
+          set((state) => ({
+            selectedProduitsFiltered: state.selectedProduitsFiltered.filter(
+              (p) => p.id !== produit.id,
+            ),
+          }));
+        }
       }
     });
 
@@ -116,14 +134,14 @@ export const useDalleStore = create<DalleStore>((set, get) => ({
     const produit = get().selectedProduits.find((produit) => produit.id === id);
     return produit ? produit.isHovered || false : false;
   },
-  setIsHovered : (id, isHovered) => {
+  setIsHovered: (id, isHovered) => {
     set((state) => ({
       selectedProduits: state.selectedProduits.map((produit) =>
-        produit.id === id ? { ...produit, isHovered:isHovered } : produit
+        produit.id === id ? { ...produit, isHovered: isHovered } : produit,
       ),
     }));
     get().produitLayer?.changed();
-  }
+  },
 }));
 
 export default useDalleStore;
