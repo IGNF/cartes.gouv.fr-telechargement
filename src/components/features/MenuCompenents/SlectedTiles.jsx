@@ -3,9 +3,11 @@ import { Download } from "@codegouvfr/react-dsfr/Download";
 import DownloadModal, {downloadModal} from "./DownloadModal";
 import "./styles/SelectedTiles.css";
 import EmptyState from "./EmptyState";
+import useDalleStore from "../../../hooks/store/useDalleStore";
 
 
 const SelectedTiles = ({ selectedDalles, onDownload, removeDalle, clearDalles }) => {
+  const setIsHovered = useDalleStore((state) => state.setIsHovered);
   return (
     <div className="SelectedTilesContainer">
     <div className="SelectedTilesContainer-title">
@@ -35,7 +37,9 @@ const SelectedTiles = ({ selectedDalles, onDownload, removeDalle, clearDalles })
     {selectedDalles.length > 0 ? (
       <ul>
         {selectedDalles.map((dalle, index) => (
-          <li key={index} className="SelectedTilesContainer-list-item">
+          <li key={index} className="SelectedTilesContainer-list-item"
+              onMouseEnter={() => setIsHovered(dalle.id, true)}
+              onMouseLeave={() => setIsHovered(dalle.id, false)}>
               <Download
                 details=""
                 label={`${dalle.name}`}

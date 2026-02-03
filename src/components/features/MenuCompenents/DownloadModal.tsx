@@ -5,7 +5,7 @@ import { Select } from "@codegouvfr/react-dsfr/Select";
 import { useState, useEffect } from "react";
 import { RadioButtons } from "@codegouvfr/react-dsfr/RadioButtons";
 import Button from "@codegouvfr/react-dsfr/Button";
-import {  formatBytes } from "../../../utils/formatters";
+import { formatBytes } from "../../../utils/formatters";
 
 export const downloadModal = createModal({
   id: "download-modal",
@@ -31,12 +31,11 @@ const DownloadModal = () => {
         } catch (e) {
           console.error(
             `Erreur lors de la récupération de la taille pour ${dalle.name}:`,
-            e
+            e,
           );
         }
       }
       setTotalSize(sum);
-
     };
     resolveSizes();
   }, [selectedDalles]);
@@ -45,7 +44,7 @@ const DownloadModal = () => {
     e.preventDefault();
     if (!downloadMethod) {
       alert(
-        "Veuillez sélectionner une option et une méthode de téléchargement"
+        "Veuillez sélectionner une option et une méthode de téléchargement",
       );
       return;
     }
@@ -74,7 +73,6 @@ const DownloadModal = () => {
 
   const count = selectedDalles.length;
 
-
   return (
     <downloadModal.Component title="Télécharger" iconId="fr-icon-download-fill">
       <form className="download-modal-form" onSubmit={handleSubmit}>
@@ -90,7 +88,7 @@ const DownloadModal = () => {
         }
 
         <div className="download-modal-content">
-          {isMetadata && (
+          {/* {isMetadata && (
             <div className="download-options">
               <Select
                 label="Donnée associée"
@@ -108,7 +106,7 @@ const DownloadModal = () => {
                 <option value="4">Option 4</option>
               </Select>
             </div>
-          )}
+          )} */}
 
           <div className="download-method">
             <RadioButtons

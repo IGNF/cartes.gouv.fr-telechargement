@@ -1,16 +1,29 @@
 filter {
   display: flex;
-flex-direction: column;
-align-items: center;
-gap: 16px;
-align-self: stretch;
+  width: 28.1875rem;
+  height: 37.75rem;
+  padding: 1rem;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.5rem;
+}
+.filter-back-button {
+  display: flex;
+  padding: 0.25rem 0.75rem 0.25rem 0.25rem;
+  margin-top: auto;
+  margin-bottom: 0.7rem;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
 }
 .filter-header {
   display: flex;
-  width: 418px;
-  height: 39px;
+  height: 2.4375rem;
   justify-content: space-between;
   align-items: flex-end;
+  align-self: stretch;
+  margin-right: 0.5rem;
+  margin-left: 0.5rem;
 }
 
 .filter-label {
@@ -24,4 +37,30 @@ align-self: stretch;
   font-style: normal;
   font-weight: 700;
   line-height: 32px; /* 133.333% */
+}
+
+.filter-date {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-left: 1rem;
+  margin-right: 1rem;
+}
+
+/* Largeur fixe en desktop */
+.filter-date > .fr-input-group {
+  width: 17rem;
+}
+
+/* Responsive : en-dessous de 768px, on passe en colonne */
+@media (max-width: 768px) {
+  .filter-date {
+    flex-direction: column;
+  }
+
+  /* largeur 100% en mobile */
+  .filter-date > .fr-input-group {
+    width: 100%;
+  }
 }

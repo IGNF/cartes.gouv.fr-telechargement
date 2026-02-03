@@ -5,7 +5,7 @@ WORKDIR /app
 # Installation des dépendances
 COPY package.json .
 COPY package-lock.json .
-RUN npm ci
+RUN npm ci --loglevel verbose
 
 # Vérifier que les dépendances sont installées
 RUN npm list --depth=0

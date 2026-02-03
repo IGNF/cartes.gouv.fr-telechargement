@@ -1,0 +1,10 @@
+@use 'dsfrign/src/module/media-query/mixin/respond-from' as rf;
+
+.selected-options-container {
+  transform: unset;
+  top: calc(7.25rem + 2.625rem + 0.5rem);
+
+  @include rf.respond-from('sm') {
+    top: calc(6rem + 2.625rem + 0.5rem)
+  }
+}

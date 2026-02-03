@@ -11,15 +11,15 @@ import { LayerWMTS } from "geopf-extensions-openlayers";
 import { addControls } from "../../utils/maps/controls";
 import { tmsLayer } from "../../utils/maps/Layers";
 import { addZoomInteraction } from "../../utils/maps/interactions";
-import { getStyleForDalle } from "../../utils/maps/style";
+import { getStyleForBlocs, getStyleForDalle } from "../../utils/maps/style";
 import VectorTileLayer from "ol/layer/VectorTile";
 import useMapStore from "../../hooks/store/useMapStore";
 
 import { SelectedPolygonInteraction } from "../../utils/interactions/selectedPolygonInteraction";
 import { SelectedClickInteraction } from "../../utils/interactions/selectedClickInteraction";
 import { HoverPopupInteraction } from "../../utils/interactions";
-// import {createSelectionControls} from "../../utils/maps/controls";
-// import { set } from "ol/transform";
+import useDalleStore from "../store/useDalleStore";
+import useFilterStore from "../store/useFilterStore";
 
 export const useMap = (
   containerRef: React.RefObject<HTMLDivElement>,
@@ -28,10 +28,11 @@ export const useMap = (
   isProduitSelected: any,
   removeProduit: any,
   addProduitLayer: any,
+  addChantierLayer: any,
   setIsMetadata: any
 ) => {
   const [map, setMap] = useState<Map | null>(null);
-
+  const isProduitFiltered = useDalleStore((state) => state.isProduitFiltered);
 
   // projection
   proj4.defs(
@@ -44,19 +45,47 @@ export const useMap = (
     `https://data.geopf.fr/tms/1.0.0/${downloadUrl}-chantier/{z}/{x}/{y}.pbf`,
     10
   );
+  chantierLayer.setStyle((feature) => {
+    const filter = useFilterStore.getState().filter;
+    if (
+      new Date(feature.getProperties().timestamp).getTime() <
+        filter.dateStart ||
+      new Date(feature.getProperties().timestamp).getTime() > filter.dateEnd
+    ) {
+      return getStyleForDalle("filtered");
+    }
+    return getStyleForBlocs(feature);
+  });
 
   const produitLayer = tmsLayer(
     `https://data.geopf.fr/tms/1.0.0/${downloadUrl}-produit/{z}/{x}/{y}.pbf`,
     16
   );
+  produitLayer.setVisible(false);
 
   const selectionProduitLayer = new VectorTileLayer({
     renderMode: "vector",
     source: produitLayer.getSource(),
     style: (feature) => {
+      const filter = useFilterStore.getState().filter;
+      const isDalleHovered = useDalleStore.getState().isDalleHovered;
+      if (isDalleHovered(feature.getProperties().id)) {
+        return getStyleForDalle("hovered");
+      }
       if (isProduitSelected(feature.getProperties().id)) {
         return getStyleForDalle("selected");
       }
+      if (isProduitFiltered(feature.getProperties().id)) {
+        return getStyleForDalle("filtered");
+      }
+      if (
+        new Date(feature.getProperties().timestamp).getTime() <
+          filter.dateStart ||
+        new Date(feature.getProperties().timestamp).getTime() > filter.dateEnd
+      ) {
+        return getStyleForDalle("filtered");
+      }
+      return getStyleForDalle("default");
     },
   });
 
@@ -71,7 +100,7 @@ export const useMap = (
             layer: "GEOGRAPHICALGRIDSYSTEMS.PLANIGNV2",
           }),
           chantierLayer,
-          produitLayer,
+          // produitLayer,
           selectionProduitLayer,
         ],
         view: new View({
@@ -83,6 +112,7 @@ export const useMap = (
       });
 
       addProduitLayer(selectionProduitLayer);
+      addChantierLayer(chantierLayer);
       addControls(mapInstance);
       addZoomInteraction(mapInstance, chantierLayer, 11);
       // createSelectionControls(mapInstance, selectionProduitLayer);
@@ -113,7 +143,6 @@ export const useMap = (
       });
       mapInstance.addInteraction(hoverInteractionChantier);
 
-
       const hoverInteractionProduit = new HoverPopupInteraction({
         layer: produitLayer,
       });
@@ -121,7 +150,7 @@ export const useMap = (
 
       // ⚡ bascule entre les interactions selon selectionMode
       useMapStore.subscribe((state) => {
-        if (state.selectionMode === "polygon" ) {
+        if (state.selectionMode === "polygon") {
           polygonInteraction.setActive(true);
           clickInteraction.setActive(false);
         } else if (state.selectionMode === "click") {

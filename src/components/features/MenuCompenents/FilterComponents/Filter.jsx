@@ -1,32 +1,52 @@
-import React from "react";
 import { Button } from "@codegouvfr/react-dsfr/Button";
-import { Alert } from "@codegouvfr/react-dsfr/Alert";
 import "./Filter.css";
 import FilterDate from "./FilterDate";
+import { useFilterStore } from "../../../../hooks/store/useFilterStore";
+import { useState } from "react";
+import useDalleStore from "../../../../hooks/store/useDalleStore";
 
 const Filter = ({ onClose } = {}) => {
+
+    const isFiltered = useFilterStore((state) => state.isFiltered);
+    const resetFilter = useFilterStore((state) => state.resetFilter);
+    const filter = useFilterStore((state) => state.filter);
+    const filteredProduits = useDalleStore((state) => state.filteredProduits);
+    const [resetKey, setResetKey] = useState(0);
+    const handleReset = () => {
+        resetFilter();        // logique store si nécessaire
+
+        filteredProduits({ dateStart: null, dateEnd: Date.now() });   // re-applique les filtres
+        setResetKey((k) => k + 1); // force le reset du composant enfant
+    };
+
+
     return (
         <div className="filter">
 
-            {onClose ? (
+            <Button
+                iconId="fr-icon-arrow-left-line"
+                iconPosition="left"
+                priority="tertiary no outline"
+                size="medium"
+                onClick={onClose}
+                className="filter-back-button">
+                Retour
+            </Button>
+
+            <div className="filter-header">
+                <h5>Filtrer</h5>
                 <Button
-                    iconId="fr-icon-arrow-left-line"
                     iconPosition="left"
-                    priority="tertiary no outline"
+                    priority="secondary"
                     size="medium"
-                    onClick={onClose}>
-                    Retour
+                    onClick={handleReset}>
+                    Réinitialiser
                 </Button>
-            ) : null}
-
-            <div className="filter-body" style={{ marginTop: 12 }}>
-                <strong>Aucun filtre disponible</strong>
-                <div style={{ marginTop: 6 }}>
-                    Pour cette donnée, aucun critère de filtrage n'est proposé pour l'instant.
-                </div>
-
-
             </div>
+            <>
+                <FilterDate key={resetKey} />
+            </>
+
         </div>
     );
 };

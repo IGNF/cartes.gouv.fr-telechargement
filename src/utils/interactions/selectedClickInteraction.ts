@@ -2,6 +2,7 @@ import { Interaction } from "ol/interaction";
 import { Layer } from "ol/layer";
 import { MapBrowserEvent } from "ol";
 import { getRemoteFileSize } from "../getRemoteFileSize";
+import { Dalle } from "../../assets/@types/types";
 
 /**
  * Interaction de sélection par clic pour les entités d'une couche vectorielle.
@@ -48,7 +49,6 @@ export class SelectedClickInteraction extends Interaction {
     const pixel = map.getEventPixel(event.originalEvent);
 
     let index = 0;
-    console.log("click handled", map, pixel);
 
     // Parcourt les entités sous le clic
     map.forEachFeatureAtPixel(pixel, (feature, layer) => {
@@ -62,20 +62,19 @@ export class SelectedClickInteraction extends Interaction {
 
 
         
-        const dalle = {
+        const dalle : Dalle = {
           name: properties.name,
           url: properties.url,
           id: properties.id,
-          size: getRemoteFileSize(properties.url),
+          timestamp: new Date(properties.timestamp).getTime(),
           metadata: properties.metadata,
         };
-        console.log("dalle clicked :", properties);
         
         // Ajoute ou retire le produit en fonction de son état
         if (!this.isProduitSelected(dalle.id) && index === 0) {
           this.addProduit(dalle);
+          
           index++;
-        console.log("hello");
         } else {
           if (index === 0) {
             this.removeProduit(dalle.id);
