@@ -9,85 +9,20 @@ import Gp from "geoportal-access-lib";
 import { LayerWMTS } from "geopf-extensions-openlayers";
 
 import { addControls } from "../../utils/maps/controls";
-import { tmsLayer } from "../../utils/maps/Layers";
-import { addZoomInteraction } from "../../utils/maps/interactions";
-import { getStyleForBlocs, getStyleForDalle } from "../../utils/maps/style";
-import VectorTileLayer from "ol/layer/VectorTile";
-import useMapStore from "../../hooks/store/useMapStore";
-
-import { SelectedPolygonInteraction } from "../../utils/interactions/selectedPolygonInteraction";
-import { SelectedClickInteraction } from "../../utils/interactions/selectedClickInteraction";
-import { HoverPopupInteraction } from "../../utils/interactions";
-import useDalleStore from "../store/useDalleStore";
-import useFilterStore from "../store/useFilterStore";
+import { useLayers } from "./useLayers";
 
 export const useMap = (
-  containerRef: React.RefObject<HTMLDivElement>,
+  containerRef: React.RefObject<HTMLDivElement> | null,
   downloadUrl: string,
-  addProduit: any,
-  isProduitSelected: any,
-  removeProduit: any,
-  addProduitLayer: any,
-  addChantierLayer: any,
-  setIsMetadata: any
 ) => {
-  const [map, setMap] = useState<Map | null>(null);
-  const isProduitFiltered = useDalleStore((state) => state.isProduitFiltered);
 
   // projection
   proj4.defs(
     "EPSG:3857",
-    "+proj=lcc +lat_1=49.000000000 +lat_2=44.000000000 +lat_0=46.500000000 +lon_0=3.000000000 +x_0=700000.000 +y_0=6600000.000 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs"
+    "+proj=lcc +lat_1=49.000000000 +lat_2=44.000000000 +lat_0=46.500000000 +lon_0=3.000000000 +x_0=700000.000 +y_0=6600000.000 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs",
   );
   register(proj4);
 
-  const chantierLayer = tmsLayer(
-    `https://data.geopf.fr/tms/1.0.0/${downloadUrl}-chantier/{z}/{x}/{y}.pbf`,
-    10
-  );
-  chantierLayer.setStyle((feature) => {
-    const filter = useFilterStore.getState().filter;
-    if (
-      new Date(feature.getProperties().timestamp).getTime() <
-        filter.dateStart ||
-      new Date(feature.getProperties().timestamp).getTime() > filter.dateEnd
-    ) {
-      return getStyleForDalle("filtered");
-    }
-    return getStyleForBlocs(feature);
-  });
-
-  const produitLayer = tmsLayer(
-    `https://data.geopf.fr/tms/1.0.0/${downloadUrl}-produit/{z}/{x}/{y}.pbf`,
-    16
-  );
-  produitLayer.setVisible(false);
-
-  const selectionProduitLayer = new VectorTileLayer({
-    renderMode: "vector",
-    source: produitLayer.getSource(),
-    style: (feature) => {
-      const filter = useFilterStore.getState().filter;
-      const isDalleHovered = useDalleStore.getState().isDalleHovered;
-      if (isDalleHovered(feature.getProperties().id)) {
-        return getStyleForDalle("hovered");
-      }
-      if (isProduitSelected(feature.getProperties().id)) {
-        return getStyleForDalle("selected");
-      }
-      if (isProduitFiltered(feature.getProperties().id)) {
-        return getStyleForDalle("filtered");
-      }
-      if (
-        new Date(feature.getProperties().timestamp).getTime() <
-          filter.dateStart ||
-        new Date(feature.getProperties().timestamp).getTime() > filter.dateEnd
-      ) {
-        return getStyleForDalle("filtered");
-      }
-      return getStyleForDalle("default");
-    },
-  });
 
   useEffect(() => {
     if (!containerRef.current) return;
@@ -98,10 +33,7 @@ export const useMap = (
         layers: [
           new LayerWMTS({
             layer: "GEOGRAPHICALGRIDSYSTEMS.PLANIGNV2",
-          }),
-          chantierLayer,
-          // produitLayer,
-          selectionProduitLayer,
+          })
         ],
         view: new View({
           center: [288074.8449901076, 6247982.515792289],
@@ -111,58 +43,11 @@ export const useMap = (
         projection: get("EPSG:2154"),
       });
 
-      addProduitLayer(selectionProduitLayer);
-      addChantierLayer(chantierLayer);
+      useLayers(mapInstance,downloadUrl)
+
       addControls(mapInstance);
-      addZoomInteraction(mapInstance, chantierLayer, 11);
-      // createSelectionControls(mapInstance, selectionProduitLayer);
+     
 
-      // ajout interactions
-      const polygonInteraction = new SelectedPolygonInteraction(
-        selectionProduitLayer,
-        isProduitSelected,
-        addProduit,
-        removeProduit
-      ).getDrawInteraction();
-      mapInstance.addInteraction(polygonInteraction);
-      polygonInteraction.setActive(false);
-
-      const clickInteraction = new SelectedClickInteraction(
-        selectionProduitLayer,
-        10,
-        isProduitSelected,
-        addProduit,
-        removeProduit,
-        setIsMetadata
-      );
-      mapInstance.addInteraction(clickInteraction);
-      clickInteraction.setActive(true);
-
-      const hoverInteractionChantier = new HoverPopupInteraction({
-        layer: chantierLayer,
-      });
-      mapInstance.addInteraction(hoverInteractionChantier);
-
-      const hoverInteractionProduit = new HoverPopupInteraction({
-        layer: produitLayer,
-      });
-      mapInstance.addInteraction(hoverInteractionProduit);
-
-      // ⚡ bascule entre les interactions selon selectionMode
-      useMapStore.subscribe((state) => {
-        if (state.selectionMode === "polygon") {
-          polygonInteraction.setActive(true);
-          clickInteraction.setActive(false);
-        } else if (state.selectionMode === "click") {
-          polygonInteraction.setActive(false);
-          clickInteraction.setActive(true);
-        } else {
-          polygonInteraction.setActive(false);
-          clickInteraction.setActive(true);
-        }
-      });
-
-      setMap(mapInstance);
     };
 
     const getConfig = async () => {
@@ -178,5 +63,4 @@ export const useMap = (
     getConfig();
   }, []);
 
-  return map;
 };
