@@ -4,6 +4,7 @@ import olVectorTileLayer from 'ol/layer/VectorTile';
 import VectorTileSource from 'ol/source/VectorTile'; // Import the base TileSource type
 import { Options as VectorTileLayerOptions } from 'ol/layer/VectorTile'; // Still import Options
 import { useMap } from 'react-openlayers';
+import useDalleStore from "../../../hooks/store/useDalleStore";
 
 interface VectorTileLayerProps extends VectorTileLayerOptions<VectorTileSource> {
   name?: string;
@@ -25,7 +26,7 @@ export function VectorTileLayer(props: VectorTileLayerProps) {
     return () => {
           map.removeLayer(layer);
     };
-  }, [map, props.name]);
+  }, [map, props]);
 
   return null;
 }

@@ -37,7 +37,7 @@ export class SelectedClickInteraction extends Interaction {
    * @param event - L'événement de clic de la carte.
    * @returns {boolean} - Retourne `true` pour continuer la propagation de l'événement.
    */
-  public override handleEvent(
+  public override handleProduitEvent(
     event: MapBrowserEvent<KeyboardEvent | WheelEvent | PointerEvent>
   ): boolean {
     // Vérifie que l'événement est un clic

@@ -1,6 +1,5 @@
 import { create } from "zustand";
 import useFilterStore from "./useFilterStore";
-import { Dalle, FilterDate } from "../../assets/@types/types";
 
 type DalleLayer = any;
 type ChantierLayer = any;
@@ -31,10 +30,11 @@ export const useDalleStore = create<DalleStore>((set, get) => ({
   chantierLayer: null,
   isMetadata: false,
   setIsMetadata: (v: boolean) => set({ isMetadata: v }),
-  addProduit: (produit) => {
+  addProduit: (produit : Dalle) => {
     const filter = useFilterStore.getState().filter;
      
         if (
+          filter.dateStart &&
           produit.timestamp >= filter.dateStart &&
           produit.timestamp <= filter.dateEnd
         ) {

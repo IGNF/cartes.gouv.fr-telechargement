@@ -11,6 +11,11 @@ import { startReactDsfr } from "@codegouvfr/react-dsfr/spa";
 import Gp from "geoportal-access-lib";
 
 import './styles/global.css' // Import du fichier global ici
+import "ol/ol.css";
+import "@gouvfr/dsfr/dist/dsfr.css";
+import "@gouvfr/dsfr/dist/utility/icons/icons.css";
+import "geopf-extensions-openlayers/css/Dsfr.css";
+
 
 startReactDsfr({ defaultColorScheme: "system", Link });
 declare module "@codegouvfr/react-dsfr/spa" {
