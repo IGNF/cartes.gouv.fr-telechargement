@@ -28,12 +28,16 @@ function getCoordinatesAtPixel(event: MapEvent): Coordinate {
    */
 export  const handleProduitEvent: vectorTileClickEventHandler = (event, layerId) => {
     console.log("handleChantierEvent called with layerId: ", layerId);
-    const { isProduitSelected, addProduit, removeProduit, setIsMetadata } = useDalleStore.getState();
+    const { isProduitSelected, addProduit, removeProduit, setIsMetadata, selectedProduits } = useDalleStore.getState();
+    console.log(isProduitSelected);
+    
     const features = getFeaturesAtPixel(event, layerId)
     if (features.length === 0) {
         return false;
     }
     features.forEach((feature: FeatureLike) => {
+        console.log("feture", feature);
+        
         const properties = feature.getProperties();
         properties.metadata ? setIsMetadata(true) : setIsMetadata(false);
         const dalle : Dalle = {
@@ -43,11 +47,19 @@ export  const handleProduitEvent: vectorTileClickEventHandler = (event, layerId)
           timestamp: new Date(properties.timestamp).getTime(),
           metadata: properties.metadata,
         };
+        console.log("dalles", dalle);
+        
         // Ajoute ou retire le produit en fonction de son état
         if (!isProduitSelected(dalle.id)) {
+            console.log('selection');
+            
           addProduit(dalle);
+          console.log(selectedProduits);
+          
           return true;
         } else {
+            console.log("remove");
+            
             removeProduit(dalle.id);
           }
         })

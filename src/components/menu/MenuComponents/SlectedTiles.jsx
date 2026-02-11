@@ -8,6 +8,7 @@ import useDalleStore from "../../../hooks/store/useDalleStore";
 
 const SelectedTiles = ({ selectedDalles, onDownload, removeDalle, clearDalles }) => {
   const setIsHovered = useDalleStore((state) => state.setIsHovered);
+  
   return (
     <div className="SelectedTilesContainer">
     <div className="SelectedTilesContainer-title">

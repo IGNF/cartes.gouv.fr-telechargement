@@ -82,7 +82,7 @@ export default function MapComponent() {
           if (layerConf.url) {
             elements.push(
               <VectorTileLayer
-                key={key + '-layer' + '-' + filter.dateStart + "-" + filter.dateEnd}
+                key={key}
                 source={tmsSource(layerConf.url)}
                 maxZoom={layerConf.maxZoom}
                 style={layerConf.style}
@@ -93,6 +93,7 @@ export default function MapComponent() {
           if (layerConf.selectInteraction) {
             elements.push(
               <SelectVectorLayerInteraction
+              key={key+'-interaction'}
                 layerId={layerConf.properties.id}
                 vectorTileClickEventHandler={layerConf.selectInteraction}
               />

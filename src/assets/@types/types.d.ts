@@ -33,4 +33,6 @@ type DownloadFile = { url: string; name: string };
  type vectorTileClickEventHandler = (event: MapEvent, layerId: string) => boolean;
 }
 
+
+
 export {};

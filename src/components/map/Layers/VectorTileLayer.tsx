@@ -13,6 +13,7 @@ interface VectorTileLayerProps extends VectorTileLayerOptions<VectorTileSource> 
 export function VectorTileLayer(props: VectorTileLayerProps) {
   const map = useMap();
   const layerRef = useRef(new olVectorTileLayer(props)); // single instance
+  const addLayer = useDalleStore((state) => state.addLayer);
 
   useEffect(() => {
     if (!map) return;
@@ -22,6 +23,7 @@ export function VectorTileLayer(props: VectorTileLayerProps) {
       layer.set('name', props.name);
     }
     map.addLayer(layer);
+    addLayer(layer)
 
     return () => {
           map.removeLayer(layer);

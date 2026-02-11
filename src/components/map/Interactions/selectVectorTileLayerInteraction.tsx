@@ -8,6 +8,8 @@ export function SelectVectorLayerInteraction({ vectorTileClickEventHandler, laye
 
     const handleEvent = (event:  MapBrowserEvent<KeyboardEvent | WheelEvent | PointerEvent>) => {
         if (event.type === 'click') {
+            console.log("hello");
+            
             vectorTileClickEventHandler(event, layerId);
         }
         return true;
