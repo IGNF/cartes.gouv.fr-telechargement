@@ -25,7 +25,7 @@ const DownloadModal = () => {
       for (const dalle of selectedDalles) {
         try {
           const size = await dalle.size;
-          const humanStr = size["human"] || "0";
+          const humanStr = size.human || "0";
           const numericValue = parseFloat(humanStr.split(" ")[0]);
           sum += numericValue || 0;
         } catch (e) {

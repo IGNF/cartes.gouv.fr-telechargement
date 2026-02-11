@@ -1,13 +1,13 @@
 import React, { useState } from "react";
 import { getRouteApi } from "@tanstack/react-router";
 import { useDalleStore } from "../../hooks/store/useDalleStore";
-import SelectedTiles from "./MenuCompenents/SlectedTiles";
-import EmptyState from "./MenuCompenents/EmptyState";
-import "./MenuCompenents/styles/Menu.css";
+import SelectedTiles from "./MenuComponents/SlectedTiles";
+import EmptyState from "./MenuComponents/EmptyState";
+import "./MenuComponents/styles/Menu.css";
 import Button from "@codegouvfr/react-dsfr/Button";
-import HelpModal, { helpModal } from "./MenuCompenents/HelpModal";
+import HelpModal, { helpModal } from "./MenuComponents/HelpModal";
 import { Input } from "@codegouvfr/react-dsfr/Input";
-import Filter from "./MenuCompenents/FilterComponents/Filter"; // ajuster si chemin différent
+import Filter from "./MenuComponents/FilterComponents/Filter"; // ajuster si chemin différent
 
 const route = getRouteApi("/telechargement/$downloadUrl");
 

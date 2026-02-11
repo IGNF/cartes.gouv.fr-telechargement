@@ -4,7 +4,7 @@ import { memo, useEffect, useState } from "react";
 import {
   FooterConsentManagementItem,
   FooterPersonalDataPolicyItem,
-} from "../../../config/consentMangement";
+} from "../../config/consentMangement";
 import { createPortal } from "react-dom";
 import { Button } from "@codegouvfr/react-dsfr/Button";
 

@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
-import MapComponent from "../../components/features/Map";
-import Menu from "../../components/features/Menu";
+import MapComponent from "../../components/map/Map";
+import Menu from "../../components/menu/Menu";
 
 export const Route = createFileRoute("/telechargement/$downloadUrl")({
   component: HomeComponent,

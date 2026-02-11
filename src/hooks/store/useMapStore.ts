@@ -1,41 +1,24 @@
 import { create } from "zustand";
-import { addPolygonSelectionInteraction } from "../../utils/Maps/interactions";
-import { addUploadSelectionInteraction } from "../../utils/Maps/interactions";
-import { addSelectedProduitInteraction } from "../../utils/Maps/interactions";
-
+import { Coordinate } from "ol/coordinate";
 type SelectionMode = "click" | "polygon" | "upload";
 type Map = any; // Replace with actual map type if available
 
 interface MapStore {
-  selectionMode: SelectionMode;
   mapInstance: Map;
+  center: Coordinate;
+  zoom: number;
+  setCenter: (center: Coordinate) => void;
+  setZoom: (zoom: number) => void;
   setMapInstance: (instance: any) => void;
-  addProduitLayer: (layer: any) => void; // Replace with actual layer type
-  setSelectionMode: (mode: SelectionMode) => void;
-  handleModeChange: () => void;
 }
 
 const useMapStore = create<MapStore>((set, get) => ({
-  selectionMode: "click",
-  setSelectionMode: (mode) => {
-    set({ selectionMode: mode });
-  },
+  center: [288074.8449901076, 6247982.515792289],
+  zoom: 6,
+  setCenter: (center) => set({ center: center }),
+  setZoom: (zoom) => set({ zoom : zoom }),
   mapInstance: null,
-  setMapInstance: (instance) => set({ mapInstance: instance }),
-  addProduitLayer: (layer) => {
-    if (get().mapInstance) {
-      get().mapInstance.addLayer(layer);
-    }
-  },
-  // This function is used to change the selection mode and add/remove interactions accordingly
-  handleModeChange: () => {
-    const selectionMode = get().selectionMode;
-    const mapInstance = get().mapInstance;
-
-    mapInstance.getInteractions().forEach((interaction) => {
-    });
-
-  },
+  setMapInstance: (instance) => set({ mapInstance: instance })
 }));
 
 export default useMapStore;

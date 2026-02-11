@@ -10,17 +10,17 @@ import { Dalle } from "../../assets/@types/types";
 export class SelectedClickInteraction extends Interaction {
   private selectionLayer: Layer<any>;
   private zoomToGo: number;
-  private isProduitSelected: (id: string | number | undefined) => boolean;
+  private isProduitSelected: (id: string ) => boolean;
   private addProduit: (produit: any) => void;
-  private removeProduit: (id: string | number | undefined) => void;
+  private removeProduit: (id: string ) => void;
   private setIsMetadata: (v: boolean) => void;
 
   constructor(
     selectionLayer: Layer<any>,
     zoomToGo: number = 10,
-    isProduitSelected: (id: string | number | undefined) => boolean,
+    isProduitSelected: (id: string ) => boolean,
     addProduit: (produit: any) => void,
-    removeProduit: (id: string | number | undefined) => void,
+    removeProduit: (id: string ) => void,
     setIsMetadata: (v: boolean) => void
   ) {
     super();
@@ -37,7 +37,7 @@ export class SelectedClickInteraction extends Interaction {
    * @param event - L'événement de clic de la carte.
    * @returns {boolean} - Retourne `true` pour continuer la propagation de l'événement.
    */
-  public override handleEvent(
+  public override handleProduitEvent(
     event: MapBrowserEvent<KeyboardEvent | WheelEvent | PointerEvent>
   ): boolean {
     // Vérifie que l'événement est un clic
