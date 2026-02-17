@@ -9,11 +9,12 @@ import { File } from "../assets/@types/types";
 const MAX_CONCURRENT_DOWNLOADS = 6;
 
 /**
- * Récupère les tailles des fichiers via des requêtes HEAD
+ * Récupère les tailles des fichiers via des requêtes HEAD et Range
+ * Gère les serveurs WMS qui ne retournent pas un content-length fiable
  * Utilisé avant le téléchargement pour afficher les tailles et le calcul exact de la progression
  *
  * @param files - Liste des fichiers dont on veut connaître la taille
- * @returns Map avec le nom du fichier comme clé et la taille en bytes comme valeur
+ * @returns Map avec le nom du fichier comme clé et la taille en bytes comme valeur (0 si inconnue)
  */
 export async function getFileSizes(
   files: File[],
@@ -22,16 +23,55 @@ export async function getFileSizes(
 
   const sizePromises = files.map(async (file) => {
     try {
-      // Requête HEAD: récupère seulement les headers, pas le contenu
-      const response = await fetch(file.url, { method: "HEAD" });
-      const contentLength = response.headers.get("content-length");
+      /**
+       * Stratégie 1: Essaie avec Range header
+       * Demande juste 1 byte pour obtenir le Content-Range
+       * Le serveur répond avec la taille totale sans envoyer le contenu complet
+       */
+      const rangeResponse = await fetch(file.url, {
+        headers: { Range: "bytes=0-0" },
+      });
 
-      // Convertit la taille en nombre
-      const fileSize = contentLength ? parseInt(contentLength, 10) : 0;
-      fileSizes.set(file.name, fileSize);
+      // Si le serveur supporte les Range requests
+      if (rangeResponse.status === 206) {
+        const contentRange = rangeResponse.headers.get("content-range");
+        if (contentRange) {
+          // Format: "bytes 0-0/total" - extrait la taille totale
+          const match = contentRange.match(/\/(\d+)$/);
+          if (match) {
+            const fileSize = parseInt(match[1], 10);
+            fileSizes.set(file.name, fileSize);
+            return;
+          }
+        }
+      }
+
+      /**
+       * Stratégie 2: Essaie HEAD request
+       * Certains serveurs retournent content-length même sans Range
+       * Mais on ne s'y fie pas entièrement (peut être faux)
+       */
+      const headResponse = await fetch(file.url, { method: "HEAD" });
+      const contentLength = headResponse.headers.get("content-length");
+
+      if (contentLength && parseInt(contentLength, 10) > 0) {
+        const fileSize = parseInt(contentLength, 10);
+        fileSizes.set(file.name, fileSize);
+        return;
+      }
+
+      /**
+       * Si aucune stratégie ne fonctionne: retourne 0 (taille inconnue)
+       * Ne télécharge PAS le fichier entièrement juste pour connaître la taille
+       * La taille réelle sera calculée pendant le téléchargement
+       */
+      fileSizes.set(file.name, 0);
+      console.warn(
+        `Could not determine reliable size for ${file.name} - will show unknown size`,
+      );
     } catch (e) {
-      // Log les erreurs mais continue
-      console.warn(`Could not get size for ${file.name}:`, e);
+      // En cas d'erreur, définit la taille à 0 (inconnue)
+      console.warn(`Error getting size for ${file.name}:`, e);
       fileSizes.set(file.name, 0);
     }
   });

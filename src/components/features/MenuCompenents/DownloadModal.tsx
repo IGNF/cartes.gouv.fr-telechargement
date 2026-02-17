@@ -131,7 +131,9 @@ const DownloadModal = () => {
               {count === 1
                 ? "taille du fichier : "
                 : "tailles totales des fichiers : "}
-              {formatBytes(totalSize)}
+              {totalSize/selectedDalles.length < 1024 *1024
+                ? "Impossible de calculer la taille"
+                : formatBytes(totalSize)}
             </p>
           }
 
