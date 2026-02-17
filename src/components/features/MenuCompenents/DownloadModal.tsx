@@ -6,7 +6,7 @@ import { useState, useEffect } from "react";
 import { RadioButtons } from "@codegouvfr/react-dsfr/RadioButtons";
 import Button from "@codegouvfr/react-dsfr/Button";
 import { formatBytes } from "../../../utils/formatters";
-import { downloadZip } from "../../../utils/download";
+import { downloadZip, getFileSizes } from "../../../utils/download";
 
 
 export const downloadModal = createModal({
@@ -20,27 +20,43 @@ const DownloadModal = () => {
   const [value, setValue] = useState("");
   const [downloadMethod, setDownloadMethod] = useState("");
   const [totalSize, setTotalSize] = useState(0);
+  const [fileSizes, setFileSizes] = useState<Map<string, number>>(new Map());
   const [downloadLoading, setDownloadLoading] = useState(false);
   const [downloadProgress, setDownloadProgress] = useState(0);
 
+  /**
+   * Effet: Récupère les tailles des fichiers sélectionnés
+   * S'exécute quand selectedDalles change
+   */
   useEffect(() => {
     const resolveSizes = async () => {
-      let sum = 0;
-      for (const dalle of selectedDalles) {
-        try {
-          const size = await dalle.size;
-          const humanStr = size["human"] || "0";
-          const numericValue = parseFloat(humanStr.split(" ")[0]);
-          sum += numericValue || 0;
-        } catch (e) {
-          console.error(
-            `Erreur lors de la récupération de la taille pour ${dalle.name}:`,
-            e,
-          );
-        }
+      if (selectedDalles.length === 0) {
+        setTotalSize(0);
+        setFileSizes(new Map());
+        return;
       }
-      setTotalSize(sum);
+
+      try {
+        // Appelle getFileSizes pour récupérer les tailles
+        const sizes = await getFileSizes(
+          selectedDalles.map((d: any) => ({ url: d.url, name: d.name }))
+        );
+
+        // Stocke les tailles pour réutilisation lors du téléchargement
+        setFileSizes(sizes);
+
+        // Calcule la taille totale
+        let sum = 0;
+        sizes.forEach((size) => {
+          sum += size;
+        });
+        setTotalSize(sum);
+      } catch (e) {
+        console.error("Erreur lors du calcul des tailles:", e);
+        setTotalSize(0);
+      }
     };
+
     resolveSizes();
   }, [selectedDalles]);
 
@@ -55,15 +71,15 @@ const DownloadModal = () => {
     if (downloadMethod === "all") {
       setDownloadLoading(true);
       setDownloadProgress(0);
+      // Appelle downloadZip en réutilisant les tailles pré-calculées
       downloadZip(
         selectedDalles.map((d: any) => ({ url: d.url, name: d.name })),
         setDownloadProgress,
+        fileSizes
       ).then(() => {
         setDownloadLoading(false);
         downloadModal.close();
       });
-
-      // selectedDalles.forEach((d: any) => window.open(d.url, "_blank"));
     } else {
       const contenu = selectedDalles.map((d: any) => d.url).join("\n");
       const blob = new Blob([contenu], { type: "text/plain" });
@@ -87,12 +103,6 @@ const DownloadModal = () => {
 
   const count = selectedDalles.length;
 
-  const formatTime = (seconds: number) => {
-    if (seconds < 60) return `${Math.ceil(seconds)}s`;
-    if (seconds < 3600) return `${Math.ceil(seconds / 60)}m`;
-    return `${Math.ceil(seconds / 3600)}h`;
-  };
-
   return (
     <downloadModal.Component title="Télécharger" iconId="fr-icon-download-fill">
       {downloadLoading ? (
@@ -106,7 +116,9 @@ const DownloadModal = () => {
               />
             </div>
             <div className="progress-info">
-              <span className="progress-percentage">{Math.round(downloadProgress)}%</span>
+              <span className="progress-percentage">
+                {Math.round(downloadProgress)}%
+              </span>
             </div>
           </div>
         </div>
@@ -119,7 +131,7 @@ const DownloadModal = () => {
               {count === 1
                 ? "taille du fichier : "
                 : "tailles totales des fichiers : "}
-              {formatBytes(totalSize * 1024 * 1024)}
+              {formatBytes(totalSize)}
             </p>
           }
 

@@ -9,13 +9,46 @@ import { File } from "../assets/@types/types";
 const MAX_CONCURRENT_DOWNLOADS = 6;
 
 /**
+ * Récupère les tailles des fichiers via des requêtes HEAD
+ * Utilisé avant le téléchargement pour afficher les tailles et le calcul exact de la progression
+ *
+ * @param files - Liste des fichiers dont on veut connaître la taille
+ * @returns Map avec le nom du fichier comme clé et la taille en bytes comme valeur
+ */
+export async function getFileSizes(
+  files: File[],
+): Promise<Map<string, number>> {
+  const fileSizes = new Map<string, number>();
+
+  const sizePromises = files.map(async (file) => {
+    try {
+      // Requête HEAD: récupère seulement les headers, pas le contenu
+      const response = await fetch(file.url, { method: "HEAD" });
+      const contentLength = response.headers.get("content-length");
+
+      // Convertit la taille en nombre
+      const fileSize = contentLength ? parseInt(contentLength, 10) : 0;
+      fileSizes.set(file.name, fileSize);
+    } catch (e) {
+      // Log les erreurs mais continue
+      console.warn(`Could not get size for ${file.name}:`, e);
+      fileSizes.set(file.name, 0);
+    }
+  });
+
+  // Attend que toutes les tailles soient récupérées
+  await Promise.all(sizePromises);
+  return fileSizes;
+}
+
+/**
  * Gestionnaire de file d'attente pour téléchargements avec limite de concurrence
- * 
+ *
  * @template T - Type des éléments à télécharger
  * @param items - Liste des éléments à traiter
  * @param downloadFn - Fonction asynchrone qui traite chaque élément
  * @param maxConcurrent - Nombre maximum de téléchargements parallèles (défaut: 6)
- * 
+ *
  * Fonctionnement:
  * - Traite jusqu'à `maxConcurrent` éléments en parallèle
  * - Démarre automatiquement les éléments en attente quand un se termine
@@ -24,7 +57,7 @@ const MAX_CONCURRENT_DOWNLOADS = 6;
 async function downloadWithConcurrencyLimit<T>(
   items: T[],
   downloadFn: (item: T, index: number) => Promise<void>,
-  maxConcurrent: number = MAX_CONCURRENT_DOWNLOADS
+  maxConcurrent: number = MAX_CONCURRENT_DOWNLOADS,
 ) {
   // Copie la liste des éléments à traiter
   const queue = [...items];
@@ -49,7 +82,7 @@ async function downloadWithConcurrencyLimit<T>(
 
       // Récupère l'index original de l'élément dans la liste
       const index = items.indexOf(item);
-      
+
       // Crée la promesse de téléchargement et l'ajoute au suivi
       const promise = downloadFn(item, index).then(() => {
         // Retire la promesse du suivi quand elle est terminée
@@ -76,12 +109,13 @@ async function downloadWithConcurrencyLimit<T>(
 
 /**
  * Télécharge et compresse des fichiers en archive ZIP
- * 
+ *
  * @param files - Tableau des fichiers à télécharger
  * @param onProgress - Callback optionnel pour suivre la progression (0-100)
- * 
+ * @param fileSizes - Map des tailles de fichiers (optionnel, pour réutiliser les tailles précalculées)
+ *
  * Processus:
- * 1. Récupère les tailles des fichiers (requêtes HEAD rapides)
+ * 1. Utilise les tailles pré-calculées si fournies, sinon les récupère
  * 2. Télécharge les fichiers avec contrôle de concurrence
  * 3. Compresse tout en archive ZIP
  * 4. Sauvegarde le fichier téléchargé
@@ -89,44 +123,25 @@ async function downloadWithConcurrencyLimit<T>(
 export async function downloadZip(
   files: File[],
   onProgress?: (progress: number) => void,
+  fileSizes?: Map<string, number>,
 ) {
   // Crée une instance JSZip pour construire l'archive
   const zip = new JSZip();
-  
+
   // Compteurs pour le suivi de la progression
-  let totalBytes = 0;      // Taille totale de tous les fichiers
-  let loadedBytes = 0;     // Taille actuellement téléchargée
-  const startTime = Date.now();
-  
-  // Map pour stocker les tailles de fichiers connus
-  const fileSizes = new Map<string, number>();
+  let totalBytes = 0; // Taille totale de tous les fichiers
+  let loadedBytes = 0; // Taille actuellement téléchargée
+
+  // Utilise les tailles fournies ou les récupère
+  const sizeMap = fileSizes || (await getFileSizes(files));
+
+  // Calcule la taille totale à partir de la map
+  for (const size of sizeMap.values()) {
+    totalBytes += size;
+  }
 
   /**
-   * Phase 1: Pré-chargement des tailles de fichiers
-   * Utilise des requêtes HEAD (plus rapides que GET) pour récupérer les en-têtes
-   * Permet d'avoir une barre de progression précise dès le départ
-   */
-  const sizePromises = files.map(async (file) => {
-    try {
-      // Requête HEAD: récupère seulement les headers, pas le contenu
-      const response = await fetch(file.url, { method: 'HEAD' });
-      const contentLength = response.headers.get('content-length');
-      
-      // Convertit la taille en nombre et l'ajoute au total
-      const fileSize = contentLength ? parseInt(contentLength, 10) : 0;
-      fileSizes.set(file.name, fileSize);
-      totalBytes += fileSize;
-    } catch (e) {
-      // Log les erreurs mais continue le téléchargement
-      console.warn(`Could not get size for ${file.name}:`, e);
-    }
-  });
-
-  // Attend que toutes les tailles soient récupérées
-  await Promise.all(sizePromises);
-
-  /**
-   * Phase 2: Téléchargement des fichiers avec limite de concurrence
+   * Phase 1: Téléchargement des fichiers avec limite de concurrence
    * Utilise la fonction downloadWithConcurrencyLimit pour gérer
    * jusqu'à 6 téléchargements simultanés
    */
@@ -140,17 +155,6 @@ export async function downloadZip(
         // Vérifie que la requête a réussi
         if (!response.ok) {
           throw new Error(`HTTP ${response.status}`);
-        }
-
-        /**
-         * Récupère la taille du fichier depuis la réponse
-         * (au cas où HEAD aurait échoué)
-         */
-        if (!fileSizes.has(file.name)) {
-          const contentLength = response.headers.get('content-length');
-          const fileSize = contentLength ? parseInt(contentLength, 10) : 0;
-          fileSizes.set(file.name, fileSize);
-          totalBytes += fileSize;
         }
 
         /**
@@ -197,7 +201,7 @@ export async function downloadZip(
         throw error;
       }
     },
-    MAX_CONCURRENT_DOWNLOADS
+    MAX_CONCURRENT_DOWNLOADS,
   );
 
   /**
@@ -214,17 +218,17 @@ export async function downloadZip(
   }
 
   /**
-   * Phase 3: Génération et sauvegarde de l'archive ZIP
+   * Phase 2: Génération et sauvegarde de l'archive ZIP
    * Marque la progression à 100%
    */
   onProgress?.(100);
-  
+
   /**
    * Génère le fichier ZIP blob avec tous les fichiers
    * type: "blob" produit un Blob directement utilisable
    */
   const zipBlob = await zip.generateAsync({ type: "blob" });
-  
+
   /**
    * Sauvegarde le fichier ZIP sur l'ordinateur de l'utilisateur
    * Utilise l'API FileSaver.js
