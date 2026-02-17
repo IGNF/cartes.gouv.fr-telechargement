@@ -20,6 +20,7 @@ const DownloadModal = () => {
   const [downloadMethod, setDownloadMethod] = useState("");
   const [totalSize, setTotalSize] = useState(0);
   const [downloadLoading, setDownloadLoading] = useState(false);
+  const [downloadProgress, setDownloadProgress] = useState(0);
 
   useEffect(() => {
     const resolveSizes = async () => {
@@ -52,8 +53,10 @@ const DownloadModal = () => {
     }
     if (downloadMethod === "all") {
       setDownloadLoading(true);
+      setDownloadProgress(0);
       downloadZip(
         selectedDalles.map((d: any) => ({ url: d.url, name: d.name })),
+        setDownloadProgress,
       ).then(() => {
         setDownloadLoading(false);
         downloadModal.close();
@@ -83,10 +86,29 @@ const DownloadModal = () => {
 
   const count = selectedDalles.length;
 
+  const formatTime = (seconds: number) => {
+    if (seconds < 60) return `${Math.ceil(seconds)}s`;
+    if (seconds < 3600) return `${Math.ceil(seconds / 60)}m`;
+    return `${Math.ceil(seconds / 3600)}h`;
+  };
+
   return (
     <downloadModal.Component title="Télécharger" iconId="fr-icon-download-fill">
       {downloadLoading ? (
-        <p>Calcul de la taille des fichiers...</p>
+        <div className="download-progress-container">
+          <p>Téléchargement et compression en cours...</p>
+          <div className="progress-bar-wrapper">
+            <div className="progress-bar">
+              <div
+                className="progress-fill"
+                style={{ width: `${downloadProgress}%` }}
+              />
+            </div>
+            <div className="progress-info">
+              <span className="progress-percentage">{Math.round(downloadProgress)}%</span>
+            </div>
+          </div>
+        </div>
       ) : (
         <form className="download-modal-form" onSubmit={handleSubmit}>
           {
