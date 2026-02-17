@@ -6,7 +6,7 @@ import { useState, useEffect } from "react";
 import { RadioButtons } from "@codegouvfr/react-dsfr/RadioButtons";
 import Button from "@codegouvfr/react-dsfr/Button";
 import { formatBytes } from "../../../utils/formatters";
-import { downloadZip } from "../../../utils/dowload";
+import { downloadZip } from "../../../utils/download";
 
 export const downloadModal = createModal({
   id: "download-modal",
