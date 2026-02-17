@@ -8,6 +8,7 @@ import Button from "@codegouvfr/react-dsfr/Button";
 import { formatBytes } from "../../../utils/formatters";
 import { downloadZip } from "../../../utils/download";
 
+
 export const downloadModal = createModal({
   id: "download-modal",
   isOpenedByDefault: false,
