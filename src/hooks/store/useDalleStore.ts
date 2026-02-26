@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import useFilterStore from "./useFilterStore";
-import { Dalle, FilterDate } from "../../assets/@types/types";
+import olVectorTileLayer from "ol/layer/VectorTile"
 
 type DalleLayer = any;
 type ChantierLayer = any;
@@ -8,10 +8,12 @@ type ChantierLayer = any;
 type DalleStore = {
   selectedProduits: Dalle[];
   selectedProduitsFiltered: Dalle[]; // liste des produits selectionnées mis de coté après filtre
+  layers:olVectorTileLayer[];
   produitLayer: DalleLayer;
   chantierLayer: ChantierLayer;
   isMetadata: boolean;
   setIsMetadata: (v: boolean) => void; // <-- ajout
+  addLayer:(layer:olVectorTileLayer)=>void;
   addProduit: (dalle: Dalle) => void;
   addProduitLayer: (dalleLayer: DalleLayer) => void;
   addChantierLayer: (chantierLayer: ChantierLayer) => void;
@@ -27,16 +29,19 @@ type DalleStore = {
 export const useDalleStore = create<DalleStore>((set, get) => ({
   selectedProduits: [],
   selectedProduitsFiltered: [],
+  layers: [],
   produitLayer: null,
   chantierLayer: null,
   isMetadata: false,
   setIsMetadata: (v: boolean) => set({ isMetadata: v }),
-  addProduit: (produit) => {
+  addLayer: (layer:olVectorTileLayer) => set((state)=>({layers: [...state.layers,layer]})),
+  addProduit: (produit : Dalle) => {
     const filter = useFilterStore.getState().filter;
      
         if (
+          (filter.dateStart &&
           produit.timestamp >= filter.dateStart &&
-          produit.timestamp <= filter.dateEnd
+          produit.timestamp <= filter.dateEnd) || (produit.timestamp<= filter.dateEnd)
         ) {
       
     
@@ -53,7 +58,7 @@ export const useDalleStore = create<DalleStore>((set, get) => ({
   addChantierLayer: (chantierLayer) =>
     set((state) => ({ chantierLayer: chantierLayer })),
   removeProduit: (id) => {
-    get().produitLayer?.changed();
+    get().layers.find(l=>l.get("id")==="produitLayer")?.changed();
     set((state) => ({
       selectedProduits: state.selectedProduits.filter(
         (produit) => produit.id !== id,
@@ -67,9 +72,9 @@ export const useDalleStore = create<DalleStore>((set, get) => ({
     }));
   },
   removeAllProduits: () => {
-    get().produitLayer?.changed();
     set({ selectedProduits: [] });
     set({ selectedProduitsFiltered: [] });
+    get().layers.find(l=>l.get("id")==="produitLayer")?.changed();
   },
   isProduitSelected: (id) =>
     get().selectedProduits.some((produit) => produit.id === id),
@@ -132,8 +137,13 @@ export const useDalleStore = create<DalleStore>((set, get) => ({
       }
     });
 
-    get().produitLayer?.changed();
-    get().chantierLayer?.changed();
+    get().layers.forEach(l=>{
+      console.log("coucou layer")
+      console.log(l)
+
+      l.changed()
+    })
+
   },
   isProduitFiltered: (id) =>
     get().selectedProduitsFiltered.some((produit) => produit.id === id),

@@ -5,6 +5,9 @@
     "jsx": "react-jsx",
     "target": "ESNext",
     "module": "ESNext",
-    "moduleResolution": "Bundler"
+    "moduleResolution": "Bundler",
+    "typeRoots": [
+      "./src/assets/@types"
+    ]
   }
 }

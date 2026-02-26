@@ -13,15 +13,15 @@ import { getRemoteFileSize } from "../getRemoteFileSize";
 export class SelectedPolygonInteraction extends Interaction {
   private drawInteraction: Draw;
   private selectionLayer: any;
-  private isProduitSelected: (id: string | number | undefined) => boolean;
+  private isProduitSelected: (id: string ) => boolean;
   private addProduit: (produit: any) => void;
-  private removeProduit: (id: string | number | undefined) => void;
+  private removeProduit: (id: string ) => void;
 
   constructor(
     selectionLayer: any,
-    isProduitSelected: (id: string | number | undefined) => boolean,
+    isProduitSelected: (id: string ) => boolean,
     addProduit: (produit: any) => void,
-    removeProduit: (id: string | number | undefined) => void
+    removeProduit: (id: string ) => void
   ) {
     super();
     this.selectionLayer = selectionLayer;
