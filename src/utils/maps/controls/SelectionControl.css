@@ -1,11 +1,16 @@
+/* ── Widget de sélection unifié — disposition verticale ─────────────── */
+
 .selection-control {
   top: 0.5em;
   right: 0.5em;
   display: flex;
-  gap: 0.5rem;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
   background: var(--background-default-grey);
-  padding: 0.5rem;
+  padding: 4px;
   border-radius: 4px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
 }
 
 .selection-control button {
@@ -15,6 +20,11 @@
   border: none;
   border-radius: 4px;
   cursor: pointer;
+  min-width: 36px;
+  min-height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .selection-control button.active {
@@ -24,4 +34,22 @@
 
 .selection-control button:hover:not(.active) {
   background-color: var(--background-action-low-blue-france);
+}
+
+/* Drag-over sur le bouton GeoJSON */
+.selection-control button.drag-over {
+  background-color: var(--background-action-low-blue-france);
+  outline: 2px dashed var(--background-action-high-blue-france);
+  outline-offset: -2px;
+}
+
+/* ── Séparateur horizontal entre sélection et import ────────────────── */
+
+.selection-control__separator {
+  display: block;
+  width: 22px;
+  height: 1px;
+  background: var(--border-default-grey, #ddd);
+  margin: 4px 0;
+  flex-shrink: 0;
 }

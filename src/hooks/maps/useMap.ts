@@ -17,6 +17,7 @@ import useMapStore from "../../hooks/store/useMapStore";
 
 import { SelectedPolygonInteraction } from "../../utils/interactions/selectedPolygonInteraction";
 import { SelectedClickInteraction } from "../../utils/interactions/selectedClickInteraction";
+import SelectionControl from "../../utils/maps/controls/SelectionControl";
 import { HoverPopupInteraction } from "../../utils/interactions";
 import useDalleStore from "../store/useDalleStore";
 import useFilterStore from "../store/useFilterStore";
@@ -88,6 +89,9 @@ export const useMap = (
       return getStyleForDalle("default");
     },
   });
+  
+  // Donner un nom à la couche pour la retrouver plus tard
+  selectionProduitLayer.set("name", "selectionProduitLayer");
 
   useEffect(() => {
     if (!containerRef.current) return;
@@ -138,6 +142,9 @@ export const useMap = (
       mapInstance.addInteraction(clickInteraction);
       clickInteraction.setActive(true);
 
+      // Contrôle unifié : clic + polygone + import GeoJSON
+      mapInstance.addControl(new SelectionControl(selectionProduitLayer));
+
       const hoverInteractionChantier = new HoverPopupInteraction({
         layer: chantierLayer,
       });
@@ -162,6 +169,8 @@ export const useMap = (
         }
       });
 
+      // Stocker l'instance dans useMapStore pour que GeoJsonImportModal puisse y accéder
+      useMapStore.getState().setMapInstance(mapInstance);
       setMap(mapInstance);
     };
 

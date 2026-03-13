@@ -6,9 +6,12 @@ import "ol/ol.css";
 import "@gouvfr/dsfr/dist/dsfr.css";
 import "@gouvfr/dsfr/dist/utility/icons/icons.css";
 import "geopf-extensions-openlayers/css/Dsfr.css";
+import "../../utils/controls/GeoJsonImportControl.css";
+import "../../utils/maps/controls/SelectionControl.css";
 import { getRouteApi } from "@tanstack/react-router";
 import { GeoJSON } from "ol/format";
 import SelectedOptions from "./MenuCompenents/SelectedOptions";
+import GeoJsonImportModal from "./MenuCompenents/GeoJsonImportModal";
 import { set } from "ol/transform";
 const route = getRouteApi("/telechargement/$downloadUrl");
 
@@ -45,7 +48,7 @@ useMap(
         style={{ height: "80vh", width: "100%" }}
       ></div>
 
-      <SelectedOptions />
+      <GeoJsonImportModal />
     </>
   );
 };

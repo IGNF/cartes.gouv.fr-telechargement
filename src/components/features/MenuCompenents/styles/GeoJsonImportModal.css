@@ -1,0 +1,200 @@
+/* ── Overlay (fermeture au clic extérieur) ───────────────────────────── */
+.gji-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 400;
+}
+
+/* ── Panneau — positionné comme .selection-control mais décalé à gauche ─ */
+.gji-panel {
+  position: absolute;
+  /* Même top que .selection-control { top: 0.5em } */
+  top: 0.5em;
+  /* Décalé à gauche du widget (widget ~52px + 8px gap) */
+  right: calc(0.5em + 52px + 8px);
+  z-index: 401;
+  width: 300px;
+  background: var(--background-default-grey, #fff);
+  border: 1px solid var(--border-default-grey, #ddd);
+  border-radius: 4px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.18);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* ── En-tête ─────────────────────────────────────────────────────────── */
+.gji-panel-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.625rem 0.75rem;
+  background: var(--background-action-high-blue-france, #000091);
+  color: #fff;
+}
+
+.gji-header-icon {
+  font-size: 1rem;
+  flex-shrink: 0;
+}
+
+.gji-panel-title {
+  flex: 1;
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.gji-close-btn {
+  color: #fff !important;
+  padding: 0 !important;
+  min-height: unset !important;
+}
+
+/* ── Corps ───────────────────────────────────────────────────────────── */
+.gji-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0.625rem;
+  padding: 0.875rem;
+}
+
+/* ── Badge format ────────────────────────────────────────────────────── */
+.gji-label {
+  margin: 0;
+  font-size: 0.75rem;
+  color: var(--text-mention-grey, #666);
+}
+
+.gji-badges {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.gji-badge {
+  display: inline-block;
+  padding: 1px 6px;
+  border: 1px solid var(--border-action-high-blue-france, #000091);
+  border-radius: 2px;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  color: var(--text-action-high-blue-france, #000091);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+/* ── Zone drag & drop ────────────────────────────────────────────────── */
+.gji-dropzone {
+  border: 1.5px dashed var(--border-default-grey, #ccc);
+  border-radius: 4px;
+  padding: 1.25rem 0.75rem;
+  background: var(--background-alt-grey, #f6f6f6);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+  text-align: center;
+}
+
+.gji-dropzone:hover {
+  border-color: var(--border-action-high-blue-france, #000091);
+  background: #f0f0ff;
+}
+
+.gji-dropzone--over {
+  border-color: var(--border-action-high-blue-france, #000091);
+  background: #e8e8ff;
+  border-style: solid;
+}
+
+.gji-dropzone--has-file {
+  cursor: default;
+  border-style: solid;
+  border-color: var(--border-action-high-blue-france, #000091);
+  background: #fff;
+  padding: 0.75rem;
+}
+
+.gji-upload-icon {
+  font-size: 1.5rem;
+  color: var(--text-action-high-blue-france, #000091);
+}
+
+.gji-drop-text {
+  margin: 0;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--text-label-grey, #161616);
+}
+
+.gji-or {
+  margin: 0;
+  font-size: 0.75rem;
+  color: var(--text-mention-grey, #666);
+}
+
+.gji-file-selected {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+}
+
+.gji-file-icon {
+  font-size: 1.125rem;
+  color: var(--text-action-high-blue-france, #000091);
+  flex-shrink: 0;
+}
+
+.gji-file-name {
+  flex: 1;
+  font-size: 0.8125rem;
+  word-break: break-all;
+}
+
+/* ── Note ────────────────────────────────────────────────────────────── */
+.gji-hint {
+  margin: 0;
+  font-size: 0.6875rem;
+  color: var(--text-mention-grey, #666);
+  line-height: 1.5;
+}
+
+/* ── Chargement ──────────────────────────────────────────────────────── */
+.gji-loading {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.75rem;
+  color: var(--text-mention-grey, #666);
+}
+
+.gji-spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid var(--border-default-grey, #ddd);
+  border-top-color: var(--background-action-high-blue-france, #000091);
+  border-radius: 50%;
+  animation: gji-spin 0.7s linear infinite;
+  flex-shrink: 0;
+}
+
+@keyframes gji-spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ── Pied ────────────────────────────────────────────────────────────── */
+.gji-panel-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  padding: 0.625rem 0.875rem;
+  border-top: 1px solid var(--border-default-grey, #ddd);
+}
+
+/* S'assurer que #map a un contexte de positionnement */
+#map {
+  position: relative;
+}

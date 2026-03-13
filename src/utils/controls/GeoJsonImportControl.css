@@ -1,0 +1,107 @@
+/* Contrôle d'import GeoJSON */
+.ol-geojson-import {
+  position: relative;
+}
+
+.ol-geojson-import__drop-zone {
+  width: 36px;
+  height: 36px;
+  background-color: white;
+  border: 1px solid #ddd;
+  border-radius: 2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.ol-geojson-import__drop-zone:hover {
+  background-color: #f5f5f5;
+  border-color: #0084f4;
+  box-shadow: 0 2px 6px rgba(0, 132, 244, 0.15);
+}
+
+.ol-geojson-import__drop-zone.drag-over {
+  background-color: #e8f2ff;
+  border-color: #0084f4;
+  box-shadow: 0 4px 12px rgba(0, 132, 244, 0.3);
+  transform: scale(1.1);
+}
+
+.ol-geojson-import__drop-zone span {
+  font-size: 18px;
+  color: #0084f4;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ol-geojson-import__drop-zone:hover span {
+  color: #0066cc;
+}
+
+/* Notifications */
+.geojson-notification {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background-color: white;
+  border-radius: 4px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  padding: 1rem;
+  max-width: 350px;
+  z-index: 9999;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: all 0.3s ease;
+  border-left: 4px solid #18753c;
+}
+
+.geojson-notification.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.geojson-notification--error {
+  border-left-color: #d81b3f;
+}
+
+.geojson-notification--error .geojson-notification__content strong {
+  color: #d81b3f;
+}
+
+.geojson-notification--success {
+  border-left-color: #18753c;
+}
+
+.geojson-notification--success .geojson-notification__content strong {
+  color: #18753c;
+}
+
+.geojson-notification__content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.geojson-notification__content strong {
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.geojson-notification__content p {
+  margin: 0;
+  font-size: 0.85rem;
+  color: #333;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .geojson-notification {
+    right: 10px;
+    bottom: 10px;
+    max-width: calc(100vw - 20px);
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Paris",
+        "description": "Zone de Paris - France",
+        "city": "Paris",
+        "country": "France"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [2.225, 48.815],
+            [2.469, 48.815],
+            [2.469, 48.902],
+            [2.225, 48.902],
+            [2.225, 48.815]
+          ]
+        ]
+      }
+    }
+  ]
+}

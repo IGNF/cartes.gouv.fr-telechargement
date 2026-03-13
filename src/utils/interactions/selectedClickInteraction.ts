@@ -3,6 +3,7 @@ import { Layer } from "ol/layer";
 import { MapBrowserEvent } from "ol";
 import { getRemoteFileSize } from "../getRemoteFileSize";
 import { Dalle } from "../../assets/@types/types";
+import { log } from "console";
 
 /**
  * Interaction de sélection par clic pour les entités d'une couche vectorielle.
@@ -59,6 +60,9 @@ export class SelectedClickInteraction extends Interaction {
         if (properties.metadata !== undefined) {
           this.setIsMetadata(true);
         }
+
+        console.log(properties);
+        
 
 
         
