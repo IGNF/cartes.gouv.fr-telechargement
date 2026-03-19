@@ -2,11 +2,11 @@ import { createModal } from "@codegouvfr/react-dsfr/Modal";
 import { useDalleStore } from "../../../hooks/store/useDalleStore";
 import "./styles/DownloadModal.css";
 import { Select } from "@codegouvfr/react-dsfr/Select";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { RadioButtons } from "@codegouvfr/react-dsfr/RadioButtons";
 import Button from "@codegouvfr/react-dsfr/Button";
 import { formatBytes } from "../../../utils/formatters";
-import { downloadZip, getFileSizes } from "../../../utils/download";
+import { downloadZip, getFileSizes, DownloadPhase } from "../../../utils/download";
 import { Dalle } from "../../../assets/@types/types";
 
 /** Instance du modal de téléchargement, partageable pour l'ouvrir/fermer depuis l'extérieur. */
@@ -25,6 +25,14 @@ type DownloadMethod = "all" | "file" | "";
 // ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
+
+/** Libellés affichés pour chaque phase de téléchargement. */
+const PHASE_LABELS: Record<DownloadPhase, string> = {
+  idle: "",
+  preparing: "Préparation du téléchargement...",
+  downloading: "Téléchargement des fichiers en cours...",
+  compressing: "Compression de l'archive ZIP...",
+};
 
 /**
  * Génère le contenu texte d'un fichier listant les URLs des produits.
@@ -57,10 +65,10 @@ const triggerFileDownload = (
 };
 
 /**
- * Génère et télécharge un unique fichier `metadonnees.json` agrégeant les
- * métadonnées de tous les produits, indexées par nom de produit.
+ * Génère et télécharge un unique `metadonnees.json` agrégeant les métadonnées
+ * de tous les produits, indexées par nom de produit.
  *
- * Structure du fichier généré :
+ * Structure :
  * ```json
  * {
  *   "LHD_FXX_0656_6861": {
@@ -96,12 +104,14 @@ const downloadAggregatedMetadata = (produits: Dalle[]): void => {
  *
  * - **Téléchargement automatique (ZIP)** : un sous-dossier par produit
  *   contenant le fichier de données et son `.json` de métadonnées.
+ *   Respecte la limite de 10 requêtes/seconde du serveur.
+ *   Affiche la phase en cours (préparation / téléchargement / compression).
+ *   Demande confirmation avant d'annuler si un téléchargement est en cours.
  *
- * - **Liens de téléchargement** : un fichier `Liens_de_telechargement.txt`
- *   (une URL par ligne) + un `metadonnees.json` unique indexé par nom.
+ * - **Liens de téléchargement** : `Liens_de_telechargement.txt` + `metadonnees.json`.
  *
- * Si `isMetadata` est vrai, l'utilisateur doit obligatoirement choisir une
- * option dans le <Select> avant de pouvoir soumettre le formulaire.
+ * Si `isMetadata` est vrai, l'utilisateur doit choisir une option dans le
+ * <Select> avant de pouvoir soumettre.
  */
 const DownloadModal = () => {
   // ---------------------------------------------------------------------------
@@ -136,6 +146,15 @@ const DownloadModal = () => {
 
   /** Progression du téléchargement ZIP (0-100). */
   const [downloadProgress, setDownloadProgress] = useState<number>(0);
+
+  /** Phase courante du téléchargement (pour afficher un label précis). */
+  const [downloadPhase, setDownloadPhase] = useState<DownloadPhase>("idle");
+
+  /**
+   * Référence vers l'AbortController actif.
+   * Permet d'annuler le téléchargement en cours depuis n'importe quel handler.
+   */
+  const abortControllerRef = useRef<AbortController | null>(null);
 
   // ---------------------------------------------------------------------------
   // Effets
@@ -184,9 +203,7 @@ const DownloadModal = () => {
   /**
    * Gère la soumission du formulaire.
    *
-   * - Affiche une erreur sur le <Select> si `isMetadata` est vrai et qu'aucune
-   *   option n'a été choisie (le bouton est aussi désactivé dans ce cas).
-   * - "all"  : ZIP structuré en sous-dossiers (données + métadonnées par produit).
+   * - "all"  : ZIP avec rate-limiting 10 req/s, phases affichées, annulable.
    * - "file" : fichier texte des liens + `metadonnees.json` indexé par nom.
    */
   const handleSubmit = async (e: React.FormEvent) => {
@@ -203,24 +220,44 @@ const DownloadModal = () => {
     }
 
     if (downloadMethod === "all") {
+      const controller = new AbortController();
+      abortControllerRef.current = controller;
+
       setIsDownloadLoading(true);
       setDownloadProgress(0);
+      setDownloadPhase("idle");
 
-      await downloadZip(
-        selectedProduits.map((p) => ({
-          url: p.url,
-          name: p.name,
-          ...(isMetadata && p.metadata ? { metadata: p.metadata } : {}),
-        })),
-        setDownloadProgress,
-        fileSizes
-      );
+      try {
+        await downloadZip(
+          selectedProduits.map((p) => ({
+            url: p.url,
+            name: p.name,
+            ...(isMetadata && p.metadata ? { metadata: p.metadata } : {}),
+          })),
+          setDownloadProgress,
+          setDownloadPhase,
+          fileSizes,
+          controller.signal
+        );
+      } catch (err) {
+        if ((err as Error).name === "AbortError") {
+          // Téléchargement annulé volontairement — pas d'erreur à afficher
+          console.info("Téléchargement annulé par l'utilisateur.");
+        } else {
+          console.error("Erreur pendant le téléchargement :", err);
+        }
+      } finally {
+        setIsDownloadLoading(false);
+        setDownloadProgress(0);
+        setDownloadPhase("idle");
+        abortControllerRef.current = null;
+      }
 
-      setIsDownloadLoading(false);
       downloadModal.close();
       return;
     }
 
+    // Méthode "file"
     triggerFileDownload(
       buildUrlFileContent(selectedProduits),
       "Liens_de_telechargement.txt"
@@ -233,8 +270,20 @@ const DownloadModal = () => {
     downloadModal.close();
   };
 
-  /** Remet le formulaire à son état initial et ferme le modal. */
-  const handleReset = () => {
+  /**
+   * Tente de fermer le modal.
+   * Si un téléchargement est en cours, demande confirmation avant d'annuler.
+   */
+  const handleClose = () => {
+    if (isDownloadLoading) {
+      const confirmed = window.confirm(
+        "Un téléchargement est en cours. Voulez-vous vraiment l'annuler ?"
+      );
+      if (!confirmed) return;
+
+      abortControllerRef.current?.abort();
+    }
+
     setSelectValue("");
     setSelectError(false);
     setDownloadMethod("all");
@@ -254,11 +303,21 @@ const DownloadModal = () => {
   const isSubmitDisabled = isMetadata && !selectValue;
 
   return (
-    <downloadModal.Component title="Télécharger" iconId="fr-icon-download-fill">
+    <downloadModal.Component
+      title="Télécharger"
+      iconId="fr-icon-download-fill"
+      concealingBackdrop={false}
+      buttons={[]}
+    >
       {isDownloadLoading ? (
-        /* --- Barre de progression --- */
+        /* --- Barre de progression avec phase --- */
         <div className="download-progress-container">
-          <p>Téléchargement et compression en cours...</p>
+          <p>{PHASE_LABELS[downloadPhase]}</p>
+          {downloadPhase === "downloading" && (
+            <p className="progress-file-count">
+              {Math.round((downloadProgress / 99) * produitCount)}/{produitCount} fichiers
+            </p>
+          )}
           <div className="progress-bar-wrapper">
             <div className="progress-bar">
               <div
@@ -271,6 +330,11 @@ const DownloadModal = () => {
                 {Math.round(downloadProgress)}%
               </span>
             </div>
+          </div>
+          <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 16 }}>
+            <Button priority="secondary" type="button" onClick={handleClose}>
+              Annuler le téléchargement
+            </Button>
           </div>
         </div>
       ) : (
@@ -328,8 +392,9 @@ const DownloadModal = () => {
                 options={[
                   {
                     label: "Téléchargement automatique",
-                    hintText:
-                      "Lancer le téléchargement automatiquement de l'ensemble des données",
+                    hintText: isMetadata
+                      ? "Télécharger un ZIP avec un sous-dossier par produit (données + métadonnées)"
+                      : "Lancer le téléchargement automatique de l'ensemble des données",
                     nativeInputProps: {
                       value: "all",
                       defaultChecked: true,
@@ -339,8 +404,9 @@ const DownloadModal = () => {
                   },
                   {
                     label: "Liens de téléchargement",
-                    hintText:
-                      "Télécharger la liste des liens de téléchargement associés aux données",
+                    hintText: isMetadata
+                      ? "Télécharger la liste des liens et un fichier metadonnees.json indexé par produit"
+                      : "Télécharger la liste des liens de téléchargement associés aux données",
                     nativeInputProps: {
                       value: "file",
                       onChange: (e) =>
@@ -367,24 +433,17 @@ const DownloadModal = () => {
             className="download-modal-actions"
             style={{
               display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
+              justifyContent: "flex-end",
               gap: 12,
             }}
           >
-            <div />
-            <div style={{ display: "flex", gap: 12 }}>
-              <Button
-                priority="primary"
-                type="submit"
-                disabled={isSubmitDisabled}
-              >
-                Télécharger
-              </Button>
-              <Button priority="secondary" type="button" onClick={handleReset}>
-                Annuler
-              </Button>
-            </div>
+            <Button
+              priority="primary"
+              type="submit"
+              disabled={isSubmitDisabled}
+            >
+              Télécharger
+            </Button>
           </div>
         </form>
       )}

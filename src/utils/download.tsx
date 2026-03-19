@@ -2,71 +2,94 @@ import JSZip from "jszip";
 import { saveAs } from "file-saver";
 import { File } from "../assets/@types/types";
 
+// ---------------------------------------------------------------------------
+// Constantes
+// ---------------------------------------------------------------------------
+
+/** Nombre maximum de téléchargements simultanés. */
+const MAX_CONCURRENT = 6;
+
 /**
- * Nombre maximal de téléchargements simultanés.
- * Limiter à 6 évite de surcharger le serveur et optimise la bande passante.
+ * Nombre maximum de requêtes par seconde autorisées par le serveur.
+ * Au-delà, le serveur retourne 429. On découpe les téléchargements en
+ * fenêtres d'1 seconde et on s'assure de ne pas dépasser cette limite.
  */
-const MAX_CONCURRENT_DOWNLOADS = 6;
+const MAX_REQUESTS_PER_SECOND = 10;
 
 // ---------------------------------------------------------------------------
 // Types
 // ---------------------------------------------------------------------------
 
 /**
- * Étend le type `File` avec les métadonnées optionnelles d'un produit.
- * Les métadonnées sont déjà parsées (objet) contrairement à l'API qui
- * les renvoie sous forme de string JSON.
+ * Étend `File` avec les métadonnées optionnelles d'un produit (déjà parsées).
  */
 export interface FileWithMetadata extends File {
   metadata?: Record<string, unknown>;
 }
+
+/**
+ * Phase courante du téléchargement, utilisée pour afficher un label précis.
+ *
+ * - `idle`        : aucun téléchargement en cours
+ * - `preparing`   : récupération des tailles de fichiers
+ * - `downloading` : téléchargement des fichiers
+ * - `compressing` : génération de l'archive ZIP
+ */
+export type DownloadPhase = "idle" | "preparing" | "downloading" | "compressing";
 
 // ---------------------------------------------------------------------------
 // getFileSizes
 // ---------------------------------------------------------------------------
 
 /**
- * Tente de récupérer la taille d'un fichier via Range ou HEAD.
- * Retourne `null` si la taille ne peut pas être déterminée de manière fiable.
- *
- * @param file - Fichier dont on veut connaître la taille.
+ * Tente de récupérer la taille d'un fichier via Range puis HEAD.
+ * Retourne `null` si la taille ne peut pas être déterminée.
  */
-async function fetchFileSize(file: File): Promise<number | null> {
+async function fetchFileSize(
+  file: File,
+  signal: AbortSignal
+): Promise<number | null> {
   try {
-    // Stratégie 1 : Range request — demande 1 byte pour lire Content-Range
-    const rangeRes = await fetch(file.url, { headers: { Range: "bytes=0-0" } });
+    const rangeRes = await fetch(file.url, {
+      headers: { Range: "bytes=0-0" },
+      signal,
+    });
     if (rangeRes.status === 206) {
       const match = rangeRes.headers.get("content-range")?.match(/\/(\d+)$/);
       if (match) return parseInt(match[1], 10);
     }
 
-    // Stratégie 2 : HEAD request
-    const headRes = await fetch(file.url, { method: "HEAD" });
+    const headRes = await fetch(file.url, { method: "HEAD", signal });
     const contentLength = headRes.headers.get("content-length");
     if (contentLength) {
       const size = parseInt(contentLength, 10);
       if (size > 0) return size;
     }
   } catch (e) {
-    console.warn(`Impossible de récupérer la taille de ${file.name}:`, e);
+    if ((e as Error).name !== "AbortError") {
+      console.warn(`Impossible de récupérer la taille de ${file.name}:`, e);
+    }
   }
-
   return null;
 }
 
 /**
  * Récupère les tailles de plusieurs fichiers en parallèle.
- * Les fichiers dont la taille est inconnue sont associés à `null`.
  *
- * @param files - Liste des fichiers.
+ * @param files  - Fichiers à mesurer.
+ * @param signal - Signal d'annulation.
  * @returns Map `name → taille en bytes | null`.
  */
 export async function getFileSizes(
-  files: File[]
+  files: File[],
+  signal?: AbortSignal
 ): Promise<Map<string, number | null>> {
+  const ctrl = signal ? null : new AbortController();
+  const sig = signal ?? ctrl!.signal;
+
   const entries = await Promise.all(
     files.map(async (file) => {
-      const size = await fetchFileSize(file);
+      const size = await fetchFileSize(file, sig);
       return [file.name, size] as [string, number | null];
     })
   );
@@ -74,35 +97,75 @@ export async function getFileSizes(
 }
 
 // ---------------------------------------------------------------------------
-// Concurrency limiter
+// Rate-limited concurrency runner
 // ---------------------------------------------------------------------------
 
 /**
- * Exécute une liste de tâches asynchrones avec une limite de concurrence.
+ * Exécute des tâches asynchrones avec :
+ * - une limite de concurrence (`maxConcurrent`)
+ * - une limite de débit (`maxPerSecond` requêtes lancées par fenêtre d'1s)
  *
- * @param items       - Éléments à traiter.
- * @param fn          - Tâche asynchrone appliquée à chaque élément.
- * @param maxConcurrent - Nombre maximum de tâches parallèles.
+ * Algorithme : on découpe les items en fenêtres de `maxPerSecond` éléments.
+ * Pour chaque fenêtre, on lance les tâches avec la limite de concurrence et
+ * on attend au moins 1 seconde avant de passer à la fenêtre suivante.
+ *
+ * @param items         - Éléments à traiter.
+ * @param fn            - Tâche asynchrone par élément.
+ * @param maxConcurrent - Téléchargements simultanés max.
+ * @param maxPerSecond  - Requêtes lancées max par seconde.
+ * @param signal        - Signal d'annulation.
  */
-async function withConcurrencyLimit<T>(
+async function runRateLimited<T>(
   items: T[],
   fn: (item: T) => Promise<void>,
-  maxConcurrent: number
+  maxConcurrent: number,
+  maxPerSecond: number,
+  signal: AbortSignal
+): Promise<void> {
+  // Découpe en fenêtres de maxPerSecond éléments
+  const windows: T[][] = [];
+  for (let i = 0; i < items.length; i += maxPerSecond) {
+    windows.push(items.slice(i, i + maxPerSecond));
+  }
+
+  for (const window of windows) {
+    if (signal.aborted) throw new DOMException("Annulé", "AbortError");
+
+    const windowStart = Date.now();
+
+    // Traite la fenêtre avec la limite de concurrence
+    await runConcurrent(window, fn, maxConcurrent, signal);
+
+    // Attend le reste de la seconde si la fenêtre s'est terminée trop vite
+    const elapsed = Date.now() - windowStart;
+    const remaining = 1000 - elapsed;
+    if (remaining > 0 && windows.indexOf(window) < windows.length - 1) {
+      await sleep(remaining, signal);
+    }
+  }
+}
+
+/**
+ * Exécute des tâches avec une limite de concurrence stricte.
+ */
+async function runConcurrent<T>(
+  items: T[],
+  fn: (item: T) => Promise<void>,
+  maxConcurrent: number,
+  signal: AbortSignal
 ): Promise<void> {
   const queue = [...items];
   const running = new Set<Promise<void>>();
 
   const runNext = async (): Promise<void> => {
-    if (queue.length === 0) return;
+    if (queue.length === 0 || signal.aborted) return;
 
     const item = queue.shift()!;
-    const task = fn(item).finally(() => {
+    const task: Promise<void> = fn(item).finally(() => {
       running.delete(task);
     });
-
     running.add(task);
 
-    // Si la limite est atteinte, attend qu'une tâche se libère
     if (running.size >= maxConcurrent) {
       await Promise.race(running);
     }
@@ -110,15 +173,27 @@ async function withConcurrencyLimit<T>(
     return runNext();
   };
 
-  // Lance jusqu'à maxConcurrent tâches en parallèle
   const initialBatch = Array.from(
     { length: Math.min(maxConcurrent, items.length) },
     () => runNext()
   );
 
   await Promise.all(initialBatch);
-  // Attend la fin de toutes les tâches encore en cours
   await Promise.all(running);
+}
+
+/**
+ * Attend `ms` millisecondes, sauf si le signal est annulé.
+ */
+function sleep(ms: number, signal: AbortSignal): Promise<void> {
+  return new Promise((resolve, reject) => {
+    if (signal.aborted) return reject(new DOMException("Annulé", "AbortError"));
+    const timer = setTimeout(resolve, ms);
+    signal.addEventListener("abort", () => {
+      clearTimeout(timer);
+      reject(new DOMException("Annulé", "AbortError"));
+    });
+  });
 }
 
 // ---------------------------------------------------------------------------
@@ -139,35 +214,40 @@ async function withConcurrencyLimit<T>(
  *     └── LHD_FXX_0657_6862.json
  * ```
  *
- * **Sans métadonnées :** les fichiers sont placés à la racine du ZIP.
+ * **Sans métadonnées :** fichiers à la racine du ZIP.
  *
  * **Progression :**
- * - Si toutes les tailles sont connues : progression en bytes (précise).
- * - Si certaines tailles sont inconnues : progression en nombre de fichiers
- *   terminés (approximative).
+ * - Mode bytes si toutes les tailles sont connues (précis).
+ * - Mode fichiers sinon (approximatif : x/N fichiers).
  *
- * @param files      - Fichiers à télécharger (avec métadonnées optionnelles).
- * @param onProgress - Callback de progression (0–100).
- * @param fileSizes  - Tailles pré-calculées (optionnel, évite un aller-réseau).
+ * **Rate-limiting :** max `MAX_REQUESTS_PER_SECOND` requêtes par seconde,
+ * avec une pause automatique entre les fenêtres.
+ *
+ * @param files          - Fichiers à télécharger.
+ * @param onProgress     - Callback de progression (0–100).
+ * @param onPhaseChange  - Callback de changement de phase.
+ * @param fileSizes      - Tailles pré-calculées (optionnel).
+ * @param signal         - Signal d'annulation (AbortController).
  */
 export async function downloadZip(
   files: FileWithMetadata[],
   onProgress?: (progress: number) => void,
-  fileSizes?: Map<string, number | null>
+  onPhaseChange?: (phase: DownloadPhase) => void,
+  fileSizes?: Map<string, number | null>,
+  signal?: AbortSignal
 ): Promise<void> {
   const zip = new JSZip();
 
-  // Récupère les tailles si non fournies
-  const sizeMap = fileSizes ?? (await getFileSizes(files));
+  // --- Phase : préparation ---
+  onPhaseChange?.("preparing");
 
-  // Détermine si on peut faire une progression en bytes
+  const sizeMap = fileSizes ?? (await getFileSizes(files, signal));
+
   const knownSizes = files
     .map((f) => sizeMap.get(f.name) ?? null)
-    .filter((s): s is number => s !== null);
+    .filter((s): s is number => s !== null && s > 0);
 
-  const allSizesKnown =
-    knownSizes.length === files.length && knownSizes.every((s) => s > 0);
-
+  const allSizesKnown = knownSizes.length === files.length;
   const totalBytes = allSizesKnown
     ? knownSizes.reduce((a, b) => a + b, 0)
     : 0;
@@ -176,67 +256,111 @@ export async function downloadZip(
   let completedFiles = 0;
 
   /**
-   * Met à jour la progression.
-   * - Mode bytes : progression précise basée sur les bytes téléchargés.
-   * - Mode fichiers : progression basée sur le nombre de fichiers terminés.
+   * Met à jour la progression en mode bytes (tailles connues).
    */
-  const updateProgress = (chunkSize = 0) => {
+  const updateProgressBytes = (chunkSize: number) => {
     if (!onProgress) return;
-
-    if (allSizesKnown && totalBytes > 0) {
-      loadedBytes += chunkSize;
-      // Plafonne à 99% — le dernier % est réservé à la génération du ZIP
-      onProgress(Math.min((loadedBytes / totalBytes) * 100, 99));
-    } else {
-      onProgress(Math.min((completedFiles / files.length) * 99, 99));
-    }
+    loadedBytes += chunkSize;
+    onProgress(Math.min((loadedBytes / totalBytes) * 100, 99));
   };
 
-  // ---------------------------------------------------------------------------
-  // Téléchargement des fichiers
-  // ---------------------------------------------------------------------------
+  /**
+   * Démarre un ticker de progression simulée pour un fichier dont la taille
+   * est inconnue (ex: WMS). La barre avance de façon logarithmique jusqu'à
+   * ce que stop() soit appelé, indiquant une activité visible sans bloquer.
+   *
+   * Algorithme : à chaque tick (300ms), on avance de 8% du reste alloué au
+   * fichier — progression rapide au début, de plus en plus lente, sans jamais
+   * atteindre le plafond avant la fin réelle.
+   *
+   * @returns stop — à appeler quand le fichier est entièrement reçu.
+   */
+  const startSimulatedTicker = (): (() => void) => {
+    if (!onProgress) return () => {};
 
-  await withConcurrencyLimit(
+    const fileShare = 1 / files.length; // fraction du total allouée à ce fichier
+    let simulatedProgress = 0; // progression simulée (0–1) dans la part du fichier
+    let stopped = false;
+
+    const tick = () => {
+      if (stopped) return;
+      const remaining = 1 - simulatedProgress;
+      simulatedProgress += remaining * 0.08;
+      const global = ((completedFiles + simulatedProgress) / files.length) * 99;
+      onProgress(Math.min(global, 99));
+      setTimeout(tick, 300);
+    };
+
+    setTimeout(tick, 300);
+
+    return () => {
+      stopped = true;
+      completedFiles += 1;
+      onProgress(Math.min((completedFiles / files.length) * 99, 99));
+    };
+  };
+
+  /**
+   * Lit tous les chunks d'un ReadableStreamDefaultReader et retourne un Blob.
+   */
+  const readAllChunks = async (
+    reader: ReadableStreamDefaultReader<Uint8Array>
+  ): Promise<Blob> => {
+    const chunks: Uint8Array[] = [];
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      chunks.push(value);
+    }
+    return new Blob(chunks);
+  };
+
+  // --- Phase : téléchargement ---
+  onPhaseChange?.("downloading");
+
+  await runRateLimited(
     files,
     async (file) => {
-      const response = await fetch(file.url);
+      if (signal?.aborted) throw new DOMException("Annulé", "AbortError");
+
+      const response = await fetch(file.url, { signal });
 
       if (!response.ok) {
-        throw new Error(
-          `Erreur HTTP ${response.status} pour ${file.name}`
-        );
+        throw new Error(`HTTP ${response.status} pour ${file.name}`);
       }
 
-      // Détermine le chemin dans le ZIP
       const hasMetadata = file.metadata != null;
       const zipFolder = hasMetadata ? zip.folder(file.name)! : zip;
-
-      // Lecture en streaming par chunks
+      const knownSize = sizeMap.get(file.name);
+      const hasKnownSize = knownSize != null && knownSize > 0;
       const reader = response.body?.getReader();
-
       let blob: Blob;
 
-      if (reader) {
-        const chunks: Uint8Array[] = [];
-
-        while (true) {
-          const { done, value } = await reader.read();
-          if (done) break;
-          chunks.push(value);
-          updateProgress(value.length);
+      if (hasKnownSize) {
+        // Taille connue : progression précise par chunks
+        if (reader) {
+          const chunks: Uint8Array[] = [];
+          while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+            chunks.push(value);
+            updateProgressBytes(value.length);
+          }
+          blob = new Blob(chunks);
+        } else {
+          blob = await response.blob();
+          updateProgressBytes(blob.size);
         }
-
-        blob = new Blob(chunks);
+        completedFiles++;
       } else {
-        // Fallback sans streaming (pas de progression granulaire)
-        blob = await response.blob();
-        updateProgress(blob.size);
+        // Taille inconnue (WMS) : ticker simulé pendant l'attente du blob
+        const stopTicker = startSimulatedTicker();
+        blob = reader ? await readAllChunks(reader) : await response.blob();
+        stopTicker();
       }
 
-      // Fichier de données dans le (sous-)dossier
       zipFolder.file(file.name, blob);
 
-      // Fichier JSON de métadonnées dans le même sous-dossier
       if (hasMetadata) {
         zipFolder.file(
           `${file.name}.json`,
@@ -247,22 +371,21 @@ export async function downloadZip(
           )
         );
       }
-
-      completedFiles++;
-
-      // En mode fichiers, met à jour après chaque fichier terminé
-      if (!allSizesKnown) {
-        updateProgress();
-      }
     },
-    MAX_CONCURRENT_DOWNLOADS
+    MAX_CONCURRENT,
+    MAX_REQUESTS_PER_SECOND,
+    signal ?? new AbortController().signal
   );
 
-  // ---------------------------------------------------------------------------
-  // Génération et sauvegarde du ZIP
-  // ---------------------------------------------------------------------------
+  // --- Phase : compression ---
+  onPhaseChange?.("compressing");
+  onProgress?.(99);
 
-  onProgress?.(100);
   const zipBlob = await zip.generateAsync({ type: "blob" });
+
+  if (signal?.aborted) throw new DOMException("Annulé", "AbortError");
+
   saveAs(zipBlob, "export.zip");
+  onProgress?.(100);
+  onPhaseChange?.("idle");
 }
