@@ -3,275 +3,266 @@ import { saveAs } from "file-saver";
 import { File } from "../assets/@types/types";
 
 /**
- * Nombre maximal de téléchargements simultanés
- * Limiter à 6 optimise la bande passante et évite de surcharger le serveur
+ * Nombre maximal de téléchargements simultanés.
+ * Limiter à 6 évite de surcharger le serveur et optimise la bande passante.
  */
 const MAX_CONCURRENT_DOWNLOADS = 6;
 
+// ---------------------------------------------------------------------------
+// Types
+// ---------------------------------------------------------------------------
+
 /**
- * Récupère les tailles des fichiers via des requêtes HEAD et Range
- * Gère les serveurs WMS qui ne retournent pas un content-length fiable
- * Utilisé avant le téléchargement pour afficher les tailles et le calcul exact de la progression
- *
- * @param files - Liste des fichiers dont on veut connaître la taille
- * @returns Map avec le nom du fichier comme clé et la taille en bytes comme valeur (0 si inconnue)
+ * Étend le type `File` avec les métadonnées optionnelles d'un produit.
+ * Les métadonnées sont déjà parsées (objet) contrairement à l'API qui
+ * les renvoie sous forme de string JSON.
  */
-export async function getFileSizes(
-  files: File[],
-): Promise<Map<string, number>> {
-  const fileSizes = new Map<string, number>();
+export interface FileWithMetadata extends File {
+  metadata?: Record<string, unknown>;
+}
 
-  const sizePromises = files.map(async (file) => {
-    try {
-      /**
-       * Stratégie 1: Essaie avec Range header
-       * Demande juste 1 byte pour obtenir le Content-Range
-       * Le serveur répond avec la taille totale sans envoyer le contenu complet
-       */
-      const rangeResponse = await fetch(file.url, {
-        headers: { Range: "bytes=0-0" },
-      });
+// ---------------------------------------------------------------------------
+// getFileSizes
+// ---------------------------------------------------------------------------
 
-      // Si le serveur supporte les Range requests
-      if (rangeResponse.status === 206) {
-        const contentRange = rangeResponse.headers.get("content-range");
-        if (contentRange) {
-          // Format: "bytes 0-0/total" - extrait la taille totale
-          const match = contentRange.match(/\/(\d+)$/);
-          if (match) {
-            const fileSize = parseInt(match[1], 10);
-            fileSizes.set(file.name, fileSize);
-            return;
-          }
-        }
-      }
-
-      /**
-       * Stratégie 2: Essaie HEAD request
-       * Certains serveurs retournent content-length même sans Range
-       * Mais on ne s'y fie pas entièrement (peut être faux)
-       */
-      const headResponse = await fetch(file.url, { method: "HEAD" });
-      const contentLength = headResponse.headers.get("content-length");
-
-      if (contentLength && parseInt(contentLength, 10) > 0) {
-        const fileSize = parseInt(contentLength, 10);
-        fileSizes.set(file.name, fileSize);
-        return;
-      }
-
-      /**
-       * Si aucune stratégie ne fonctionne: retourne 0 (taille inconnue)
-       * Ne télécharge PAS le fichier entièrement juste pour connaître la taille
-       * La taille réelle sera calculée pendant le téléchargement
-       */
-      fileSizes.set(file.name, 0);
-      console.warn(
-        `Could not determine reliable size for ${file.name} - will show unknown size`,
-      );
-    } catch (e) {
-      // En cas d'erreur, définit la taille à 0 (inconnue)
-      console.warn(`Error getting size for ${file.name}:`, e);
-      fileSizes.set(file.name, 0);
+/**
+ * Tente de récupérer la taille d'un fichier via Range ou HEAD.
+ * Retourne `null` si la taille ne peut pas être déterminée de manière fiable.
+ *
+ * @param file - Fichier dont on veut connaître la taille.
+ */
+async function fetchFileSize(file: File): Promise<number | null> {
+  try {
+    // Stratégie 1 : Range request — demande 1 byte pour lire Content-Range
+    const rangeRes = await fetch(file.url, { headers: { Range: "bytes=0-0" } });
+    if (rangeRes.status === 206) {
+      const match = rangeRes.headers.get("content-range")?.match(/\/(\d+)$/);
+      if (match) return parseInt(match[1], 10);
     }
-  });
 
-  // Attend que toutes les tailles soient récupérées
-  await Promise.all(sizePromises);
-  return fileSizes;
+    // Stratégie 2 : HEAD request
+    const headRes = await fetch(file.url, { method: "HEAD" });
+    const contentLength = headRes.headers.get("content-length");
+    if (contentLength) {
+      const size = parseInt(contentLength, 10);
+      if (size > 0) return size;
+    }
+  } catch (e) {
+    console.warn(`Impossible de récupérer la taille de ${file.name}:`, e);
+  }
+
+  return null;
 }
 
 /**
- * Gestionnaire de file d'attente pour téléchargements avec limite de concurrence
+ * Récupère les tailles de plusieurs fichiers en parallèle.
+ * Les fichiers dont la taille est inconnue sont associés à `null`.
  *
- * @template T - Type des éléments à télécharger
- * @param items - Liste des éléments à traiter
- * @param downloadFn - Fonction asynchrone qui traite chaque élément
- * @param maxConcurrent - Nombre maximum de téléchargements parallèles (défaut: 6)
- *
- * Fonctionnement:
- * - Traite jusqu'à `maxConcurrent` éléments en parallèle
- * - Démarre automatiquement les éléments en attente quand un se termine
- * - Utilise Promise.race pour gérer efficacement les promesses
+ * @param files - Liste des fichiers.
+ * @returns Map `name → taille en bytes | null`.
  */
-async function downloadWithConcurrencyLimit<T>(
+export async function getFileSizes(
+  files: File[]
+): Promise<Map<string, number | null>> {
+  const entries = await Promise.all(
+    files.map(async (file) => {
+      const size = await fetchFileSize(file);
+      return [file.name, size] as [string, number | null];
+    })
+  );
+  return new Map(entries);
+}
+
+// ---------------------------------------------------------------------------
+// Concurrency limiter
+// ---------------------------------------------------------------------------
+
+/**
+ * Exécute une liste de tâches asynchrones avec une limite de concurrence.
+ *
+ * @param items       - Éléments à traiter.
+ * @param fn          - Tâche asynchrone appliquée à chaque élément.
+ * @param maxConcurrent - Nombre maximum de tâches parallèles.
+ */
+async function withConcurrencyLimit<T>(
   items: T[],
-  downloadFn: (item: T, index: number) => Promise<void>,
-  maxConcurrent: number = MAX_CONCURRENT_DOWNLOADS,
-) {
-  // Copie la liste des éléments à traiter
+  fn: (item: T) => Promise<void>,
+  maxConcurrent: number
+): Promise<void> {
   const queue = [...items];
-  // Ensemble contenant les promesses actuellement en cours
-  const inProgress = new Set<Promise<void>>();
+  const running = new Set<Promise<void>>();
+
+  const runNext = async (): Promise<void> => {
+    if (queue.length === 0) return;
+
+    const item = queue.shift()!;
+    const task = fn(item).finally(() => {
+      running.delete(task);
+    });
+
+    running.add(task);
+
+    // Si la limite est atteinte, attend qu'une tâche se libère
+    if (running.size >= maxConcurrent) {
+      await Promise.race(running);
+    }
+
+    return runNext();
+  };
+
+  // Lance jusqu'à maxConcurrent tâches en parallèle
+  const initialBatch = Array.from(
+    { length: Math.min(maxConcurrent, items.length) },
+    () => runNext()
+  );
+
+  await Promise.all(initialBatch);
+  // Attend la fin de toutes les tâches encore en cours
+  await Promise.all(running);
+}
+
+// ---------------------------------------------------------------------------
+// downloadZip
+// ---------------------------------------------------------------------------
+
+/**
+ * Télécharge une liste de fichiers et les compresse dans une archive ZIP.
+ *
+ * **Structure du ZIP avec métadonnées :**
+ * ```
+ * export.zip
+ * ├── LHD_FXX_0656_6861/
+ * │   ├── LHD_FXX_0656_6861.laz
+ * │   └── LHD_FXX_0656_6861.json
+ * └── LHD_FXX_0657_6862/
+ *     ├── LHD_FXX_0657_6862.laz
+ *     └── LHD_FXX_0657_6862.json
+ * ```
+ *
+ * **Sans métadonnées :** les fichiers sont placés à la racine du ZIP.
+ *
+ * **Progression :**
+ * - Si toutes les tailles sont connues : progression en bytes (précise).
+ * - Si certaines tailles sont inconnues : progression en nombre de fichiers
+ *   terminés (approximative).
+ *
+ * @param files      - Fichiers à télécharger (avec métadonnées optionnelles).
+ * @param onProgress - Callback de progression (0–100).
+ * @param fileSizes  - Tailles pré-calculées (optionnel, évite un aller-réseau).
+ */
+export async function downloadZip(
+  files: FileWithMetadata[],
+  onProgress?: (progress: number) => void,
+  fileSizes?: Map<string, number | null>
+): Promise<void> {
+  const zip = new JSZip();
+
+  // Récupère les tailles si non fournies
+  const sizeMap = fileSizes ?? (await getFileSizes(files));
+
+  // Détermine si on peut faire une progression en bytes
+  const knownSizes = files
+    .map((f) => sizeMap.get(f.name) ?? null)
+    .filter((s): s is number => s !== null);
+
+  const allSizesKnown =
+    knownSizes.length === files.length && knownSizes.every((s) => s > 0);
+
+  const totalBytes = allSizesKnown
+    ? knownSizes.reduce((a, b) => a + b, 0)
+    : 0;
+
+  let loadedBytes = 0;
+  let completedFiles = 0;
 
   /**
-   * Traite les éléments de la file d'attente
-   * S'exécute récursivement jusqu'à ce que tout soit traité
+   * Met à jour la progression.
+   * - Mode bytes : progression précise basée sur les bytes téléchargés.
+   * - Mode fichiers : progression basée sur le nombre de fichiers terminés.
    */
-  const processNext = async () => {
-    // Arrête si la file est vide et aucun téléchargement en cours
-    if (queue.length === 0 && inProgress.size === 0) {
-      return;
-    }
+  const updateProgress = (chunkSize = 0) => {
+    if (!onProgress) return;
 
-    // Lance les téléchargements jusqu'à atteindre la limite de concurrence
-    while (inProgress.size < maxConcurrent && queue.length > 0) {
-      // Récupère le prochain élément de la file
-      const item = queue.shift();
-      if (!item) break;
-
-      // Récupère l'index original de l'élément dans la liste
-      const index = items.indexOf(item);
-
-      // Crée la promesse de téléchargement et l'ajoute au suivi
-      const promise = downloadFn(item, index).then(() => {
-        // Retire la promesse du suivi quand elle est terminée
-        inProgress.delete(promise);
-        // Traite les éléments en attente
-        return processNext();
-      });
-
-      inProgress.add(promise);
-    }
-
-    // Si des téléchargements sont en cours, attend qu'un se termine
-    if (inProgress.size > 0) {
-      // Promise.race attend que la première promesse se termine
-      await Promise.race(inProgress);
-      // Traite les éléments suivants
-      return processNext();
+    if (allSizesKnown && totalBytes > 0) {
+      loadedBytes += chunkSize;
+      // Plafonne à 99% — le dernier % est réservé à la génération du ZIP
+      onProgress(Math.min((loadedBytes / totalBytes) * 100, 99));
+    } else {
+      onProgress(Math.min((completedFiles / files.length) * 99, 99));
     }
   };
 
-  // Lance le traitement de la file d'attente
-  await processNext();
-}
+  // ---------------------------------------------------------------------------
+  // Téléchargement des fichiers
+  // ---------------------------------------------------------------------------
 
-/**
- * Télécharge et compresse des fichiers en archive ZIP
- *
- * @param files - Tableau des fichiers à télécharger
- * @param onProgress - Callback optionnel pour suivre la progression (0-100)
- * @param fileSizes - Map des tailles de fichiers (optionnel, pour réutiliser les tailles précalculées)
- *
- * Processus:
- * 1. Utilise les tailles pré-calculées si fournies, sinon les récupère
- * 2. Télécharge les fichiers avec contrôle de concurrence
- * 3. Compresse tout en archive ZIP
- * 4. Sauvegarde le fichier téléchargé
- */
-export async function downloadZip(
-  files: File[],
-  onProgress?: (progress: number) => void,
-  fileSizes?: Map<string, number>,
-) {
-  // Crée une instance JSZip pour construire l'archive
-  const zip = new JSZip();
-
-  // Compteurs pour le suivi de la progression
-  let totalBytes = 0; // Taille totale de tous les fichiers
-  let loadedBytes = 0; // Taille actuellement téléchargée
-
-  // Utilise les tailles fournies ou les récupère
-  const sizeMap = fileSizes || (await getFileSizes(files));
-
-  // Calcule la taille totale à partir de la map
-  for (const size of sizeMap.values()) {
-    totalBytes += size;
-  }
-
-  /**
-   * Phase 1: Téléchargement des fichiers avec limite de concurrence
-   * Utilise la fonction downloadWithConcurrencyLimit pour gérer
-   * jusqu'à 6 téléchargements simultanés
-   */
-  await downloadWithConcurrencyLimit(
+  await withConcurrencyLimit(
     files,
     async (file) => {
-      try {
-        // Lance le téléchargement du fichier
-        const response = await fetch(file.url);
+      const response = await fetch(file.url);
 
-        // Vérifie que la requête a réussi
-        if (!response.ok) {
-          throw new Error(`HTTP ${response.status}`);
-        }
+      if (!response.ok) {
+        throw new Error(
+          `Erreur HTTP ${response.status} pour ${file.name}`
+        );
+      }
 
-        /**
-         * Récupère un lecteur pour streamer le contenu par chunks
-         * Évite de charger tout le fichier en mémoire d'un coup
-         */
-        const reader = response.body?.getReader();
-        if (!reader) {
-          // Fallback si le streaming n'est pas disponible
-          const blob = await response.blob();
-          zip.file(file.name, blob);
-          loadedBytes += blob.size;
-          updateProgress();
-          return;
-        }
+      // Détermine le chemin dans le ZIP
+      const hasMetadata = file.metadata != null;
+      const zipFolder = hasMetadata ? zip.folder(file.name)! : zip;
 
-        /**
-         * Lit le fichier par chunks (morceaux)
-         * Chaque chunk est environ 64KB par défaut
-         * Cela permet un suivi de progression plus fluide
-         */
+      // Lecture en streaming par chunks
+      const reader = response.body?.getReader();
+
+      let blob: Blob;
+
+      if (reader) {
         const chunks: Uint8Array[] = [];
+
         while (true) {
           const { done, value } = await reader.read();
           if (done) break;
-
-          // Ajoute le chunk à la liste
           chunks.push(value);
-          // Met à jour le compteur de bytes téléchargés
-          loadedBytes += value.length;
-          // Notifie la progression
-          updateProgress();
+          updateProgress(value.length);
         }
 
-        /**
-         * Crée un Blob à partir de tous les chunks
-         * et l'ajoute à l'archive ZIP
-         */
-        const blob = new Blob(chunks);
-        zip.file(file.name, blob);
-      } catch (error) {
-        // Log l'erreur et la propage (pour un possible traitement)
-        console.error(`Error downloading ${file.name}:`, error);
-        throw error;
+        blob = new Blob(chunks);
+      } else {
+        // Fallback sans streaming (pas de progression granulaire)
+        blob = await response.blob();
+        updateProgress(blob.size);
+      }
+
+      // Fichier de données dans le (sous-)dossier
+      zipFolder.file(file.name, blob);
+
+      // Fichier JSON de métadonnées dans le même sous-dossier
+      if (hasMetadata) {
+        zipFolder.file(
+          `${file.name}.json`,
+          JSON.stringify(
+            { name: file.name, url: file.url, metadata: file.metadata },
+            null,
+            2
+          )
+        );
+      }
+
+      completedFiles++;
+
+      // En mode fichiers, met à jour après chaque fichier terminé
+      if (!allSizesKnown) {
+        updateProgress();
       }
     },
-    MAX_CONCURRENT_DOWNLOADS,
+    MAX_CONCURRENT_DOWNLOADS
   );
 
-  /**
-   * Fonction interne pour mettre à jour la progression
-   * Calcule le pourcentage et appelle le callback si fourni
-   */
-  function updateProgress() {
-    if (totalBytes > 0) {
-      // Calcule le pourcentage (0-100)
-      const progress = (loadedBytes / totalBytes) * 100;
-      // Limite à 99% jusqu'à la génération du ZIP (qui fait passer à 100%)
-      onProgress?.(Math.min(progress, 99));
-    }
-  }
+  // ---------------------------------------------------------------------------
+  // Génération et sauvegarde du ZIP
+  // ---------------------------------------------------------------------------
 
-  /**
-   * Phase 2: Génération et sauvegarde de l'archive ZIP
-   * Marque la progression à 100%
-   */
   onProgress?.(100);
-
-  /**
-   * Génère le fichier ZIP blob avec tous les fichiers
-   * type: "blob" produit un Blob directement utilisable
-   */
   const zipBlob = await zip.generateAsync({ type: "blob" });
-
-  /**
-   * Sauvegarde le fichier ZIP sur l'ordinateur de l'utilisateur
-   * Utilise l'API FileSaver.js
-   */
   saveAs(zipBlob, "export.zip");
 }
