@@ -19,6 +19,9 @@ export const downloadModal = createModal({
 // Types
 // ---------------------------------------------------------------------------
 
+/** Nombre maximum de produits autorisés pour le téléchargement automatique (ZIP). */
+const MAX_PRODUITS_ZIP = 15;
+
 /** Méthode de téléchargement choisie par l'utilisateur. */
 type DownloadMethod = "all" | "file" | "";
 
@@ -302,6 +305,13 @@ const DownloadModal = () => {
    */
   const isSubmitDisabled = isMetadata && !selectValue;
 
+  /**
+   * Le téléchargement automatique est bloqué si plus de MAX_PRODUITS_ZIP
+   * produits sont sélectionnés. L'utilisateur doit utiliser les liens à la place.
+   */
+  const isTooManyProduits =
+    downloadMethod === "all" && produitCount > MAX_PRODUITS_ZIP;
+
   return (
     <downloadModal.Component
       title="Télécharger"
@@ -416,12 +426,22 @@ const DownloadModal = () => {
                 ]}
               />
 
-              {downloadMethod === "all" && (
+              {downloadMethod === "all"  && !isTooManyProduits && (
                 <p className="fr-message fr-message--warning">
                   <small>
                     Ce téléchargement peut nécessiter un certain temps.
                     Assurez-vous de disposer d'une connexion Internet stable
                     avant de continuer.
+                  </small>
+                </p>
+              )}
+
+              {isTooManyProduits && (
+                <p className="fr-message fr-message--error">
+                  <small>
+                    Le téléchargement automatique est limité à {MAX_PRODUITS_ZIP} produits.
+                    Vous en avez sélectionné {produitCount}. Utilisez les liens de
+                    téléchargement ou réduisez votre sélection.
                   </small>
                 </p>
               )}
@@ -440,7 +460,7 @@ const DownloadModal = () => {
             <Button
               priority="primary"
               type="submit"
-              disabled={isSubmitDisabled}
+              disabled={isSubmitDisabled || isTooManyProduits}
             >
               Télécharger
             </Button>
