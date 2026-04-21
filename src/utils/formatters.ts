@@ -9,10 +9,19 @@ interface NavigatorWithConnection extends Navigator {
 }
 
 export const formatBytes = (bytes = 0): string => {
-  if (!bytes) return "0 octets";
+  // Vérifie que bytes est un nombre valide et positif
+  if (!bytes || bytes < 0 || !Number.isFinite(bytes)) return "0 octets";
+  
   const k = 1024;
-  const sizes = ["octets", "KB", "MB", "GB"];
+  const sizes = ["octets", "KB", "MB", "GB", "TB"];
+  
+  // Calcule l'index de l'unité appropriée
   const i = Math.floor(Math.log(bytes) / Math.log(k));
   
-  return `${parseFloat((bytes / Math.pow(k, i)).toFixed(2))} ${sizes[i]}`;
+  // Sécurité: limite l'index à la taille du tableau
+  const safeIndex = Math.min(i, sizes.length - 1);
+  
+  // Formate et retourne la valeur
+  const value = parseFloat((bytes / Math.pow(k, safeIndex)).toFixed(2));
+  return `${value} ${sizes[safeIndex]}`;
 };

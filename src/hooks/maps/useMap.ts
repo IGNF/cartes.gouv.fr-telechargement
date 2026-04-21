@@ -144,7 +144,7 @@ export const useMap = (
       mapInstance.addInteraction(hoverInteractionChantier);
 
       const hoverInteractionProduit = new HoverPopupInteraction({
-        layer: produitLayer,
+        layer: selectionProduitLayer,
       });
       mapInstance.addInteraction(hoverInteractionProduit);
 
