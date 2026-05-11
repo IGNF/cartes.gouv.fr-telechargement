@@ -5,6 +5,80 @@ import { Dalle, FilterDate } from "../../assets/@types/types";
 type DalleLayer = any;
 type ChantierLayer = any;
 
+// Rate limiting constants
+const MAX_CONCURRENT_REQUESTS = 3;
+const MAX_REQUESTS_PER_SECOND = 10;
+
+// Queue pour gérer les requêtes de taille avec rate limiting
+interface SizeRequest {
+  url: string;
+  produitId: string;
+}
+
+let sizeQueue: SizeRequest[] = [];
+let isProcessingQueue = false;
+
+/**
+ * Traite la file d'attente des requêtes de taille avec rate limiting.
+ */
+async function processSizeQueue(): Promise<void> {
+  if (isProcessingQueue || sizeQueue.length === 0) return;
+  
+  isProcessingQueue = true;
+
+  try {
+    // Découpe en fenêtres de MAX_REQUESTS_PER_SECOND
+    const windows: SizeRequest[][] = [];
+    for (let i = 0; i < sizeQueue.length; i += MAX_REQUESTS_PER_SECOND) {
+      windows.push(sizeQueue.slice(i, i + MAX_REQUESTS_PER_SECOND));
+    }
+
+    sizeQueue = []; // Vider la queue après découpe
+
+    for (const window of windows) {
+      const windowStart = Date.now();
+
+      // Traite la fenêtre avec une limite de concurrence
+      const chunks = [];
+      for (let i = 0; i < window.length; i += MAX_CONCURRENT_REQUESTS) {
+        chunks.push(window.slice(i, i + MAX_CONCURRENT_REQUESTS));
+      }
+
+      for (const chunk of chunks) {
+        await Promise.all(
+          chunk.map(async (req) => {
+            try {
+              const res = await fetch(req.url, { method: "HEAD" });
+              const size = parseInt(res.headers.get("content-length") || "0", 10) || 0;
+              
+              // Utiliser useDalleStore pour mettre à jour le state
+              const store = useDalleStore.getState();
+              store.updateFileSize(req.url, size);
+            } catch (error) {
+              console.error("Erreur lors du calcul de la taille :", error);
+              const store = useDalleStore.getState();
+              store.updateFileSize(req.url, 0);
+            }
+          })
+        );
+      }
+
+      // Attendre le reste de la seconde si la fenêtre s'est terminée trop vite
+      const elapsed = Date.now() - windowStart;
+      const remaining = 1000 - elapsed;
+      if (remaining > 0 && windows.indexOf(window) < windows.length - 1) {
+        await new Promise((resolve) => setTimeout(resolve, remaining));
+      }
+    }
+  } finally {
+    isProcessingQueue = false;
+    // Continuer avec les nouvelles requêtes si elles ont été ajoutées
+    if (sizeQueue.length > 0) {
+      processSizeQueue();
+    }
+  }
+}
+
 type DalleStore = {
   selectedProduits: Dalle[];
   selectedProduitsFiltered: Dalle[]; // liste des produits selectionnées mis de coté après filtre
@@ -13,7 +87,8 @@ type DalleStore = {
   produitLayer: DalleLayer;
   chantierLayer: ChantierLayer;
   isMetadata: boolean;
-  setIsMetadata: (v: boolean) => void; // <-- ajout
+  setIsMetadata: (v: boolean) => void;
+  updateFileSize: (url: string, size: number) => void;
   addProduit: (dalle: Dalle) => void;
   addProduitLayer: (dalleLayer: DalleLayer) => void;
   addChantierLayer: (chantierLayer: ChantierLayer) => void;
@@ -35,6 +110,30 @@ export const useDalleStore = create<DalleStore>((set, get) => ({
   chantierLayer: null,
   isMetadata: false,
   setIsMetadata: (v: boolean) => set({ isMetadata: v }),
+  
+  /**
+   * Met à jour la taille d'un fichier et recalcule le total.
+   * Appelée par la queue de traitement des requêtes.
+   */
+  updateFileSize: (url: string, size: number) => {
+    set((state) => {
+      const newFileSizes = new Map(state.fileSizes);
+      newFileSizes.set(url, size);
+
+      // Recalculer le total
+      const sizes = Array.from(newFileSizes.values());
+      const allKnown = sizes.every((s) => s !== null && s > 0);
+      const newTotal = allKnown
+        ? sizes.reduce<number>((acc, s) => acc + (s ?? 0), 0)
+        : null;
+
+      return {
+        fileSizes: newFileSizes,
+        totalSize: newTotal,
+      };
+    });
+  },
+
   addProduit: (produit) => {
     const filter = useFilterStore.getState().filter;
      
@@ -47,41 +146,9 @@ export const useDalleStore = create<DalleStore>((set, get) => ({
         selectedProduits: [...state.selectedProduits, produit],
       }));
 
-      // Récupérer et stocker la taille du fichier
-      (async () => {
-        try {
-          const res = await fetch(produit.url, { method: "HEAD" });
-          const size = parseInt(res.headers.get("content-length") || "0", 10) || 0;
-          
-          set((state) => {
-            const newFileSizes = new Map(state.fileSizes);
-            newFileSizes.set(produit.url, size);
-            
-            // Recalculer le total
-            const sizes = Array.from(newFileSizes.values());
-            const allKnown = sizes.every((s) => s !== null && s > 0);
-            const newTotal = allKnown
-              ? sizes.reduce<number>((acc, s) => acc + (s ?? 0), 0)
-              : null;
-            
-            return {
-              fileSizes: newFileSizes,
-              totalSize: newTotal,
-            };
-          });
-        } catch (error) {
-          console.error("Erreur lors du calcul de la taille :", error);
-          // Définir la taille comme inconnue
-          set((state) => {
-            const newFileSizes = new Map(state.fileSizes);
-            newFileSizes.set(produit.url, 0);
-            return {
-              fileSizes: newFileSizes,
-              totalSize: null, // Au moins une taille est inconnue
-            };
-          });
-        }
-      })();
+      // Enqueuer la requête de taille
+      sizeQueue.push({ url: produit.url, produitId: produit.id });
+      processSizeQueue();
     }
     
     get().filteredProduits({
