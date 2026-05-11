@@ -1,7 +1,6 @@
 import { Interaction } from "ol/interaction";
 import { Layer } from "ol/layer";
 import { MapBrowserEvent } from "ol";
-import { getRemoteFileSize } from "../getRemoteFileSize";
 import { Dalle } from "../../assets/@types/types";
 
 /**

@@ -8,6 +8,8 @@ type ChantierLayer = any;
 type DalleStore = {
   selectedProduits: Dalle[];
   selectedProduitsFiltered: Dalle[]; // liste des produits selectionnées mis de coté après filtre
+  fileSizes: Map<string, number>; // cache des tailles de fichiers par URL
+  totalSize: number | null; // taille totale, null si au moins une taille est inconnue
   produitLayer: DalleLayer;
   chantierLayer: ChantierLayer;
   isMetadata: boolean;
@@ -27,6 +29,8 @@ type DalleStore = {
 export const useDalleStore = create<DalleStore>((set, get) => ({
   selectedProduits: [],
   selectedProduitsFiltered: [],
+  fileSizes: new Map(),
+  totalSize: null,
   produitLayer: null,
   chantierLayer: null,
   isMetadata: false,
@@ -34,15 +38,52 @@ export const useDalleStore = create<DalleStore>((set, get) => ({
   addProduit: (produit) => {
     const filter = useFilterStore.getState().filter;
      
-        if (
-          produit.timestamp >= filter.dateStart &&
-          produit.timestamp <= filter.dateEnd
-        ) {
-      
+    if (
+      (filter.dateStart === null || produit.timestamp >= filter.dateStart) &&
+      (filter.dateEnd === null || produit.timestamp <= filter.dateEnd)
+    ) {
+      // Ajouter le produit à la sélection
+      set((state) => ({
+        selectedProduits: [...state.selectedProduits, produit],
+      }));
+
+      // Récupérer et stocker la taille du fichier
+      (async () => {
+        try {
+          const res = await fetch(produit.url, { method: "HEAD" });
+          const size = parseInt(res.headers.get("content-length") || "0", 10) || 0;
+          
+          set((state) => {
+            const newFileSizes = new Map(state.fileSizes);
+            newFileSizes.set(produit.url, size);
+            
+            // Recalculer le total
+            const sizes = Array.from(newFileSizes.values());
+            const allKnown = sizes.every((s) => s !== null && s > 0);
+            const newTotal = allKnown
+              ? sizes.reduce<number>((acc, s) => acc + (s ?? 0), 0)
+              : null;
+            
+            return {
+              fileSizes: newFileSizes,
+              totalSize: newTotal,
+            };
+          });
+        } catch (error) {
+          console.error("Erreur lors du calcul de la taille :", error);
+          // Définir la taille comme inconnue
+          set((state) => {
+            const newFileSizes = new Map(state.fileSizes);
+            newFileSizes.set(produit.url, 0);
+            return {
+              fileSizes: newFileSizes,
+              totalSize: null, // Au moins une taille est inconnue
+            };
+          });
+        }
+      })();
+    }
     
-    set((state) => ({
-      selectedProduits: [...state.selectedProduits, produit],
-    }));}
     get().filteredProduits({
       dateStart: filter.dateStart,
       dateEnd: filter.dateEnd,
@@ -54,6 +95,10 @@ export const useDalleStore = create<DalleStore>((set, get) => ({
     set((state) => ({ chantierLayer: chantierLayer })),
   removeProduit: (id) => {
     get().produitLayer?.changed();
+    
+    // Récupérer l'URL du produit avant de le supprimer
+    const produit = get().selectedProduits.find((p) => p.id === id);
+    
     set((state) => ({
       selectedProduits: state.selectedProduits.filter(
         (produit) => produit.id !== id,
@@ -65,20 +110,48 @@ export const useDalleStore = create<DalleStore>((set, get) => ({
         (produit) => produit.id !== id,
       ),
     }));
+
+    // Retirer la taille du cache et recalculer le total
+    if (produit) {
+      set((state) => {
+        const newFileSizes = new Map(state.fileSizes);
+        newFileSizes.delete(produit.url);
+        
+        // Recalculer le total
+        if (newFileSizes.size === 0) {
+          return {
+            fileSizes: newFileSizes,
+            totalSize: null,
+          };
+        }
+        
+        const sizes = Array.from(newFileSizes.values());
+        const allKnown = sizes.every((s) => s !== null && s > 0);
+        const newTotal = allKnown
+          ? sizes.reduce<number>((acc, s) => acc + (s ?? 0), 0)
+          : null;
+        
+        return {
+          fileSizes: newFileSizes,
+          totalSize: newTotal,
+        };
+      });
+    }
   },
   removeAllProduits: () => {
     get().produitLayer?.changed();
     set({ selectedProduits: [] });
     set({ selectedProduitsFiltered: [] });
+    set({ fileSizes: new Map(), totalSize: null });
   },
   isProduitSelected: (id) =>
     get().selectedProduits.some((produit) => produit.id === id),
   filteredProduits: (filter) => {
-
-    get().selectedProduits.forEach((produit) => {
+    const produitsTmp = [...get().selectedProduits];
+    produitsTmp.forEach((produit) => {
       if (
-        produit.timestamp <= filter.dateStart ||
-        produit.timestamp >= filter.dateEnd
+        (filter.dateStart !== null && produit.timestamp <= filter.dateStart) ||
+        (filter.dateEnd !== null && produit.timestamp >= filter.dateEnd)
       ) {
         get().removeProduit(produit.id);
         set((state) => ({
@@ -96,7 +169,7 @@ export const useDalleStore = create<DalleStore>((set, get) => ({
 
         if (
           produit.timestamp >= dateStart &&
-          produit.timestamp <= filter.dateEnd
+          (filter.dateEnd === null || produit.timestamp <= filter.dateEnd)
         ) {
           // on réajoute les produits qui sont dans l'intervalle de date
           set((state) => ({
@@ -109,13 +182,48 @@ export const useDalleStore = create<DalleStore>((set, get) => ({
               (p) => p.id !== produit.id,
             ),
           }));
+
+          // Récupérer la taille du fichier
+          (async () => {
+            try {
+              const res = await fetch(produit.url, { method: "HEAD" });
+              const size = parseInt(res.headers.get("content-length") || "0", 10) || 0;
+              
+              set((state) => {
+                const newFileSizes = new Map(state.fileSizes);
+                newFileSizes.set(produit.url, size);
+                
+                // Recalculer le total
+                const sizes = Array.from(newFileSizes.values());
+                const allKnown = sizes.every((s) => s !== null && s > 0);
+                const newTotal = allKnown
+                  ? sizes.reduce<number>((acc, s) => acc + (s ?? 0), 0)
+                  : null;
+                
+                return {
+                  fileSizes: newFileSizes,
+                  totalSize: newTotal,
+                };
+              });
+            } catch (error) {
+              console.error("Erreur lors du calcul de la taille :", error);
+              set((state) => {
+                const newFileSizes = new Map(state.fileSizes);
+                newFileSizes.set(produit.url, 0);
+                return {
+                  fileSizes: newFileSizes,
+                  totalSize: null,
+                };
+              });
+            }
+          })();
         }
       } else {
         const dateStart = filter.dateStart;
 
         if (
           produit.timestamp >= dateStart &&
-          produit.timestamp <= filter.dateEnd
+          (filter.dateEnd === null || produit.timestamp <= filter.dateEnd)
         ) {
           // on réajoute les produits qui sont dans l'intervalle de date
           set((state) => ({
@@ -128,6 +236,41 @@ export const useDalleStore = create<DalleStore>((set, get) => ({
               (p) => p.id !== produit.id,
             ),
           }));
+
+          // Récupérer la taille du fichier
+          (async () => {
+            try {
+              const res = await fetch(produit.url, { method: "HEAD" });
+              const size = parseInt(res.headers.get("content-length") || "0", 10) || 0;
+              
+              set((state) => {
+                const newFileSizes = new Map(state.fileSizes);
+                newFileSizes.set(produit.url, size);
+                
+                // Recalculer le total
+                const sizes = Array.from(newFileSizes.values());
+                const allKnown = sizes.every((s) => s !== null && s > 0);
+                const newTotal = allKnown
+                  ? sizes.reduce<number>((acc, s) => acc + (s ?? 0), 0)
+                  : null;
+                
+                return {
+                  fileSizes: newFileSizes,
+                  totalSize: newTotal,
+                };
+              });
+            } catch (error) {
+              console.error("Erreur lors du calcul de la taille :", error);
+              set((state) => {
+                const newFileSizes = new Map(state.fileSizes);
+                newFileSizes.set(produit.url, 0);
+                return {
+                  fileSizes: newFileSizes,
+                  totalSize: null,
+                };
+              });
+            }
+          })();
         }
       }
     });

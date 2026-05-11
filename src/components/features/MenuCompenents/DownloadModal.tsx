@@ -123,6 +123,8 @@ const DownloadModal = () => {
 
   const selectedProduits: Dalle[] = useDalleStore((s) => s.selectedProduits);
   const isMetadata: boolean = useDalleStore((s) => s.isMetadata);
+  const storeFileSizes: Map<string, number> = useDalleStore((s) => s.fileSizes);
+  const storeTotalSize: number | null = useDalleStore((s) => s.totalSize);
 
   /** Option sélectionnée dans le <Select> de donnée associée. */
   const [selectValue, setSelectValue] = useState<string>("");
@@ -135,14 +137,6 @@ const DownloadModal = () => {
 
   /** Méthode de téléchargement choisie via les radio buttons. */
   const [downloadMethod, setDownloadMethod] = useState<DownloadMethod>("all");
-
-  /** Taille totale (en octets) des produits sélectionnés, null si inconnue. */
-  const [totalSize, setTotalSize] = useState<number | null>(null);
-
-  /** Cache des tailles individuelles, réutilisé lors du téléchargement ZIP. */
-  const [fileSizes, setFileSizes] = useState<Map<string, number | null>>(
-    new Map()
-  );
 
   /** Indique si un téléchargement ZIP est en cours. */
   const [isDownloadLoading, setIsDownloadLoading] = useState<boolean>(false);
@@ -159,45 +153,6 @@ const DownloadModal = () => {
    */
   const abortControllerRef = useRef<AbortController | null>(null);
 
-  // ---------------------------------------------------------------------------
-  // Effets
-  // ---------------------------------------------------------------------------
-
-  /**
-   * Récupère et met en cache les tailles des fichiers dès que la sélection change.
-   * `totalSize` reste `null` si au moins une taille est inconnue.
-   */
-  useEffect(() => {
-    const fetchFileSizes = async () => {
-      if (selectedProduits.length === 0) {
-        setTotalSize(null);
-        setFileSizes(new Map());
-        return;
-      }
-
-      try {
-        const sizes = await getFileSizes(
-          selectedProduits.map((p) => ({ url: p.url, name: p.name }))
-        );
-
-        setFileSizes(sizes);
-
-        const values = Array.from(sizes.values());
-        const allKnown = values.every((s) => s !== null && s > 0);
-
-        setTotalSize(
-          allKnown
-            ? values.reduce<number>((acc, s) => acc + (s ?? 0), 0)
-            : null
-        );
-      } catch (error) {
-        console.error("Erreur lors du calcul des tailles :", error);
-        setTotalSize(null);
-      }
-    };
-
-    fetchFileSizes();
-  }, [selectedProduits]);
 
   // ---------------------------------------------------------------------------
   // Handlers
@@ -239,7 +194,7 @@ const DownloadModal = () => {
           })),
           setDownloadProgress,
           setDownloadPhase,
-          fileSizes,
+          storeFileSizes,
           controller.signal
         );
       } catch (err) {
@@ -357,8 +312,8 @@ const DownloadModal = () => {
             {produitCount === 1
               ? "taille du fichier : "
               : "tailles totales des fichiers : "}
-            {totalSize !== null
-              ? formatBytes(totalSize)
+            {storeTotalSize !== null
+              ? formatBytes(storeTotalSize)
               : "Impossible de calculer la taille"}
           </p>
 

@@ -5,7 +5,6 @@ import { booleanIntersects } from "@turf/turf";
 import GeoJSON from "ol/format/GeoJSON";
 import { Polygon } from "ol/geom";
 import { Dalle } from "../../assets/@types/types";
-import { getRemoteFileSize } from "../getRemoteFileSize";
 
 /**
  * Interaction de sélection par polygone pour les entités d'une couche vectorielle.
