@@ -250,40 +250,8 @@ export const useDalleStore = create<DalleStore>((set, get) => ({
             ),
           }));
 
-          // Récupérer la taille du fichier
-          (async () => {
-            try {
-              const res = await fetch(produit.url, { method: "HEAD" });
-              const size = parseInt(res.headers.get("content-length") || "0", 10) || 0;
-              
-              set((state) => {
-                const newFileSizes = new Map(state.fileSizes);
-                newFileSizes.set(produit.url, size);
-                
-                // Recalculer le total
-                const sizes = Array.from(newFileSizes.values());
-                const allKnown = sizes.every((s) => s !== null && s > 0);
-                const newTotal = allKnown
-                  ? sizes.reduce<number>((acc, s) => acc + (s ?? 0), 0)
-                  : null;
-                
-                return {
-                  fileSizes: newFileSizes,
-                  totalSize: newTotal,
-                };
-              });
-            } catch (error) {
-              console.error("Erreur lors du calcul de la taille :", error);
-              set((state) => {
-                const newFileSizes = new Map(state.fileSizes);
-                newFileSizes.set(produit.url, 0);
-                return {
-                  fileSizes: newFileSizes,
-                  totalSize: null,
-                };
-              });
-            }
-          })();
+          // Enqueuer la requête de taille au lieu de la lancer directement
+          sizeQueue.push({ url: produit.url, produitId: produit.id });
         }
       } else {
         const dateStart = filter.dateStart;
@@ -304,43 +272,14 @@ export const useDalleStore = create<DalleStore>((set, get) => ({
             ),
           }));
 
-          // Récupérer la taille du fichier
-          (async () => {
-            try {
-              const res = await fetch(produit.url, { method: "HEAD" });
-              const size = parseInt(res.headers.get("content-length") || "0", 10) || 0;
-              
-              set((state) => {
-                const newFileSizes = new Map(state.fileSizes);
-                newFileSizes.set(produit.url, size);
-                
-                // Recalculer le total
-                const sizes = Array.from(newFileSizes.values());
-                const allKnown = sizes.every((s) => s !== null && s > 0);
-                const newTotal = allKnown
-                  ? sizes.reduce<number>((acc, s) => acc + (s ?? 0), 0)
-                  : null;
-                
-                return {
-                  fileSizes: newFileSizes,
-                  totalSize: newTotal,
-                };
-              });
-            } catch (error) {
-              console.error("Erreur lors du calcul de la taille :", error);
-              set((state) => {
-                const newFileSizes = new Map(state.fileSizes);
-                newFileSizes.set(produit.url, 0);
-                return {
-                  fileSizes: newFileSizes,
-                  totalSize: null,
-                };
-              });
-            }
-          })();
+          // Enqueuer la requête de taille au lieu de la lancer directement
+          sizeQueue.push({ url: produit.url, produitId: produit.id });
         }
       }
     });
+
+    // Traiter les requêtes de taille enqueues
+    processSizeQueue();
 
     get().produitLayer?.changed();
     get().chantierLayer?.changed();
