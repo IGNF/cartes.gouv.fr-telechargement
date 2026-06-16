@@ -35,7 +35,7 @@ export default function HistoryNavigation() {
     >
       <Button
         className="gpf-btn-icon"
-        iconId="fr-icon-arrow-left-s-line"
+        iconId="fr-icon-arrow-go-back-line"
         priority="tertiary"
         size="medium"
         onClick={() => stepHistory("undo")}
@@ -44,7 +44,7 @@ export default function HistoryNavigation() {
       />
       <Button
         className="gpf-btn-icon"
-        iconId="fr-icon-arrow-right-s-line"
+        iconId="fr-icon-arrow-go-forward-line"
         priority="tertiary"
         size="medium"
         onClick={() => stepHistory("redo")}
