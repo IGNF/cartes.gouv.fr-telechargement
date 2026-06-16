@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import useFilterStore from "./useFilterStore";
-import { Dalle, FilterDate } from "../../assets/@types/types";
+import { Dalle, FilterDate, HistoricItem } from "../../assets/@types/types";
 
 type DalleLayer = any;
 type ChantierLayer = any;
@@ -82,6 +82,8 @@ async function processSizeQueue(): Promise<void> {
 type DalleStore = {
   selectedProduits: Dalle[];
   selectedProduitsFiltered: Dalle[]; // liste des produits selectionnées mis de coté après filtre
+  historicPastItems: HistoricItem[];
+  historicFutureItems: HistoricItem[];
   fileSizes: Map<string, number>; // cache des tailles de fichiers par URL
   totalSize: number | null; // taille totale, null si au moins une taille est inconnue
   produitLayer: DalleLayer;
@@ -99,11 +101,15 @@ type DalleStore = {
   isProduitFiltered: (id: string) => boolean;
   isDalleHovered: (id: string) => boolean;
   setIsHovered: (id: string, isHovered: boolean) => void;
+  addHistoricItem: (item: HistoricItem) => void;
+  stepHistory: (action: "undo" | "redo") => void;
 };
 
 export const useDalleStore = create<DalleStore>((set, get) => ({
   selectedProduits: [],
   selectedProduitsFiltered: [],
+  historicPastItems: [],
+  historicFutureItems: [],
   fileSizes: new Map(),
   totalSize: null,
   produitLayer: null,
@@ -213,7 +219,7 @@ export const useDalleStore = create<DalleStore>((set, get) => ({
   },
   isProduitSelected: (id) =>
     get().selectedProduits.some((produit) => produit.id === id),
-  filteredProduits: (filter) => {
+  filteredProduits: (filter: FilterDate) => {
     const produitsTmp = [...get().selectedProduits];
     produitsTmp.forEach((produit) => {
       if (
@@ -298,6 +304,96 @@ export const useDalleStore = create<DalleStore>((set, get) => ({
     }));
     get().produitLayer?.changed();
   },
+  addHistoricItem: (item: HistoricItem) => {
+    set((state) => ({
+      historicPastItems: [...state.historicPastItems, item],
+      historicFutureItems: [],
+    }));
+  },
+  stepHistory: (action) => {
+    const { selectedProduits, historicPastItems, historicFutureItems } = get();
+
+    if (action === "undo") {
+      const lastHistoricItem = historicPastItems[historicPastItems.length - 1];
+      // Si le dernier élément historique est une action "filter", on réapplique le filtre correspondant
+      if (lastHistoricItem.action === "filter" && lastHistoricItem.filter) {
+        let currentFilter = useFilterStore.getState().filter;
+        useFilterStore.getState().setFilterOnChange(lastHistoricItem.filter);
+        get().filteredProduits(lastHistoricItem.filter);
+
+        set((state) => ({
+        historicPastItems: state.historicPastItems.slice(
+          0,
+          state.historicPastItems.length - 1,
+        ),
+        historicFutureItems: [...state.historicFutureItems, { action: "filter", filter: currentFilter }],
+      }));
+      }
+      // Si le dernier élément historique est une action "add", on retire les produits correspondants
+      else {
+        if (lastHistoricItem.action === "add" && lastHistoricItem.dalles) {
+          lastHistoricItem.dalles.forEach((dalle) => {
+            get().removeProduit(dalle.id);
+          });
+        }
+        // Si le dernier élément historique est une action "remove", on réajoute les produits correspondants
+        if (lastHistoricItem.action === "remove" && lastHistoricItem.dalles) {
+          lastHistoricItem.dalles.forEach((dalle) => {
+            get().addProduit(dalle);
+          });
+        }
+        // On met à jour les historiques après l'action
+        set((state) => ({
+          historicPastItems: state.historicPastItems.slice(
+            0,
+            state.historicPastItems.length - 1,
+          ),
+          historicFutureItems: [...state.historicFutureItems, lastHistoricItem],
+        }));
+      }
+    } else if (action === "redo") {
+      const nextHistoricItem = historicFutureItems[historicFutureItems.length - 1];
+      // Si le prochain élément historique est une action "filter", on réapplique le filtre correspondant
+      if (nextHistoricItem.action === "filter" && nextHistoricItem.filter) {
+        let currentFilter = useFilterStore.getState().filter;
+        useFilterStore.getState().setFilterOnChange(nextHistoricItem.filter);
+        get().filteredProduits(nextHistoricItem.filter);
+
+        set((state) => ({
+          historicFutureItems: state.historicFutureItems.slice(
+            0,
+            state.historicFutureItems.length - 1,
+          ),
+          historicPastItems: [...state.historicPastItems, { action: "filter", filter: currentFilter }],
+        }));
+      }
+      // Si le prochain élément historique est une action "add", on réajoute les produits correspondants
+      else {
+        if (nextHistoricItem.action === "add" && nextHistoricItem.dalles) {
+          nextHistoricItem.dalles.forEach((dalle) => {
+            get().addProduit(dalle);
+          });
+        }
+        // Si le prochain élément historique est une action "remove", on retire les produits correspondants
+        if (nextHistoricItem.action === "remove" && nextHistoricItem.dalles) {
+          nextHistoricItem.dalles.forEach((dalle) => {
+            get().removeProduit(dalle.id);
+          });
+        }
+        // On met à jour les historiques après l'action
+        set((state) => ({
+          historicFutureItems: state.historicFutureItems.slice(
+            0,
+            state.historicFutureItems.length - 1,
+          ),
+          historicPastItems: [...state.historicPastItems, nextHistoricItem],
+        }));
+      }
+    }
+
+    get().produitLayer?.changed();
+    get().chantierLayer?.changed();
+  }
 }));
 
 export default useDalleStore;

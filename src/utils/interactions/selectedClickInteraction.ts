@@ -13,6 +13,7 @@ export class SelectedClickInteraction extends Interaction {
   private addProduit: (produit: any) => void;
   private removeProduit: (id: string | number | undefined) => void;
   private setIsMetadata: (v: boolean) => void;
+  private addHistoricItem: (item: any) => void;
 
   constructor(
     selectionLayer: Layer<any>,
@@ -20,7 +21,8 @@ export class SelectedClickInteraction extends Interaction {
     isProduitSelected: (id: string | number | undefined) => boolean,
     addProduit: (produit: any) => void,
     removeProduit: (id: string | number | undefined) => void,
-    setIsMetadata: (v: boolean) => void
+    setIsMetadata: (v: boolean) => void,
+    addHistoricItem: (item: any) => void
   ) {
     super();
     this.selectionLayer = selectionLayer;
@@ -29,6 +31,7 @@ export class SelectedClickInteraction extends Interaction {
     this.addProduit = addProduit;
     this.removeProduit = removeProduit;
     this.setIsMetadata = setIsMetadata;
+    this.addHistoricItem = addHistoricItem;
   }
 
   /**
@@ -68,6 +71,10 @@ export class SelectedClickInteraction extends Interaction {
           timestamp: new Date(properties.timestamp).getTime(),
           metadata: properties.metadata,
         };
+        this.addHistoricItem({
+          action: "add",
+          dalles: [dalle],
+        });
         
         // Ajoute ou retire le produit en fonction de son état
         if (!this.isProduitSelected(dalle.id) && index === 0) {

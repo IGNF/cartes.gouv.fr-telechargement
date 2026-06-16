@@ -15,19 +15,21 @@ export class SelectedPolygonInteraction extends Interaction {
   private isProduitSelected: (id: string | number | undefined) => boolean;
   private addProduit: (produit: any) => void;
   private removeProduit: (id: string | number | undefined) => void;
+  private addHistoricItem: (item: any) => void;
 
   constructor(
     selectionLayer: any,
     isProduitSelected: (id: string | number | undefined) => boolean,
     addProduit: (produit: any) => void,
-    removeProduit: (id: string | number | undefined) => void
+    removeProduit: (id: string | number | undefined) => void,
+    addHistoricItem: (item: any) => void
   ) {
     super();
     this.selectionLayer = selectionLayer;
     this.isProduitSelected = isProduitSelected;
     this.addProduit = addProduit;
     this.removeProduit = removeProduit;
-
+    this.addHistoricItem = addHistoricItem;
     // Initialise l'interaction de dessin
     this.drawInteraction = new Draw({
       source: new VectorSource(), // Source temporaire pour le polygone dessiné
@@ -47,6 +49,7 @@ export class SelectedPolygonInteraction extends Interaction {
       const listAlreadyChecked: String[] = []; // Liste pour éviter de vérifier plusieurs fois la même entité
 
       // Parcourt les entités dans l'étendue du polygone dessiné
+      let featuresInExtent: Dalle[] = [];
       this.selectionLayer.getFeaturesInExtent(extent).forEach((feature) => {
         const featureExtent = feature.getGeometry().getExtent();
         const coords = [
@@ -81,7 +84,7 @@ export class SelectedPolygonInteraction extends Interaction {
             timestamp: new Date(properties.timestamp).getTime(),
             metadata: properties.metadata,
           };
-
+          featuresInExtent.push(dalle)
           listAlreadyChecked.push(dalle.id);
 
           if (!this.isProduitSelected(dalle.id)) {
@@ -91,7 +94,10 @@ export class SelectedPolygonInteraction extends Interaction {
           }
         }
       });
-
+      this.addHistoricItem({
+        action: "add",
+        dalles: featuresInExtent,
+      });
       // Rafraîchit la couche de sélection
       this.selectionLayer.getSource().changed();
     });

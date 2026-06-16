@@ -11,10 +11,14 @@ const Filter = ({ onClose } = {}) => {
     const resetFilter = useFilterStore((state) => state.resetFilter);
     const filter = useFilterStore((state) => state.filter);
     const filteredProduits = useDalleStore((state) => state.filteredProduits);
+    const addHistoricItem = useDalleStore((state) => state.addHistoricItem);
     const [resetKey, setResetKey] = useState(0);
     const handleReset = () => {
         resetFilter();        // logique store si nécessaire
-
+        addHistoricItem({
+            action: "filter",
+            filter: { dateStart: null, dateEnd: Date.now() },
+        });
         filteredProduits({ dateStart: null, dateEnd: Date.now() });   // re-applique les filtres
         setResetKey((k) => k + 1); // force le reset du composant enfant
     };

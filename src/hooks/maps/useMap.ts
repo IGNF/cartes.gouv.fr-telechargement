@@ -20,6 +20,7 @@ import { SelectedClickInteraction } from "../../utils/interactions/selectedClick
 import { HoverPopupInteraction } from "../../utils/interactions";
 import useDalleStore from "../store/useDalleStore";
 import useFilterStore from "../store/useFilterStore";
+import { add } from "ol/coordinate";
 
 export const useMap = (
   containerRef: React.RefObject<HTMLDivElement>,
@@ -29,7 +30,8 @@ export const useMap = (
   removeProduit: any,
   addProduitLayer: any,
   addChantierLayer: any,
-  setIsMetadata: any
+  setIsMetadata: any,
+  addHistoricItem: any
 ) => {
   const [map, setMap] = useState<Map | null>(null);
   const isProduitFiltered = useDalleStore((state) => state.isProduitFiltered);
@@ -122,7 +124,8 @@ export const useMap = (
         selectionProduitLayer,
         isProduitSelected,
         addProduit,
-        removeProduit
+        removeProduit,
+        addHistoricItem,
       ).getDrawInteraction();
       mapInstance.addInteraction(polygonInteraction);
       polygonInteraction.setActive(false);
@@ -133,7 +136,8 @@ export const useMap = (
         isProduitSelected,
         addProduit,
         removeProduit,
-        setIsMetadata
+        setIsMetadata,
+        addHistoricItem
       );
       mapInstance.addInteraction(clickInteraction);
       clickInteraction.setActive(true);
