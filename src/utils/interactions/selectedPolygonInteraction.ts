@@ -15,19 +15,21 @@ export class SelectedPolygonInteraction extends Interaction {
   private isProduitSelected: (id: string | number | undefined) => boolean;
   private addProduit: (produit: any) => void;
   private removeProduit: (id: string | number | undefined) => void;
+  private addHistoricStep: (item: any) => void;
 
   constructor(
     selectionLayer: any,
     isProduitSelected: (id: string | number | undefined) => boolean,
     addProduit: (produit: any) => void,
-    removeProduit: (id: string | number | undefined) => void
+    removeProduit: (id: string | number | undefined) => void,
+    addHistoricStep: (item: any) => void
   ) {
     super();
     this.selectionLayer = selectionLayer;
     this.isProduitSelected = isProduitSelected;
     this.addProduit = addProduit;
     this.removeProduit = removeProduit;
-
+    this.addHistoricStep = addHistoricStep;
     // Initialise l'interaction de dessin
     this.drawInteraction = new Draw({
       source: new VectorSource(), // Source temporaire pour le polygone dessiné
@@ -47,6 +49,8 @@ export class SelectedPolygonInteraction extends Interaction {
       const listAlreadyChecked: String[] = []; // Liste pour éviter de vérifier plusieurs fois la même entité
 
       // Parcourt les entités dans l'étendue du polygone dessiné
+      let featuresInExtentAdd: Dalle[] = [];
+      let featuresInExtentRemove: Dalle[] = [];
       this.selectionLayer.getFeaturesInExtent(extent).forEach((feature) => {
         const featureExtent = feature.getGeometry().getExtent();
         const coords = [
@@ -81,17 +85,26 @@ export class SelectedPolygonInteraction extends Interaction {
             timestamp: new Date(properties.timestamp).getTime(),
             metadata: properties.metadata,
           };
-
           listAlreadyChecked.push(dalle.id);
 
           if (!this.isProduitSelected(dalle.id)) {
             this.addProduit(dalle);
+
+          featuresInExtentAdd.push(dalle)
           } else {
             this.removeProduit(dalle.id);
+          featuresInExtentRemove.push(dalle)
           }
         }
       });
-
+      this.addHistoricStep([{
+        action: "add",
+        dalles: featuresInExtentAdd,
+      },
+      {
+        action: "remove",
+        dalles: featuresInExtentRemove,
+      }]);
       // Rafraîchit la couche de sélection
       this.selectionLayer.getSource().changed();
     });

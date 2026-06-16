@@ -11,3 +11,11 @@ export type FilterDate = { dateStart: number | null; dateEnd: number };
 
 
 export type File = { url: string; name: string };
+
+export type HistoricItem = {
+  action: "add" | "remove" | "filter";
+  dalles?: Dalle[];
+  filter?: FilterDate;
+};
+
+export type HistoricStep = HistoricItem[]

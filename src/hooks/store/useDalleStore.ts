@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import useFilterStore from "./useFilterStore";
-import { Dalle, FilterDate } from "../../assets/@types/types";
+import { Dalle, FilterDate, HistoricItem, HistoricStep } from "../../assets/@types/types";
 
 type DalleLayer = any;
 type ChantierLayer = any;
@@ -82,6 +82,8 @@ async function processSizeQueue(): Promise<void> {
 type DalleStore = {
   selectedProduits: Dalle[];
   selectedProduitsFiltered: Dalle[]; // liste des produits selectionnées mis de coté après filtre
+  historicPastSteps: HistoricStep[];
+  historicFutureSteps: HistoricStep[];
   fileSizes: Map<string, number>; // cache des tailles de fichiers par URL
   totalSize: number | null; // taille totale, null si au moins une taille est inconnue
   produitLayer: DalleLayer;
@@ -99,11 +101,15 @@ type DalleStore = {
   isProduitFiltered: (id: string) => boolean;
   isDalleHovered: (id: string) => boolean;
   setIsHovered: (id: string, isHovered: boolean) => void;
+  addHistoricStep: (step: HistoricStep) => void;
+  navigateHistory: (action: "undo" | "redo") => void;
 };
 
 export const useDalleStore = create<DalleStore>((set, get) => ({
   selectedProduits: [],
   selectedProduitsFiltered: [],
+  historicPastSteps: [],
+  historicFutureSteps: [],
   fileSizes: new Map(),
   totalSize: null,
   produitLayer: null,
@@ -213,7 +219,7 @@ export const useDalleStore = create<DalleStore>((set, get) => ({
   },
   isProduitSelected: (id) =>
     get().selectedProduits.some((produit) => produit.id === id),
-  filteredProduits: (filter) => {
+  filteredProduits: (filter: FilterDate) => {
     const produitsTmp = [...get().selectedProduits];
     produitsTmp.forEach((produit) => {
       if (
@@ -298,6 +304,99 @@ export const useDalleStore = create<DalleStore>((set, get) => ({
     }));
     get().produitLayer?.changed();
   },
+  addHistoricStep: (step: HistoricStep) => {
+    set((state) => ({
+      historicPastSteps: [...state.historicPastSteps, step],
+      historicFutureSteps: [],
+    }));
+  },
+  navigateHistory: (action) => {
+    const { selectedProduits, historicPastSteps, historicFutureSteps } = get();
+    if (action === "undo") {
+      const lastHistoricStep = historicPastSteps[historicPastSteps.length - 1];
+        // Si le dernier élément historique est une action "filter", on réapplique le filtre correspondant
+        if (lastHistoricStep[0].action === "filter" && lastHistoricStep[0].filter) {
+          let currentFilter = useFilterStore.getState().filter;
+          useFilterStore.getState().setFilterOnChange(lastHistoricStep[0].filter);
+          get().filteredProduits(lastHistoricStep[0].filter);
+
+          set((state) => ({
+          historicPastSteps: state.historicPastSteps.slice(
+            0,
+            state.historicPastSteps.length - 1,
+          ),
+          historicFutureSteps: [...state.historicFutureSteps, [{ action: "filter", filter: currentFilter }]],
+        }));
+      }
+      // Si le dernier élément historique est une action "add", on retire les produits correspondants
+      else {
+        lastHistoricStep.forEach((lastHistoricItem) => {
+          if (lastHistoricItem.action === "add" && lastHistoricItem.dalles) {
+            lastHistoricItem.dalles.forEach((dalle) => {
+              get().removeProduit(dalle.id);
+            });
+          }
+          // Si le dernier élément historique est une action "remove", on réajoute les produits correspondants
+          if (lastHistoricItem.action === "remove" && lastHistoricItem.dalles) {
+            lastHistoricItem.dalles.forEach((dalle) => {
+              get().addProduit(dalle);
+            });
+          }
+        });
+        // On met à jour les historiques après l'action
+        set((state) => ({
+          historicPastSteps: state.historicPastSteps.slice(
+            0,
+            state.historicPastSteps.length - 1,
+          ),
+          historicFutureSteps: [...state.historicFutureSteps, lastHistoricStep],
+        }));
+      }
+    } else if (action === "redo") {
+      const nextHistoricStep = historicFutureSteps[historicFutureSteps.length - 1];
+      // Si le prochain élément historique est une action "filter", on réapplique le filtre correspondant
+      if (nextHistoricStep[0].action === "filter" && nextHistoricStep[0].filter) {
+        let currentFilter = useFilterStore.getState().filter;
+        useFilterStore.getState().setFilterOnChange(nextHistoricStep[0].filter);
+        get().filteredProduits(nextHistoricStep[0].filter);
+
+        set((state) => ({
+          historicFutureSteps: state.historicFutureSteps.slice(
+            0,
+            state.historicFutureSteps.length - 1,
+          ),
+          historicPastSteps: [...state.historicPastSteps, [{ action: "filter", filter: currentFilter }]],
+        }));
+      }
+      // Si le prochain élément historique est une action "add", on réajoute les produits correspondants
+      else {
+        nextHistoricStep.forEach((nextHistoricItem) => {
+          if (nextHistoricItem.action === "add" && nextHistoricItem.dalles) {
+            nextHistoricItem.dalles.forEach((dalle) => {
+              get().addProduit(dalle);
+            });
+          }
+          // Si le prochain élément historique est une action "remove", on retire les produits correspondants
+          if (nextHistoricItem.action === "remove" && nextHistoricItem.dalles) {
+            nextHistoricItem.dalles.forEach((dalle) => {
+              get().removeProduit(dalle.id);
+            });
+          }
+        });
+        // On met à jour les historiques après l'action
+        set((state) => ({
+          historicFutureSteps: state.historicFutureSteps.slice(
+            0,
+            state.historicFutureSteps.length - 1,
+          ),
+          historicPastSteps: [...state.historicPastSteps, nextHistoricStep],
+        }));
+      }
+    }
+
+    get().produitLayer?.changed();
+    get().chantierLayer?.changed();
+  }
 }));
 
 export default useDalleStore;

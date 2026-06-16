@@ -8,6 +8,7 @@ import useDalleStore from "../../../hooks/store/useDalleStore";
 
 const SelectedTiles = ({ selectedDalles, onDownload, removeDalle, clearDalles }) => {
   const setIsHovered = useDalleStore((state) => state.setIsHovered);
+  const addHistoricStep = useDalleStore((state) => state.addHistoricStep);
   return (
     <div className="SelectedTilesContainer">
     <div className="SelectedTilesContainer-title">
@@ -26,7 +27,13 @@ const SelectedTiles = ({ selectedDalles, onDownload, removeDalle, clearDalles })
           <Button
             size="small"
             iconId="fr-icon-delete-line"
-            onClick={clearDalles}
+            onClick={() => {
+              clearDalles();
+              addHistoricStep([{
+                action: "remove",
+                dalles: [...selectedDalles],
+              }]);
+            }}
             priority="secondary"
             title="Effacer toutes les dalles sélectionnées"
             aria-label="Effacer toutes les dalles sélectionnées"
@@ -51,7 +58,13 @@ const SelectedTiles = ({ selectedDalles, onDownload, removeDalle, clearDalles })
               />
               <Button
                 iconId="fr-icon-delete-line"
-                onClick={() => removeDalle(dalle.id)}
+                onClick={() => {
+                  removeDalle(dalle.id);
+                  addHistoricStep([{
+                    action: "remove",
+                    dalles: [dalle],
+                  }]);
+                }}
                 priority="tertiary no outline"
                 size="small"
                 title={`Supprimer la dalle ${dalle.name}`}
