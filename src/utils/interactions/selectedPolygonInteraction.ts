@@ -49,7 +49,8 @@ export class SelectedPolygonInteraction extends Interaction {
       const listAlreadyChecked: String[] = []; // Liste pour éviter de vérifier plusieurs fois la même entité
 
       // Parcourt les entités dans l'étendue du polygone dessiné
-      let featuresInExtent: Dalle[] = [];
+      let featuresInExtentAdd: Dalle[] = [];
+      let featuresInExtentRemove: Dalle[] = [];
       this.selectionLayer.getFeaturesInExtent(extent).forEach((feature) => {
         const featureExtent = feature.getGeometry().getExtent();
         const coords = [
@@ -84,19 +85,25 @@ export class SelectedPolygonInteraction extends Interaction {
             timestamp: new Date(properties.timestamp).getTime(),
             metadata: properties.metadata,
           };
-          featuresInExtent.push(dalle)
           listAlreadyChecked.push(dalle.id);
 
           if (!this.isProduitSelected(dalle.id)) {
             this.addProduit(dalle);
+
+          featuresInExtentAdd.push(dalle)
           } else {
             this.removeProduit(dalle.id);
+          featuresInExtentRemove.push(dalle)
           }
         }
       });
       this.addHistoricItem({
         action: "add",
-        dalles: featuresInExtent,
+        dalles: featuresInExtentAdd,
+      });
+      this.addHistoricItem({
+        action: "remove",
+        dalles: featuresInExtentRemove,
       });
       // Rafraîchit la couche de sélection
       this.selectionLayer.getSource().changed();

@@ -22,7 +22,7 @@ export class SelectedClickInteraction extends Interaction {
     addProduit: (produit: any) => void,
     removeProduit: (id: string | number | undefined) => void,
     setIsMetadata: (v: boolean) => void,
-    addHistoricItem: (item: any) => void
+    addHistoricItem: (item: any) => void,
   ) {
     super();
     this.selectionLayer = selectionLayer;
@@ -40,7 +40,7 @@ export class SelectedClickInteraction extends Interaction {
    * @returns {boolean} - Retourne `true` pour continuer la propagation de l'événement.
    */
   public override handleEvent(
-    event: MapBrowserEvent<KeyboardEvent | WheelEvent | PointerEvent>
+    event: MapBrowserEvent<KeyboardEvent | WheelEvent | PointerEvent>,
   ): boolean {
     // Vérifie que l'événement est un clic
     if (event.type !== "click") {
@@ -62,28 +62,32 @@ export class SelectedClickInteraction extends Interaction {
           this.setIsMetadata(true);
         }
 
-
-        
-        const dalle : Dalle = {
+        const dalle: Dalle = {
           name: properties.name,
           url: properties.url,
           id: properties.id,
           timestamp: new Date(properties.timestamp).getTime(),
           metadata: properties.metadata,
         };
-        this.addHistoricItem({
-          action: "add",
-          dalles: [dalle],
-        });
-        
+
         // Ajoute ou retire le produit en fonction de son état
         if (!this.isProduitSelected(dalle.id) && index === 0) {
           this.addProduit(dalle);
-          
+
+          this.addHistoricItem({
+            action: "add",
+            dalles: [dalle],
+          });
+
           index++;
         } else {
           if (index === 0) {
             this.removeProduit(dalle.id);
+
+            this.addHistoricItem({
+              action: "remove",
+              dalles: [dalle],
+            });
             index++;
           }
         }
