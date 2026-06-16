@@ -21,15 +21,16 @@ const FilterDate = () => {
           type: 'date',
 
           onChange: (e) => {
+            addHistoricItem({
+              action: "filter",
+              filter: useFilterStore.getState().filter,
+            });
             setDateStart(new Date(e.target.value).getTime());
             filteredProduits({ dateStart: new Date(e.target.value).getTime(), dateEnd: dateEnd });
             setFilterOnChange({ dateStart: new Date(e.target.value).getTime(), dateEnd: dateEnd });
-            addHistoricItem({
-              action: "filter",
-              filter: filteredProduits({ dateStart: new Date(e.target.value).getTime(), dateEnd: dateEnd }),
-            });
+            
           },
-          value: dateStart ? new Date(dateStart).toISOString().slice(0, 10) : null,
+          value: useFilterStore.getState().filter.dateStart ? new Date(useFilterStore.getState().filter.dateStart).toISOString().slice(0, 10) : ''
         }}
         label="Date de début"
       />
@@ -39,15 +40,16 @@ const FilterDate = () => {
         nativeInputProps={{
           type: 'date',
           onChange: (e) => {
+            addHistoricItem({
+              action: "filter",
+              filter: useFilterStore.getState().filter,
+            });
             setDateEnd(new Date(e.target.value).getTime());
             filteredProduits({ dateStart: dateStart, dateEnd: new Date(e.target.value).getTime() });
             setFilterOnChange({ dateStart: dateStart, dateEnd: new Date(e.target.value).getTime() });
-            addHistoricItem({
-              action: "filter",
-              filter: filteredProduits({ dateStart: dateStart, dateEnd: new Date(e.target.value).getTime() }),
-            });
+            
           },
-          value: new Date(dateEnd).toISOString().slice(0, 10)
+          value: useFilterStore.getState().filter.dateEnd ? new Date(useFilterStore.getState().filter.dateEnd).toISOString().slice(0, 10) : ''
         }}
         label="Date de fin" />
     </div>
