@@ -13,7 +13,7 @@ export class SelectedClickInteraction extends Interaction {
   private addProduit: (produit: any) => void;
   private removeProduit: (id: string | number | undefined) => void;
   private setIsMetadata: (v: boolean) => void;
-  private addHistoricItem: (item: any) => void;
+  private addHistoricStep: (item: any) => void;
 
   constructor(
     selectionLayer: Layer<any>,
@@ -22,7 +22,7 @@ export class SelectedClickInteraction extends Interaction {
     addProduit: (produit: any) => void,
     removeProduit: (id: string | number | undefined) => void,
     setIsMetadata: (v: boolean) => void,
-    addHistoricItem: (item: any) => void,
+    addHistoricStep: (item: any) => void,
   ) {
     super();
     this.selectionLayer = selectionLayer;
@@ -31,7 +31,7 @@ export class SelectedClickInteraction extends Interaction {
     this.addProduit = addProduit;
     this.removeProduit = removeProduit;
     this.setIsMetadata = setIsMetadata;
-    this.addHistoricItem = addHistoricItem;
+    this.addHistoricStep = addHistoricStep;
   }
 
   /**
@@ -74,20 +74,20 @@ export class SelectedClickInteraction extends Interaction {
         if (!this.isProduitSelected(dalle.id) && index === 0) {
           this.addProduit(dalle);
 
-          this.addHistoricItem({
+          this.addHistoricStep([{
             action: "add",
             dalles: [dalle],
-          });
+          }]);
 
           index++;
         } else {
           if (index === 0) {
             this.removeProduit(dalle.id);
 
-            this.addHistoricItem({
+            this.addHistoricStep([{
               action: "remove",
               dalles: [dalle],
-            });
+            }]);
             index++;
           }
         }

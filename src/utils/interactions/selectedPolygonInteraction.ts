@@ -15,21 +15,21 @@ export class SelectedPolygonInteraction extends Interaction {
   private isProduitSelected: (id: string | number | undefined) => boolean;
   private addProduit: (produit: any) => void;
   private removeProduit: (id: string | number | undefined) => void;
-  private addHistoricItem: (item: any) => void;
+  private addHistoricStep: (item: any) => void;
 
   constructor(
     selectionLayer: any,
     isProduitSelected: (id: string | number | undefined) => boolean,
     addProduit: (produit: any) => void,
     removeProduit: (id: string | number | undefined) => void,
-    addHistoricItem: (item: any) => void
+    addHistoricStep: (item: any) => void
   ) {
     super();
     this.selectionLayer = selectionLayer;
     this.isProduitSelected = isProduitSelected;
     this.addProduit = addProduit;
     this.removeProduit = removeProduit;
-    this.addHistoricItem = addHistoricItem;
+    this.addHistoricStep = addHistoricStep;
     // Initialise l'interaction de dessin
     this.drawInteraction = new Draw({
       source: new VectorSource(), // Source temporaire pour le polygone dessiné
@@ -97,14 +97,14 @@ export class SelectedPolygonInteraction extends Interaction {
           }
         }
       });
-      this.addHistoricItem({
+      this.addHistoricStep([{
         action: "add",
         dalles: featuresInExtentAdd,
-      });
-      this.addHistoricItem({
+      },
+      {
         action: "remove",
         dalles: featuresInExtentRemove,
-      });
+      }]);
       // Rafraîchit la couche de sélection
       this.selectionLayer.getSource().changed();
     });

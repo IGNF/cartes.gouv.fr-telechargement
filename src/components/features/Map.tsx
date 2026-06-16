@@ -21,7 +21,7 @@ const MapComponent = () => {
   const addProduitLayer = useDalleStore((state) => state.addProduitLayer);
   const addChantierLayer = useDalleStore((state) => state.addChantierLayer);
   const setIsMetadata = useDalleStore((state) => state.setIsMetadata);
-  const addHistoricItem = useDalleStore((state) => state.addHistoricItem);
+  const addHistoricStep = useDalleStore((state) => state.addHistoricStep);
 
   const mapContainerRef = useRef<HTMLDivElement>(null);
 
@@ -34,7 +34,7 @@ const MapComponent = () => {
     addProduitLayer,
     addChantierLayer,
     setIsMetadata,
-    addHistoricItem
+    addHistoricStep
   );
 
   return (

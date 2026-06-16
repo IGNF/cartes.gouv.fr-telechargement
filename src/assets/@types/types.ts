@@ -17,3 +17,5 @@ export type HistoricItem = {
   dalles?: Dalle[];
   filter?: FilterDate;
 };
+
+export type HistoricStep = HistoricItem[]

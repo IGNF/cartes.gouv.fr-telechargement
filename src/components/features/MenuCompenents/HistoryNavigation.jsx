@@ -4,9 +4,9 @@ import { Button } from "@codegouvfr/react-dsfr/Button";
 import useDalleStore from "../../../hooks/store/useDalleStore";
 
 export default function HistoryNavigation() {
-  const historicPastItems = useDalleStore((state) => state.historicPastItems);
-  const historicFutureItems = useDalleStore((state) => state.historicFutureItems);
-  const stepHistory = useDalleStore((state) => state.stepHistory);
+  const historicPastSteps = useDalleStore((state) => state.historicPastSteps);
+  const historicFutureSteps = useDalleStore((state) => state.historicFutureSteps);
+  const navigateHistory = useDalleStore((state) => state.navigateHistory);
   const [mapContainer, setMapContainer] = useState(null);
 
   useEffect(() => {
@@ -38,8 +38,8 @@ export default function HistoryNavigation() {
         iconId="fr-icon-arrow-go-back-line"
         priority="tertiary"
         size="medium"
-        onClick={() => stepHistory("undo")}
-        disabled={historicPastItems.length === 0}
+        onClick={() => navigateHistory("undo")}
+        disabled={historicPastSteps.length === 0}
         title="Annuler"
       />
       <Button
@@ -47,8 +47,8 @@ export default function HistoryNavigation() {
         iconId="fr-icon-arrow-go-forward-line"
         priority="tertiary"
         size="medium"
-        onClick={() => stepHistory("redo")}
-        disabled={historicFutureItems.length === 0}
+        onClick={() => navigateHistory("redo")}
+        disabled={historicFutureSteps.length === 0}
         title="Rétablir"
       />
     </div>

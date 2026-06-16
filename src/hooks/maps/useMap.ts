@@ -31,7 +31,7 @@ export const useMap = (
   addProduitLayer: any,
   addChantierLayer: any,
   setIsMetadata: any,
-  addHistoricItem: any
+  addHistoricStep: any
 ) => {
   const [map, setMap] = useState<Map | null>(null);
   const isProduitFiltered = useDalleStore((state) => state.isProduitFiltered);
@@ -125,7 +125,7 @@ export const useMap = (
         isProduitSelected,
         addProduit,
         removeProduit,
-        addHistoricItem,
+        addHistoricStep,
       ).getDrawInteraction();
       mapInstance.addInteraction(polygonInteraction);
       polygonInteraction.setActive(false);
@@ -137,7 +137,7 @@ export const useMap = (
         addProduit,
         removeProduit,
         setIsMetadata,
-        addHistoricItem
+        addHistoricStep
       );
       mapInstance.addInteraction(clickInteraction);
       clickInteraction.setActive(true);
