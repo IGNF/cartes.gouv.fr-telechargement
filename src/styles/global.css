@@ -172,3 +172,12 @@ opacity:0
 .ol-scale-line {
   left: 58px;
 }
+
+.bouton-cartes-gouv.fr-btn--tertiary {
+  background-color: var(--background-action-high-blue-france) !important;
+  color: var(--text-inverted-blue-france) !important;
+}
+
+.bouton-cartes-gouv.fr-btn--tertiary::before {
+  background-color: transparent !important;
+}
