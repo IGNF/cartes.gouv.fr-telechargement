@@ -24,7 +24,7 @@ const AppHeader: FC<AppHeaderProps> = ({ navItems = [] }) => {
                 </>
             }
             homeLinkProps={{
-                href: "/",
+                href: "https://cartes.gouv.fr/",
                 title: "Accueil - cartes.gouv.fr",
             }}
             operatorLogo={{
@@ -43,7 +43,7 @@ const AppHeader: FC<AppHeaderProps> = ({ navItems = [] }) => {
                     </Badge>
                 </>
             }
-            serviceTagline="Le service public des cartes et données du territoire"
+            serviceTagline="Notre territoire commun"
             quickAccessItems={[
                 <HeaderMenuHelp key="header-menu-help" />,
                 <HeaderMenuServices key="header-menu-services" />,
