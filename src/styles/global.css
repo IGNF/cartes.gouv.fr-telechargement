@@ -84,7 +84,7 @@ opacity:0
 
 .history-navigation-container {
   position: absolute;
-  top: calc(1rem + 300px);
+  top: calc(1rem + 118px);
   right: 1rem;
   z-index: 1000;
   display: inline-flex;
