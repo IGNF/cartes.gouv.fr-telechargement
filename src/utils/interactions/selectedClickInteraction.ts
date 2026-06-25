@@ -1,7 +1,6 @@
 import { Interaction } from "ol/interaction";
 import { Layer } from "ol/layer";
 import { MapBrowserEvent } from "ol";
-import { getRemoteFileSize } from "../getRemoteFileSize";
 import { Dalle } from "../../assets/@types/types";
 import { log } from "console";
 
@@ -15,6 +14,7 @@ export class SelectedClickInteraction extends Interaction {
   private addProduit: (produit: any) => void;
   private removeProduit: (id: string | number | undefined) => void;
   private setIsMetadata: (v: boolean) => void;
+  private addHistoricStep: (item: any) => void;
 
   constructor(
     selectionLayer: Layer<any>,
@@ -22,7 +22,8 @@ export class SelectedClickInteraction extends Interaction {
     isProduitSelected: (id: string | number | undefined) => boolean,
     addProduit: (produit: any) => void,
     removeProduit: (id: string | number | undefined) => void,
-    setIsMetadata: (v: boolean) => void
+    setIsMetadata: (v: boolean) => void,
+    addHistoricStep: (item: any) => void,
   ) {
     super();
     this.selectionLayer = selectionLayer;
@@ -31,6 +32,7 @@ export class SelectedClickInteraction extends Interaction {
     this.addProduit = addProduit;
     this.removeProduit = removeProduit;
     this.setIsMetadata = setIsMetadata;
+    this.addHistoricStep = addHistoricStep;
   }
 
   /**
@@ -39,7 +41,7 @@ export class SelectedClickInteraction extends Interaction {
    * @returns {boolean} - Retourne `true` pour continuer la propagation de l'événement.
    */
   public override handleEvent(
-    event: MapBrowserEvent<KeyboardEvent | WheelEvent | PointerEvent>
+    event: MapBrowserEvent<KeyboardEvent | WheelEvent | PointerEvent>,
   ): boolean {
     // Vérifie que l'événement est un clic
     if (event.type !== "click") {
@@ -61,27 +63,32 @@ export class SelectedClickInteraction extends Interaction {
           this.setIsMetadata(true);
         }
 
-        console.log(properties);
-        
-
-
-        
-        const dalle : Dalle = {
+        const dalle: Dalle = {
           name: properties.name,
           url: properties.url,
           id: properties.id,
           timestamp: new Date(properties.timestamp).getTime(),
           metadata: properties.metadata,
         };
-        
+
         // Ajoute ou retire le produit en fonction de son état
         if (!this.isProduitSelected(dalle.id) && index === 0) {
           this.addProduit(dalle);
-          
+
+          this.addHistoricStep([{
+            action: "add",
+            dalles: [dalle],
+          }]);
+
           index++;
         } else {
           if (index === 0) {
             this.removeProduit(dalle.id);
+
+            this.addHistoricStep([{
+              action: "remove",
+              dalles: [dalle],
+            }]);
             index++;
           }
         }

@@ -1,4 +1,5 @@
 name: 🐛 Signaler une anomalie
+projects: ["IGNF/83"]
 description: Aidez nous à améliorer cartes.gouv.fr en complétant ce rapport d'anomalie
 labels: [bug]
 body:

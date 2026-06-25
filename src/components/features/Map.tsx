@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import React, { useRef } from "react";
 import { useMap } from "../../hooks/maps/useMap";
 import { useDalleStore } from "../../hooks/store/useDalleStore";
 
@@ -9,10 +9,10 @@ import "geopf-extensions-openlayers/css/Dsfr.css";
 import "../../utils/controls/GeoJsonImportControl.css";
 import "../../utils/maps/controls/SelectionControl.css";
 import { getRouteApi } from "@tanstack/react-router";
-import { GeoJSON } from "ol/format";
-import SelectedOptions from "./MenuCompenents/SelectedOptions";
+import SelectedOptions from "./MenuCompenents/SelectedOptions.jsx";
 import GeoJsonImportModal from "./MenuCompenents/GeoJsonImportModal";
-import { set } from "ol/transform";
+import HistoryNavigation from "./MenuCompenents/HistoryNavigation.jsx";
+
 const route = getRouteApi("/telechargement/$downloadUrl");
 
 const MapComponent = () => {
@@ -24,20 +24,21 @@ const MapComponent = () => {
   const addProduitLayer = useDalleStore((state) => state.addProduitLayer);
   const addChantierLayer = useDalleStore((state) => state.addChantierLayer);
   const setIsMetadata = useDalleStore((state) => state.setIsMetadata);
+  const addHistoricStep = useDalleStore((state) => state.addHistoricStep);
 
   const mapContainerRef = useRef<HTMLDivElement>(null);
 
-useMap(
-    mapContainerRef,
+  useMap(
+    mapContainerRef as React.RefObject<HTMLDivElement>,
     downloadUrl,
     addProduit,
     isProduitSelected,
     removeDalle,
     addProduitLayer,
     addChantierLayer,
-    setIsMetadata
+    setIsMetadata,
+    addHistoricStep
   );
-
 
   return (
     <>
@@ -49,6 +50,7 @@ useMap(
       ></div>
 
       <GeoJsonImportModal />
+      <HistoryNavigation />
     </>
   );
 };
