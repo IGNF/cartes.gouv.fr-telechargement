@@ -1,32 +1,27 @@
 import { Interaction } from "ol/interaction";
-import { Layer } from "ol/layer";
 import { MapBrowserEvent } from "ol";
+import { Layer } from "ol/layer";
 import { Dalle } from "../../assets/@types/types";
 
-/**
- * Interaction de sélection par clic pour les entités d'une couche vectorielle.
- */
 export class SelectedClickInteraction extends Interaction {
   private selectionLayer: Layer<any>;
-  private zoomToGo: number;
   private isProduitSelected: (id: string | number | undefined) => boolean;
-  private addProduit: (produit: any) => void;
+  private addProduit: (produit: Dalle) => void;
   private removeProduit: (id: string | number | undefined) => void;
-  private setIsMetadata: (v: boolean) => void;
+  private setIsMetadata: (value: boolean) => void;
   private addHistoricStep: (item: any) => void;
 
   constructor(
     selectionLayer: Layer<any>,
-    zoomToGo: number = 10,
+    _zoomToGo: number,
     isProduitSelected: (id: string | number | undefined) => boolean,
-    addProduit: (produit: any) => void,
+    addProduit: (produit: Dalle) => void,
     removeProduit: (id: string | number | undefined) => void,
-    setIsMetadata: (v: boolean) => void,
+    setIsMetadata: (value: boolean) => void,
     addHistoricStep: (item: any) => void,
   ) {
     super();
     this.selectionLayer = selectionLayer;
-    this.zoomToGo = zoomToGo;
     this.isProduitSelected = isProduitSelected;
     this.addProduit = addProduit;
     this.removeProduit = removeProduit;
@@ -34,96 +29,37 @@ export class SelectedClickInteraction extends Interaction {
     this.addHistoricStep = addHistoricStep;
   }
 
-  /**
-   * Gère l'événement de clic pour la sélection.
-   * @param event - L'événement de clic de la carte.
-   * @returns {boolean} - Retourne `true` pour continuer la propagation de l'événement.
-   */
   public override handleEvent(
     event: MapBrowserEvent<KeyboardEvent | WheelEvent | PointerEvent>,
   ): boolean {
-    // Vérifie que l'événement est un clic
-    if (event.type !== "click") {
-      return true; // Continue la propagation pour les autres types d'événements
-    }
+    if (event.type !== "click") return true;
 
-    const map = event.map;
-    const pixel = map.getEventPixel(event.originalEvent);
+    const pixel = event.map.getEventPixel(event.originalEvent);
+    event.map.forEachFeatureAtPixel(pixel, (feature) => {
+      const properties = feature.getProperties();
+      if (properties.metadata !== undefined) this.setIsMetadata(true);
 
-    let index = 0;
+      const dalle: Dalle = {
+        name: properties.name,
+        url: properties.url,
+        id: properties.id,
+        timestamp: new Date(properties.timestamp).getTime(),
+        metadata: properties.metadata,
+      };
 
-    // Parcourt les entités sous le clic
-    map.forEachFeatureAtPixel(pixel, (feature, layer) => {
-      if (
-        layer?.getSource()["key_"] === this.selectionLayer.getSource()["key_"]
-      ) {
-        const properties = feature.getProperties();
-        if (properties.metadata !== undefined) {
-          this.setIsMetadata(true);
-        }
-
-        const dalle: Dalle = {
-          name: properties.name,
-          url: properties.url,
-          id: properties.id,
-          timestamp: new Date(properties.timestamp).getTime(),
-          metadata: properties.metadata,
-        };
-
-        // Ajoute ou retire le produit en fonction de son état
-        if (!this.isProduitSelected(dalle.id) && index === 0) {
-          this.addProduit(dalle);
-
-          this.addHistoricStep([{
-            action: "add",
-            dalles: [dalle],
-          }]);
-
-          index++;
-        } else {
-          if (index === 0) {
-            this.removeProduit(dalle.id);
-
-            this.addHistoricStep([{
-              action: "remove",
-              dalles: [dalle],
-            }]);
-            index++;
-          }
-        }
-
-        // Déplace la carte de manière imperceptible
-        this.moveMapImperceptibly(map);
+      if (this.isProduitSelected(dalle.id)) {
+        this.removeProduit(dalle.id);
+        this.addHistoricStep([{ action: "remove", dalles: [dalle] }]);
+      } else {
+        this.addProduit(dalle);
+        this.addHistoricStep([{ action: "add", dalles: [dalle] }]);
       }
+
+      return true;
+    }, {
+      layerFilter: (layer) => layer === this.selectionLayer,
     });
 
-    // Rafraîchit la couche de sélection
-    this.selectionLayer.changed();
-
-    return true; // Continue la propagation de l'événement
-  }
-
-  /**
-   * Déplace la carte de manière imperceptible en ajustant légèrement le centre.
-   * @param map - L'instance de la carte.
-   */
-  private moveMapImperceptibly(map: any): void {
-    const view = map.getView();
-    const currentCenter = view.getCenter();
-
-    if (currentCenter) {
-      // Ajoute un léger décalage au centre actuel
-      const imperceptibleOffset = 0.00001; // Ajustez cette valeur si nécessaire
-      const newCenter = [
-        currentCenter[0] + imperceptibleOffset,
-        currentCenter[1] + imperceptibleOffset,
-      ];
-
-      // Anime la vue vers le nouveau centre
-      view.animate({
-        center: newCenter,
-        duration: 100, // Animation rapide (0.1 seconde)
-      });
-    }
+    return true;
   }
 }

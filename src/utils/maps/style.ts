@@ -51,6 +51,16 @@ const styleDalle = {
   },
 };
 
+const styles = Object.fromEntries(
+  Object.entries(styleDalle).map(([type, config]) => [
+    type,
+    new Style({
+      fill: config.fill,
+      stroke: config.stroke,
+    }),
+  ]),
+) as Record<keyof typeof styleDalle, Style>;
+
 /**
  * Génère un style OpenLayers basé sur le type d'interaction ou d'état.
  *
@@ -59,11 +69,7 @@ const styleDalle = {
  * @returns Un objet `Style` configuré pour OpenLayers.
  */
 export const getStyleForDalle = (type: keyof typeof styleDalle): Style => {
-  const config = styleDalle[type];
-  return new Style({
-    fill: config.fill,
-    stroke: config.stroke,
-  });
+  return styles[type];
 };
 
 /**
@@ -75,15 +81,7 @@ export const getStyleForBlocs = (feature: any) => {
   const isHovered = feature.get("hovered");
 
   if (isHovered) {
-    const config = styleDalle["hovered"];
-    return new Style({
-      fill: config.fill,
-      stroke: config.stroke,
-    });
+    return styles.hovered;
   }
-  const config = styleDalle["default"];
-  return new Style({
-    fill: config.fill,
-    stroke: config.stroke,
-  });
+  return styles.default;
 };
