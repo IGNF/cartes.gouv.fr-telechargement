@@ -175,7 +175,7 @@ onUnmounted(() => {
 .history-navigation-container {
   position: absolute;
   right: 1rem;
-  z-index: 1000;
+  z-index: 1;
   display: inline-flex;
   flex-direction: column;
   gap: 0.375rem;
