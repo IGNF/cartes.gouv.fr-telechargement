@@ -223,7 +223,7 @@ watch([startDate, endDate], applyFilter);
 <style>
 .menu {
   display: flex;
-  height: 604px;
+  height: 80vh;
   padding: 24px 16px;
   flex-direction: column;
   align-items: center;
@@ -309,6 +309,7 @@ watch([startDate, endDate], applyFilter);
   width: 100%;
   padding: 1rem;
   flex-direction: column;
+  overflow-y: auto;
 }
 
 .SelectedTilesContainer-title {
@@ -322,7 +323,6 @@ watch([startDate, endDate], applyFilter);
 
 .SelectedTilesContainer ul {
   width: 100%;
-  max-height: 288px;
   padding: 0;
   margin: 1rem 0;
   overflow-y: auto;
