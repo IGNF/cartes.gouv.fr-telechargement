@@ -2,9 +2,27 @@
   "compilerOptions": {
     "strict": true,
     "esModuleInterop": true,
-    "jsx": "react-jsx",
     "target": "ESNext",
     "module": "ESNext",
-    "moduleResolution": "Bundler"
-  }
+    "moduleResolution": "Bundler",
+    "types": [
+      "vite/client"
+    ],
+    "jsx": "preserve",
+    "skipLibCheck": true
+  },
+  "include": [
+    "src/main.ts",
+    "src/router.ts",
+    "src/App.vue",
+    "src/views/**/*.vue",
+    "src/components/OpenLayersMap.vue",
+    "src/components/DownloadPanel.vue",
+    "src/stores/**/*.ts",
+    "src/utils/download.tsx",
+    "src/utils/formatters.ts",
+    "src/utils/interactions/selectedClickInteraction.ts",
+    "src/utils/interactions/selectedPolygonInteraction.ts",
+    "src/utils/maps/**/*.ts"
+  ]
 }

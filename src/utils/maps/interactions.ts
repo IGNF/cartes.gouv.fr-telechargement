@@ -2,7 +2,7 @@ import { Map } from "ol";
 import { FeatureLike } from "ol/Feature";
 import { getStyleForDalle } from "./style";
 import { Select } from "ol/interaction";
-import {  getCenter } from "ol/extent";
+import { getCenter } from "ol/extent";
 import proj4 from "proj4";
 import { register } from "ol/proj/proj4";
 import { Draw } from "ol/interaction";
@@ -77,18 +77,24 @@ export const addHoveredInteraction = (
  */
 export const addZoomInteraction = (map: Map, layer: any, zoomToGo: number) => {
   map.on("singleclick", (event) => {
+    const view = map.getView();
+    const currentZoom = view.getZoom() ?? 0;
+    if (currentZoom >= zoomToGo) return;
+
     const feature = map.forEachFeatureAtPixel(
       event.pixel,
       (feature, layerCandidate) => {
         return layerCandidate === layer ? feature : null;
-      }
+      },
+      {
+        layerFilter: (layerCandidate) => layerCandidate === layer,
+      },
     );
     if (feature) {
       const geometry = feature.getGeometry(); // on vérifie qu'on a une géométrie pour zoomer dessus
       if (!geometry) return;
       const extent = getCenter(geometry.getExtent());
-      const view = map.getView();
-      view.animate({zoom:zoomToGo,duration:1000,anchor:extent})
+      view.animate({ zoom: zoomToGo, duration: 1000, anchor: extent })
       // view.fit(extent, {
       //   duration: 1000,
       //   easing: easeOut,
@@ -114,14 +120,14 @@ export const addSelectedProduitInteraction = (
     map.forEachFeatureAtPixel(pixel, function (feature, layer) {
       if (index === 0) {
         if (layer.getMaxZoom() === 16) {
-            handleFeatureClick(
-              feature.getProperties().name,
-              feature.getProperties().url,
-              feature.getProperties().id,
-              isProduitSelected,
-              addProduit,
-              removeProduit
-            );
+          handleFeatureClick(
+            feature.getProperties().name,
+            feature.getProperties().url,
+            feature.getProperties().id,
+            isProduitSelected,
+            addProduit,
+            removeProduit
+          );
 
           centerOnFeatureSmooth(map, feature);
           index += 1;
