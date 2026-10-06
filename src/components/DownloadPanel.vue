@@ -60,7 +60,7 @@ function downloadLinks() {
   URL.revokeObjectURL(url);
 
   if (dalleStore.isMetadata && associatedData.value === "with-metadata") {
-    const metadata = Object.fromEntries(selectedProduits.value.map((produit) => [produit.name, { url: produit.url, metadata: produit.metadata ?? {} }]));
+    const metadata = Object.fromEntries(selectedProduits.value.map((produit) => [produit.name_download, { url: produit.url, metadata: produit.metadata ?? {} }]));
     const metadataUrl = URL.createObjectURL(new Blob([JSON.stringify(metadata, null, 2)], { type: "application/json" }));
     const metadataLink = document.createElement("a");
     metadataLink.href = metadataUrl;
@@ -102,6 +102,7 @@ async function submitDownload() {
     const files = selectedProduits.value.map((produit) => ({
       url: produit.url,
       name: produit.name,
+      name_download: produit.name_download,
       ...(associatedData.value === "with-metadata" && produit.metadata ? { metadata: produit.metadata } : {}),
     }));
     await downloadZip(files, (progress) => { downloadProgress.value = progress; }, (phase) => { downloadPhase.value = phase; }, fileSizes.value, abortController.signal);

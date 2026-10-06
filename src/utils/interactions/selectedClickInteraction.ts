@@ -36,15 +36,25 @@ export class SelectedClickInteraction extends Interaction {
 
     const pixel = event.map.getEventPixel(event.originalEvent);
     event.map.forEachFeatureAtPixel(pixel, (feature) => {
+      console.log(feature);
       const properties = feature.getProperties();
       if (properties.metadata !== undefined) this.setIsMetadata(true);
-
+      console.log(properties);
+      
+      let metadata;
+      try {
+        metadata = JSON.parse(properties.metadata);
+      } catch {
+        metadata = properties.metadata;
+      }
+      
       const dalle: Dalle = {
         name: properties.name,
+        name_download: properties.name_download || properties.name,
         url: properties.url,
         id: properties.id,
         timestamp: new Date(properties.timestamp).getTime(),
-        metadata: properties.metadata,
+        metadata: metadata,
       };
 
       if (this.isProduitSelected(dalle.id)) {

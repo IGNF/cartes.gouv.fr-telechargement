@@ -359,7 +359,7 @@ export async function downloadZip(
         stopTicker();
       }
 
-      zipFolder.file(file.name, blob);
+      zipFolder.file(file.name_download, blob);
 
       if (hasMetadata) {
         zipFolder.file(
