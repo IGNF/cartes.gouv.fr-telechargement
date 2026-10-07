@@ -3,6 +3,7 @@ export type Dalle = {
   name: string;
   url: string;
   timestamp: number;
+  name_download: string;
   metadata?: Record<string, any>;
   isHovered?: boolean;
 };
@@ -10,7 +11,7 @@ export type Dalle = {
 export type FilterDate = { dateStart: number | null; dateEnd: number };
 
 
-export type File = { url: string; name: string };
+export type File = { url: string; name: string, name_download: string };
 
 export type HistoricItem = {
   action: "add" | "remove" | "filter";
