@@ -27,7 +27,7 @@
     "@vitejs/plugin-vue": "^6.0.8",
     "cartes.gouv.fr-vue-components": "github:IGNF/cartes.gouv.fr-vue-components#v0.0.6",
     "file-saver": "^2.0.5",
-    "geopf-extensions-openlayers": "^1.0.0-beta.7",
+    "geopf-extensions-openlayers": "^1.0.0-beta.16",
     "jszip": "^3.10.1",
     "ol": "^10.7.0",
     "pinia": "^3.0.4",

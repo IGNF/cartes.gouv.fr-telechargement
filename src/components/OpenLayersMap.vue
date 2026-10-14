@@ -4,7 +4,6 @@ import Map from "ol/Map";
 import View from "ol/View";
 import VectorTileLayer from "ol/layer/VectorTile";
 import { LayerWMTS } from "geopf-extensions-openlayers";
-import { addControls } from "../utils/maps/controls";
 import { tmsLayer } from "../utils/maps/Layers";
 import { addZoomInteraction } from "../utils/maps/interactions";
 import { useMapStore } from "../stores/map";
@@ -14,6 +13,14 @@ import { getStyleForBlocs, getStyleForDalle } from "../utils/maps/style";
 import { SelectedClickInteraction } from "../utils/interactions/selectedClickInteraction";
 import { SelectedPolygonInteraction } from "../utils/interactions/selectedPolygonInteraction";
 import Gp from "geoportal-access-lib";
+import Controls from "./map/Controls/Controls.vue";
+import GeoportalZoom from "./map/Controls/GeoportalZoom.vue";
+import Territories from "./map/Controls/Territories.vue";
+import ScaleLine from "./map/Controls/ScaleLine.vue";
+import LayerImport from "./map/Controls/LayerImport.vue";
+import SearchEngine from "./map/Controls/SearchEngine.vue";
+import ImportedFeaturesInteraction from "./map/Interactions/ImportedFeaturesInteraction.vue";
+import { geoportalZoomOptions, territoriesOptions, scaleLineOptions, layerImportOptions, searchEngineOptions } from "../utils/maps/controlOptions";
 
 const props = defineProps<{ downloadUrl: string }>();
 const mapElement = ref<HTMLDivElement | null>(null);
@@ -66,7 +73,6 @@ function createMap() {
       maxZoom: 16,
     }),
   });
-  addControls(map);
   addZoomInteraction(map, chantierLayer, 11);
   dalleStore.setProduitLayer(selectionProduitLayer);
   dalleStore.setChantierLayer(chantierLayer);
@@ -119,6 +125,7 @@ watch(
   () => {
     stopSelectionWatch?.();
     stopSelectionWatch = null;
+    mapStore.setMapInstance(null);
     map?.setTarget(undefined);
     map?.dispose();
     map = null;
@@ -139,6 +146,15 @@ onUnmounted(() => {
 
 <template>
   <div ref="mapElement" id="map" class="fr-col-8 map-container" style="height: 80vh; width: 100%">
+    <Controls>
+      <GeoportalZoom visibility :geoportal-zoom-options="geoportalZoomOptions" />
+      <Territories visibility :territories-options="territoriesOptions" />
+      <ScaleLine visibility :scale-line-options="scaleLineOptions" />
+      <LayerImport v-slot="{ map: currentMap, layerImport }" visibility :layer-import-options="layerImportOptions">
+        <ImportedFeaturesInteraction :map="currentMap" :layer-import="layerImport" />
+      </LayerImport>
+      <SearchEngine visibility :search-engine-options="searchEngineOptions" />
+    </Controls>
     <div class="selected-options-container" aria-label="Options de selection">
       <button
         class="fr-btn fr-btn--tertiary-no-outline fr-btn--sm fr-icon-cursor-line"
@@ -187,7 +203,7 @@ onUnmounted(() => {
 }
 
 .selected-options-container {
-  top: 1rem;
+  top: 5rem;
 }
 
 .history-navigation-container {
@@ -211,13 +227,13 @@ onUnmounted(() => {
 
 @media (max-width: 600px) {
   .selected-options-container {
-    top: 0.75rem;
+    top: 4.75rem;
     right: 0.75rem;
     padding: 6px;
   }
 
   .history-navigation-container {
-    top: calc(0.75rem + 108px);
+    top: calc(4.75rem + 108px);
     right: 0.75rem;
     padding: 6px;
     transform: none;
