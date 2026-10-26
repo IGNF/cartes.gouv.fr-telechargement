@@ -1,11 +1,13 @@
 <script setup lang="ts">
-import { RouterView } from "vue-router";
+import { RouterView, useRoute } from "vue-router";
 import {
   CgfrFooter,
   CgfrHeader,
   CgfrModalCookies,
   CgfrModalTheme,
 } from "cartes.gouv.fr-vue-components";
+
+const route = useRoute();
 </script>
 
 <template>
@@ -17,7 +19,10 @@ import {
   <main class="fr-container--fluid">
     <RouterView />
   </main>
-  <CgfrFooter base-url="https://cartes.gouv.fr" />
+  <CgfrFooter
+    base-url="https://cartes.gouv.fr"
+    :compact="route.name !== 'telechargement'"
+  />
   <CgfrModalCookies />
   <CgfrModalTheme />
 </template>

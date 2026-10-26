@@ -145,7 +145,7 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div ref="mapElement" id="map" class="fr-col-8 map-container" style="height: 80vh; width: 100%">
+  <div ref="mapElement" id="map" class="fr-col-8 map-container" style="height: 83vh; width: 100%">
     <Controls>
       <GeoportalZoom visibility :geoportal-zoom-options="geoportalZoomOptions" />
       <Territories visibility :territories-options="territoriesOptions" />

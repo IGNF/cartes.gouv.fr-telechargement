@@ -224,7 +224,7 @@ watch([startDate, endDate], applyFilter);
 <style>
 .menu {
   display: flex;
-  height: 80vh;
+  height: 83vh;
   padding: 24px 16px;
   flex-direction: column;
   align-items: center;
