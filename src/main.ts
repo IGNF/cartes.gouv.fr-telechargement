@@ -6,7 +6,7 @@ import "ol/ol.css";
 import "@gouvfr/dsfr/dist/dsfr.min.css";
 import "@gouvfr/dsfr/dist/utility/icons/icons.min.css";
 import "@gouvminint/vue-dsfr/styles";
-import "cartes.gouv.fr-vue-components/dist/index.css";
+import "@ignf/cartes.gouv.fr-vue-components/dist/index.css";
 import "geopf-extensions-openlayers/css/Dsfr.css";
 import "./styles/global.css";
 import App from "./App.vue";

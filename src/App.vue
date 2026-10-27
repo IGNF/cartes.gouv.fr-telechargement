@@ -7,7 +7,7 @@ import {
   CgfrHeader,
   CgfrModalCookies,
   CgfrModalTheme,
-} from "cartes.gouv.fr-vue-components";
+} from "@ignf/cartes.gouv.fr-vue-components";
 
 const route = useRoute();
 const { isAuthenticated, user: authUser, login, logout, error, status } = useAuth();

@@ -9,7 +9,7 @@ import { defineConfig } from "vite";
 import VueDevTools from "vite-plugin-vue-devtools";
 
 export default defineConfig({
-    base: process.env.BASE_URL || "/telechargement/",
+    base: process.env.BASE_URL || "/telechargement",
     envPrefix: ["VITE_", "IAM_", "ALERTS_"],
     plugins: [
       vue(),
