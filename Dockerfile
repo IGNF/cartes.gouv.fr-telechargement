@@ -5,6 +5,7 @@ WORKDIR /app
 # Installation des dépendances
 COPY package.json .
 COPY package-lock.json .
+COPY authentification-vue-oidc-0.1.0.tgz .
 RUN npm ci --loglevel verbose
 
 # Vérifier que les dépendances sont installées
@@ -24,8 +25,15 @@ FROM nginxinc/nginx-unprivileged:stable-alpine AS production
 # Copie de la configuration Nginx
 COPY .docker/nginx-default.conf /etc/nginx/conf.d/default.conf
 
-# Copie des fichiers construits
-COPY --from=builder /app/dist /usr/share/nginx/html
+# Vite et le routeur utilisent /telechargement/ : conserver cette arborescence.
+COPY --from=builder /app/dist /usr/share/nginx/html/telechargement
+COPY --from=builder /app/public/config/config-template.json /opt/telechargement/config-template.json
+COPY --chmod=0755 .docker/entrypoint.sh /docker-entrypoint.d/40-app-config.sh
+
+# Le processus nginx non privilégié doit pouvoir générer la configuration runtime.
+USER root
+RUN chown -R nginx:nginx /usr/share/nginx/html/telechargement/config
+USER nginx
 
 # Définir le répertoire de travail
 WORKDIR /usr/share/nginx/html

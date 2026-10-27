@@ -12,6 +12,8 @@
     "skipLibCheck": true
   },
   "include": [
+    "src/config/**/*.ts",
+    "src/types/**/*.d.ts",
     "src/main.ts",
     "src/router.ts",
     "src/App.vue",
