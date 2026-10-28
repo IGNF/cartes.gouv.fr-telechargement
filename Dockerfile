@@ -26,13 +26,12 @@ FROM nginxinc/nginx-unprivileged:stable-alpine AS production
 COPY .docker/nginx-default.conf /etc/nginx/conf.d/default.conf
 
 # Vite et le routeur utilisent /telechargement/ : conserver cette arborescence.
-COPY --from=builder /app/dist /usr/share/nginx/html/telechargement
+COPY --chown=nginx:nginx --from=builder /app/dist /usr/share/nginx/html/telechargement
+# Garder le modèle hors de la racine publique, mais accessible à l'entrypoint.
 COPY --from=builder /app/public/config/config-template.json /opt/telechargement/config-template.json
-COPY --chmod=0755 .docker/entrypoint.sh /docker-entrypoint.d/40-app-config.sh
+COPY --chmod=0755 .docker/entrypoint.sh /entrypoint.sh
 
-# Le processus nginx non privilégié doit pouvoir générer la configuration runtime.
-USER root
-RUN chown -R nginx:nginx /usr/share/nginx/html/telechargement/config
+# L'entrypoint génère config.json en tant qu'utilisateur nginx et lance ensuite Nginx.
 USER nginx
 
 # Définir le répertoire de travail
@@ -46,5 +45,6 @@ EXPOSE 8080
 RUN ls -l /usr/share/nginx/html
 
 # Démarrer Nginx
+ENTRYPOINT ["/entrypoint.sh"]
 CMD ["nginx", "-g", "daemon off;"]
 
