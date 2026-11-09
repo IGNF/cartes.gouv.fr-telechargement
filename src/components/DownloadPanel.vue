@@ -145,7 +145,19 @@ watch([startDate, endDate], applyFilter);
       <div class="SelectedTilesContainer">
         <div class="SelectedTilesContainer-title"><h2 class="fr-h5">Dalles sélectionnées</h2><div v-if="selectedProduits.length" class="SelectedTilesContainer-title-buttons"><button class="fr-btn fr-btn--sm fr-icon-download-line" title="Télécharger toutes les dalles sélectionnées" aria-label="Télécharger toutes les dalles sélectionnées" @click="openDownload" /><button class="fr-btn fr-btn--secondary fr-btn--sm fr-icon-delete-line" title="Effacer toutes les dalles sélectionnées" aria-label="Effacer toutes les dalles sélectionnées" @click="dalleStore.removeAllProduits" /></div></div>
         <p v-if="!selectedProduits.length">Choisissez un mode de sélection dans la barre d’outils, puis sélectionnez vos dalles.</p>
-        <ul v-else><li v-for="dalle in selectedProduits" :key="dalle.id" class="SelectedTilesContainer-list-item" @mouseenter="dalleStore.setIsHovered(dalle.id, true)" @mouseleave="dalleStore.setIsHovered(dalle.id, false)"><a class="fr-link" :href="dalle.url" :title="`Télécharger la dalle ${dalle.name}`">{{ dalle.name }}</a><button class="fr-btn fr-btn--tertiary-no-outline fr-btn--sm fr-icon-delete-line" :title="`Supprimer la dalle ${dalle.name}`" @click="dalleStore.removeProduit(dalle.id)" /></li></ul>
+        <ul v-else><li v-for="dalle in selectedProduits" :key="dalle.id" class="SelectedTilesContainer-list-item" 
+          @mouseenter="dalleStore.setIsHovered(dalle.id, true)"
+          @mouseleave="dalleStore.setIsHovered(dalle.id, false)">
+            <span class="SelectedTilesContainer-list-item-name">
+            <a class="fr-link" :href="dalle.url" :title="`Télécharger la dalle ${dalle.name}`">
+              {{ dalle.name }}
+            </a>
+            </span>
+            <button class="fr-btn fr-btn--tertiary-no-outline fr-btn--sm fr-icon-delete-line" 
+            :title="`Supprimer la dalle ${dalle.name}`" 
+            @click="dalleStore.removeProduit(dalle.id)" />
+          </li>
+        </ul>
       </div>
   </section>
   <Teleport to="body">
@@ -308,8 +320,10 @@ watch([startDate, endDate], applyFilter);
 .SelectedTilesContainer {
   display: flex;
   width: 100%;
+  min-width: 0;
   padding: 1rem;
   flex-direction: column;
+  overflow-x: hidden;
   overflow-y: auto;
 }
 
@@ -326,6 +340,7 @@ watch([startDate, endDate], applyFilter);
   width: 100%;
   padding: 0;
   margin: 1rem 0;
+  overflow-x: hidden;
   overflow-y: auto;
   list-style: none;
 }
@@ -333,11 +348,24 @@ watch([startDate, endDate], applyFilter);
 .SelectedTilesContainer-list-item {
   display: flex;
   width: 100%;
+  min-width: 0;
   align-items: center;
   justify-content: space-between;
+  gap: 0.5rem;
   padding: 0.75rem;
   margin-bottom: 0.5rem;
   border-radius: 4px;
+}
+
+.SelectedTilesContainer-list-item-name {
+  flex: 1;
+  min-width: 0;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+.SelectedTilesContainer-list-item > button {
+  flex-shrink: 0;
 }
 
 .download-modal-content,
