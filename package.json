@@ -5,7 +5,11 @@
   "type": "module",
   "scripts": {
     "typecheck": "vue-tsc --noEmit",
-    "dev": "vite --port=3001",
+    "dev": "vite",
+    "dev:localhost": "vite --mode localhost",
+    "dev:qua": "vite --mode qua",
+    "dev:prod": "vite --mode prod",
+    "test:unit": "vitest run",
     "build": "vite build",
     "serve": "vite preview",
     "start": "vite",
@@ -15,7 +19,12 @@
   "devDependencies": {
     "@types/jest": "^30.0.0",
     "@types/proj4": "^2.19.0",
+    "jsdom": "^25.0.0",
+    "unplugin-auto-import": "^21.1.0",
+    "unplugin-vue-components": "^32.1.0",
     "vite": "^7.1.12",
+    "vite-plugin-vue-devtools": "^8.2.1",
+    "vitest": "^4.0.17",
     "vue-tsc": "^3.3.11"
   },
   "dependencies": {
@@ -25,7 +34,8 @@
     "@openapitools/openapi-generator-cli": "^2.25.0",
     "@turf/turf": "^7.2.0",
     "@vitejs/plugin-vue": "^6.0.8",
-    "cartes.gouv.fr-vue-components": "github:IGNF/cartes.gouv.fr-vue-components#v0.0.6",
+    "authentification-vue-oidc": "file:authentification-vue-oidc-0.1.0.tgz",
+    "@ignf/cartes.gouv.fr-vue-components": "github:IGNF/cartes.gouv.fr-vue-components#v1.1.2",
     "file-saver": "^2.0.5",
     "geopf-extensions-openlayers": "^1.0.0-beta.16",
     "jszip": "^3.10.1",

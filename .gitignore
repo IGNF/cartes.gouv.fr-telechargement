@@ -1,5 +1,8 @@
 # Environments
 .env
+.env.local
+.env.*.local
+public/config/config.json
 .venv
 env/
 venv/
