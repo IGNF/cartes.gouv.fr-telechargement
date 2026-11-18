@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { onMounted, onUnmounted, watch } from "vue";
 import { LayerImport } from "geopf-extensions-openlayers";
+import VectorLayer from "ol/layer/Vector";
 import { useMapStore } from "../../../stores/map";
 import {
   layerImportOptions as defaultOptions,
@@ -18,6 +19,15 @@ const props = withDefaults(defineProps<{
 const mapStore = useMapStore();
 // Conserver l'instance OpenLayers hors de la réactivité profonde de Vue.
 const layerImport = new LayerImport(props.layerImportOptions);
+
+layerImport.addEventListener("layerimport:vector:added", (event) => {
+  if (!("layer" in event) || !(event.layer instanceof VectorLayer)) return;
+
+  // Les styles propres aux entités masquent le style défini sur la couche.
+  for (const feature of event.layer.getSource()?.getFeatures() ?? []) {
+    feature.setStyle(undefined);
+  }
+});
 
 onMounted(() => {
   watch(
