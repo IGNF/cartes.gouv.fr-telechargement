@@ -1,8 +1,9 @@
 import { GeoportalZoom, LayerImport, SearchEngineAdvanced, SearchEngineGeocodeIGN, Territories } from "geopf-extensions-openlayers";
+import searchResultPinUrl from "geopf-extensions-openlayers/src/packages/Controls/SearchEngine/map-pin-2-fill.svg?url";
 import { ScaleLine } from "ol/control";
 import IconGeolocationSVG from "../../assets/geolocation.svg";
-import CircleStyle from "ol/style/Circle";
 import Fill from "ol/style/Fill";
+import Icon from "ol/style/Icon";
 import Stroke from "ol/style/Stroke";
 import Style from "ol/style/Style";
 
@@ -55,14 +56,16 @@ export const searchEngineOptions: SearchEngineOptions = {
   placeholder: "Rechercher un lieu...",
 };
 
+// Reprend le style du résultat sélectionné dans SearchEngineAdvanced.
+const importedFeatureColor = "#910000";
 const importedLayerStyle = new Style({
-  image: new CircleStyle({
-    radius: 6,
-    fill: new Fill({ color: "#000091" }),
-    stroke: new Stroke({ color: "#fff", width: 2 }),
+  image: new Icon({
+    src: searchResultPinUrl,
+    color: importedFeatureColor,
+    anchor: [0.5, 1],
   }),
-  stroke: new Stroke({ color: "#000091", lineDash: [5, 5], width: 2 }),
-  fill: new Fill({ color: "rgba(1, 1, 1, 0.3)" }),
+  stroke: new Stroke({ color: importedFeatureColor, lineDash: [8, 8], width: 2 }),
+  fill: new Fill({ color: "rgba(145, 0, 0, 0.2)" }),
 });
 
 export const layerImportOptions: LayerImportOptions = {
