@@ -11,7 +11,7 @@ This application is built with Vue 3 and TypeScript. It uses Vue single-file com
 - **Routing**: Vue Router
 - **State Management**: Pinia
 - **Mapping**: OpenLayers
-- **UI Components**: DSFR, Vue DSFR and `cartes.gouv.fr-vue-components`
+- **UI Components**: DSFR, Vue DSFR and `@ignf/cartes.gouv.fr-vue-components`
 
 ## Project Structure
 
