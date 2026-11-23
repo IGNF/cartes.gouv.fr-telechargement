@@ -20,7 +20,7 @@ RUN npm run build
 # Vérification du contenu du répertoire de construction
 RUN ls -l /app/dist
 
-FROM nginxinc/nginx-unprivileged:stable-alpine AS production
+FROM nginx/nginx-unprivileged:1.31-alpine AS production
 
 # Copie de la configuration Nginx
 COPY .docker/nginx-default.conf /etc/nginx/conf.d/default.conf
